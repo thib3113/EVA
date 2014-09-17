@@ -1,1 +1,5 @@
 sftp-config.json
+cache/
+config.php
+log/
+db/
