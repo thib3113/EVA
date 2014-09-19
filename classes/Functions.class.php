@@ -1,0 +1,54 @@
+<?php
+
+Class Functions extends SqliteManager{
+
+
+    public static function log($log, $label = "notice"){
+        if(!is_file(ROOT.LOG_FILE)){
+            self::createLogFile();
+            self::log($log, $label);
+        }
+        else{
+            $timestamp = date("r", time());
+            $fp = fopen(ROOT.LOG_FILE, 'a+');
+            if(!fwrite($fp, "$label : $timestamp : $log"))
+                return false;
+            else
+                return true;
+        }
+            
+    }
+
+    public static function createLogFile(){
+        if(!$fp = fopen(ROOT.LOG_FILE,"a+")) // ouverture du fichier en écriture
+            return false;
+        if(self::log("Création du fichier de log"))
+            die('écriture du fichier de log impossible !');
+        else
+            chmod(ROOT.LOG_FILE, 0777);
+    }
+
+    public static function slugIt($name) {
+        /*
+           Cleans the string given:
+            - Removes all special caracters
+            - Sets every string in lower case
+            - Removes all similar caracters
+        */
+        
+        $a = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëÇçÌÍÎÏìíîïÙÚÛÜùúûüÿÑñ@()/[]|\'&';
+        $b = 'AAAAAAaaaaaaOOOOOOooooooEEEEeeeeCcIIIIiiiiUUUUuuuuyNn---------';
+        $url = utf8_encode(strtr(utf8_decode($name), utf8_decode($a), utf8_decode($b)));
+        $url = preg_replace('/ /', '-', $url);  
+        $url = trim(preg_replace('/[^a-z|A-Z|0-9|-]/', '', strtolower($url)), '-');
+        $url = preg_replace('/\-+/', '-', $url);
+        $url = urlencode($url);
+
+        return $url;
+    }
+
+    public static function getHttpResponseCode($url) {
+        $headers = get_headers($url);
+        return substr($headers[0], 9, 3);
+    }
+}

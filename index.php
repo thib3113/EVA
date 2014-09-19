@@ -13,5 +13,22 @@ function __autoload($class_name){
 require ROOT.'/config.php';
 
 $config = new Configuration();
-$config->sgbdCreate();
+// $config->sgbdCreate();
+// $config->setKey();
+// $config->sgbdSave();
+
+// $user_manager = new UsersManager();
+// $user = $user_manager->isConnect();
+
+$user = new User();
+$user->sgbdCreate();
+
+// var_dump(ROOT.LOG_FILE);
+// var_dump(fileperms(ROOT.LOG_FILE));
+
+if($user->isConnect()){
+    Hook::callHook("pre_index_connect");
+}
+else
+    Hook::callHook("pre_index_unconnect")
 ?>

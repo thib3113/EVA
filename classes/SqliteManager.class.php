@@ -16,8 +16,14 @@ Class SqliteManager extends SQLite3{
             case "boolean":
                 $DBType = "INT(1)";
             break;
-            case "integrer":
+            case "bigint":
                 $DBType = "bigint(20)";
+            break;
+            case "int":
+                $DBType = "int(10)";
+            break;
+            case 'longstring':
+                $return = 'longtext';
             break;
             case 'key':
                 $return = 'INTEGER NOT NULL PRIMARY KEY';
@@ -108,6 +114,31 @@ Class SqliteManager extends SQLite3{
             $query .=');';
         }
 
+    }
+
+    public function exist_table($table){
+            $query = "SELECT name FROM sqlite_temp_master WHERE type='table'";
+            // $query = 'SHOW TABLES LIKE '.self::escapeString($table);
+            $exec = self::_query($query, __LINE__, __FILE__);
+            var_dump($exec);
+            return false;
+            if($this->num_rows($exec) > 0)
+                return true;
+            else
+                return false;
+        }
+
+    public function exist_cols($table, $cols){
+        if($this->exist_table($table)){
+            $query = 'SHOW COLUMNS FROM '.$table.' LIKE '.self::escapeString($cols);
+            $exec = self::_query($query, __LINE__, __FILE__);
+            if($this->num_rows($exec) > 0)
+                return true;
+            else
+                return false;
+        }
+        else
+            return false;
     }
 
 
