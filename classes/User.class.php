@@ -23,7 +23,7 @@ Class User extends Sqlitemanager{
     }
 
     public function isConnect(){
-        return $this->getId() != 0? true : false;
+        return (bool)$this->getId();
     }
 
     

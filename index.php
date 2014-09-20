@@ -17,14 +17,11 @@ $config = new Configuration();
 // $config->setKey();
 // $config->sgbdSave();
 
-// $user_manager = new UsersManager();
-// $user = $user_manager->isConnect();
+$user_manager = new UsersManager();
+$user = $user_manager->isConnect();
 
-$user = new User();
-$user->sgbdCreate();
-
-// var_dump(ROOT.LOG_FILE);
-// var_dump(fileperms(ROOT.LOG_FILE));
+// $user = new User();
+// $user->sgbdCreate();
 
 if($user->isConnect()){
     Hook::callHook("pre_index_connect");
