@@ -1,6 +1,6 @@
 <?php
 
-Class Configuration extends SqliteManager{
+Class Configuration extends SgdbManager{
 	protected $id, $key, $value, $cacheConf;
 	protected $TABLE_NAME = "configuration";
 	protected $object_fields= array(

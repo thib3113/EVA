@@ -1,6 +1,6 @@
 <?php
 
-Class Hook extends SqliteManager{
+Class Hook extends SgdbManager{
     private $hook_list = array();
 
     function __construct(){
@@ -20,7 +20,7 @@ Class Hook extends SqliteManager{
                 else
                     return false;
             }
-        }
+        }   
         else
             return false;
     }

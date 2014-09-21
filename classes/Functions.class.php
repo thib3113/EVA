@@ -1,6 +1,6 @@
 <?php
 
-Class Functions extends SqliteManager{
+Class Functions extends SgdbManager{
 
 
     public static function log($log, $label = "notice"){

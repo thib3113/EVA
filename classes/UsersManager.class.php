@@ -1,6 +1,6 @@
 <?php
 
-class UsersManager extends Sqlitemanager{
+class UsersManager extends SgdbManager{
     protected $TABLE_NAME = "User";
 
     private $table_users = "Users"; //nom de la table contenant les users
@@ -44,24 +44,24 @@ class UsersManager extends Sqlitemanager{
         }
 
         //vérification de l'existence de la col users
-        if(!Sqlitemanager::exist_table($this->table_users)){
+        if(!SgdbManager::exist_table($this->table_users)){
             $this->setTypeOfError("text");
             die($this->error(4040, true));
         }
         //vérification de l'existence de la col users
-        if(!Sqlitemanager::exist_cols($this->table_users, $this->col_users)){
+        if(!SgdbManager::exist_cols($this->table_users, $this->col_users)){
             $this->setTypeOfError("text");
             die($this->error(4041, true));
         }
         //vérification de l'existence de la col pass
-        if(!Sqlitemanager::exist_cols($this->table_users, $this->col_pass)){
+        if(!SgdbManager::exist_cols($this->table_users, $this->col_pass)){
             $this->setTypeOfError("text");
             die($this->error(4042, true));
         }
 
         if($this->enable_admin){
             //vérification de l'existence de la col pass
-            if(!Sqlitemanager::exist_cols($this->table_users, $this->col_groups)){
+            if(!SgdbManager::exist_cols($this->table_users, $this->col_groups)){
                 $this->setTypeOfError("text");
                 die($this->error(4043, true));
             }
@@ -95,12 +95,12 @@ class UsersManager extends Sqlitemanager{
         //on crée la requete
         foreach ($user_infos as $key => $value) {
             $keys[] = $key;
-            $values[] = Sqlitemanager::escapeString($value);
+            $values[] = SgdbManager::escapeString($value);
         }
 
         //création de la query
         $query = 'INSERT INTO `'.$this->table_users.'` ('.implode(', ', $keys).') VALUES ('.implode(', ', $values).' )';
-        if(!Sqlitemanager::_query($query))
+        if(!SgdbManager::_query($query))
             return $this->error(1);
         else
             return true;
@@ -124,12 +124,12 @@ class UsersManager extends Sqlitemanager{
         $values = array(); //tableau pour stocker les values
         //on crée la requete
         foreach ($user_infos as $key => $value) {
-            $values[] = $key.'='.Sqlitemanager::escapeString($value);
+            $values[] = $key.'='.SgdbManager::escapeString($value);
         }
 
         //création de la query
         $query = 'UPDATE '.$this->table_users.' SET '.implode(', ', $values).' WHERE id='.$id_user;
-        if(!Sqlitemanager::_query($query))
+        if(!SgdbManager::_query($query))
             return $this->error(2);
         else
             return true;
@@ -148,7 +148,7 @@ class UsersManager extends Sqlitemanager{
 
         //création de la query
         $query = 'DELETE FROM '.$this->table_users.' WHERE id='.$id_user;
-        if(!Sqlitemanager::_query($query))
+        if(!SgdbManager::_query($query))
             return $this->error(2);
         else
             return true;
@@ -175,8 +175,8 @@ class UsersManager extends Sqlitemanager{
 
         //création de la query
         $query = 'SELECT * FROM '.$this->table_users.' WHERE id='.$id;
-        $result_ = Sqlitemanager::_query($query);
-        $return = Sqlitemanager::fetch_assoc($result_);
+        $result_ = SgdbManager::_query($query);
+        $return = SgdbManager::fetch_assoc($result_);
         $return['avatar'] = empty($return['avatar'])? $this->getGravatar($return['email']) : $config['base_url'].'/vues/img_up/profils/'.$return['avatar'];
         return $return; 
         
@@ -194,9 +194,9 @@ class UsersManager extends Sqlitemanager{
         if($each){
             $result_ = array();
             foreach ($user_infos as $key => $value) {
-                $query = 'SELECT * FROM '.$this->table_users.' WHERE `'.$key.'` = '.Sqlitemanager::escapeString($value);
-                $result_query = Sqlitemanager::_query($query);
-                $result = Sqlitemanager::fetch_assoc($result_query);
+                $query = 'SELECT * FROM '.$this->table_users.' WHERE `'.$key.'` = '.SgdbManager::escapeString($value);
+                $result_query = SgdbManager::_query($query);
+                $result = SgdbManager::fetch_assoc($result_query);
                 if(!empty($result)){
                     if(!$details)
                         return true;
@@ -213,13 +213,13 @@ class UsersManager extends Sqlitemanager{
             $values = array(); //tableau pour stocker les values
             //on crée la requete
             foreach ($user_infos as $key => $value) {
-                $values[] = $key.'='.Sqlitemanager::escapeString($value);
+                $values[] = $key.'='.SgdbManager::escapeString($value);
             }
 
             //création de la query
             $query = 'SELECT * FROM '.$this->table_users.' WHERE '.implode(' AND ', $values);
-            $result_query = Sqlitemanager::_query($query);
-            $result = Sqlitemanager::fetch_assoc($result_query);
+            $result_query = SgdbManager::_query($query);
+            $result = SgdbManager::fetch_assoc($result_query);
 
             if(!empty($result)){
                 if(!$details)
@@ -324,8 +324,8 @@ class UsersManager extends Sqlitemanager{
         $password = ($need_encrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant 
 
         //on fait une requete du password avec le mot de passe
-        $result_query = Sqlitemanager::_query('SELECT * FROM '.$this->table_users.' WHERE `'.$this->col_users.'`='.Sqlitemanager::escapeString($user).' AND `'.$this->col_pass.'`='.Sqlitemanager::escapeString($password));
-        $result = Sqlitemanager::fetch_assoc($result_query);
+        $result_query = SgdbManager::_query('SELECT * FROM '.$this->table_users.' WHERE `'.$this->col_users.'`='.SgdbManager::escapeString($user).' AND `'.$this->col_pass.'`='.SgdbManager::escapeString($password));
+        $result = SgdbManager::fetch_assoc($result_query);
         
         if(empty($result)) // si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant 
             return $this->error(5);

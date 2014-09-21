@@ -6,7 +6,7 @@
  @description:  Classe de gestion des gpio via wiring PI
  */
 
-class Gpio extends SqliteManager{
+class Gpio extends SgdbManager{
 
     const GPIO_DEFAULT_PATH = '/usr/local/bin/gpio';
     private static $TablePins=array(
