@@ -2,6 +2,7 @@
 
 Class Hook extends SgdbManager{
     static private $hook_list = array();
+    static private $menuItems;
 
     function __construct(){
         parent::__construct();
@@ -23,6 +24,10 @@ Class Hook extends SgdbManager{
         }   
         else
             return false;
+    }
+
+    static public function addMenuItem($item_name, $icon, $params = null){
+        self::$menuItems[] = array($item_name, $icon, $params);
     }
 
 }

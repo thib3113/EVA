@@ -11,7 +11,7 @@ Class Functions extends SgdbManager{
         else{
             $timestamp = date("r", time());
             $fp = fopen(ROOT.LOG_FILE, 'a+');
-            if(!fwrite($fp, "$label : $timestamp : $log"))
+            if(!fwrite($fp, "$label : $timestamp : $log\n"))
                 return false;
             else
                 return true;
