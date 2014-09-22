@@ -20,8 +20,8 @@ $template_infos = $config->getTemplateInfos();
 $smarty->assign("template_infos", $template_infos);
 
 
-if(!is_file(ROOT.'/vues/'.$template_infos['tpl']))
+if(!is_file($template_infos['tpl']))
     $smarty->display(ROOT.'/vues/404.tpl');
 else
-    $smarty->display(ROOT.'/vues/'.$template_infos['tpl']);
+    $smarty->display($template_infos['tpl']);
 ?>

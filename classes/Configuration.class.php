@@ -13,7 +13,7 @@ Class Configuration extends SgdbManager{
 
     function __construct(){
         $this->templateInfos = array(
-            "tpl" => "index.tpl",
+            "tpl" => ROOT.'/vues/index.tpl',
             "title" => PROGRAM_NAME.' '.PROGRAM_VERSION,
         );
 

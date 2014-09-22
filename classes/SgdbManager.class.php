@@ -1,7 +1,7 @@
 <?php
 
 Class SgdbManager extends PDO{
-    private $nb_text_debug = 0;
+    private $debugItem = array();
 
 	function __construct(){
         if(!is_file(ROOT.DB_NAME))
@@ -13,6 +13,17 @@ Class SgdbManager extends PDO{
             $db_type = "mysql";
         parent::__construct($db_type.':'.ROOT.DB_NAME);
 	}
+
+    function __destruct(){
+
+        //on écris les debug
+        $list_debug = '<div id="debug_list">';
+        foreach ($this->debugItem as $value) {
+            $list_debug .= $value;
+        }
+        $list_debug .= '</div>';
+        echo $list_debug;
+    }
 
     function sgbdType($type){
         switch($type){
@@ -41,11 +52,18 @@ Class SgdbManager extends PDO{
         }
     }
 
-    public function debug($texte){
-        if($this->nb_text_debug>0)
-            echo "<br>";
-        echo $texte;
-        $this->nb_text_debug++;
+    public function debug($query, $params, $errorInfo, $file, $line){
+        foreach ($errorInfo as $value) {
+            if(!empty($value) )
+                $i = 1;
+        }
+        $this->debugItem[] = '<div class="debug_content">
+                                        <span class="debug_query">'.$query.'</span>
+                                        <span class="debug_params">'.implode(",", $params).'</span>
+                                        <span class="debug_error">'.(isset($i)? implode(",", $errorInfo) : "NULL" ).'</span>
+                                        <span class="debug_file">'.$file.'</span>
+                                        <span class="debug_line">'.$line.'</span>
+            </div>';
     }
 
     public function _query($query, $params, $line, $file){
@@ -53,7 +71,7 @@ Class SgdbManager extends PDO{
             $params = array($params);
 
         if(DEBUG){
-            self::debug("Requete : $query ( ".implode(",", $params)." )".(!empty($this->errorInfo)? "return : ".implode(',',$this->errorInfo) : "")." IN FILE $file LINE $line") ;
+            self::debug($query, $params, $this->errorInfo(), $file, $line);
         }
 
         if(!$request = $this->prepare($query)){
@@ -68,7 +86,7 @@ Class SgdbManager extends PDO{
     public function sgdbError($query, $params, $error, $file, $line){
         Functions::log("Requete : ".$query." ( ".implode(",", $params)." ), return : ".implode(',',$error)." IN FILE ".$file." LINE ".$line, "ERROR");
         if(DEBUG){
-            self::debug("Requete : ".$query.", return : ".implode(',',$error)." IN FILE ".$file." LINE ".$line);
+            self::debug($query, $params, $this->errorInfo, $file, $line);
             exit();
         }
         else
