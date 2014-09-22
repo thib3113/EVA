@@ -121,9 +121,6 @@ Class SgdbManager extends PDO{
     }
 
     public function exist_table($table, $autocreate = false){
-
-        $return = false;
-
         $query = 'SELECT COUNT(*) as count FROM sqlite_master WHERE type=\'table\' AND name=?';
         $params = array(DB_PREFIX.$table);  
         $statement = self::_query($query,$params, __LINE__, __FILE__);
