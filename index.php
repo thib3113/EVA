@@ -1,26 +1,27 @@
 <?php
 define('ROOT', __DIR__);
-session_start();
-$start=microtime(true);
-ini_set('display_errors','1');
-
-error_reporting(E_ALL);
-
-function __autoload($class_name){
-    require_once ROOT.'/classes/'.$class_name . '.class.php';
-}
-
-require ROOT.'/config.php';
-
-$config = new Configuration();
-
-$user_manager = new UsersManager();
-$user = $user_manager->isConnect();
+require ROOT.'/base.php';
 
 
-if($user){
-    Hook::callHook("pre_index_connect");
+if(empty($_['page']) || !is_file(ROOT.'/modeles/'.$_['page'])){
+    Hook::callHook("pre_header");
+    Hook::callHook("header");
+    Hook::callHook("pre_index");
+    Hook::callHook("index");
+    Hook::callHook("pre_footer");
+    Hook::callHook("footer");
 }
 else
-    Hook::callHook("pre_index_unconnect")
+    require ROOT.'/modeles/'.$_['page'];
+
+
+$template_infos = $config->getTemplateInfos();
+
+$smarty->assign("template_infos", $template_infos);
+
+
+if(!is_file(ROOT.'/vues/'.$template_infos['tpl']))
+    $smarty->display(ROOT.'/vues/404.tpl');
+else
+    $smarty->display(ROOT.'/vues/'.$template_infos['tpl']);
 ?>

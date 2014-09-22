@@ -9,7 +9,14 @@ Class Configuration extends SgdbManager{
 									'value'=>'longstring'
 									);
 
+    private $templateInfos = array();
+
     function __construct(){
+        $this->templateInfos = array(
+            "tpl" => "index.tpl",
+            "title" => PROGRAM_NAME.' '.PROGRAM_VERSION,
+        );
+
         parent::__construct();
     }
 
@@ -29,6 +36,16 @@ Class Configuration extends SgdbManager{
 
     public function getConfig(){
         
+    }
+
+    public function getTemplateInfos(){
+        return $this->templateInfos;
+    }
+
+    public function setTemplateInfos($infos){
+        foreach ($infos as $key => $value) {
+            $this->templateInfos[$key] = $value;
+        }
     }
 
 }
