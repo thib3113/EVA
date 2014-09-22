@@ -48,24 +48,6 @@ class UsersManager extends SgdbManager{
             $this->setTypeOfError("text");
             die($this->error(4040, true));
         }
-        //vérification de l'existence de la col users
-        if(!SgdbManager::exist_cols($this->table_users, $this->col_users)){
-            $this->setTypeOfError("text");
-            die($this->error(4041, true));
-        }
-        //vérification de l'existence de la col pass
-        if(!SgdbManager::exist_cols($this->table_users, $this->col_pass)){
-            $this->setTypeOfError("text");
-            die($this->error(4042, true));
-        }
-
-        if($this->enable_admin){
-            //vérification de l'existence de la col pass
-            if(!SgdbManager::exist_cols($this->table_users, $this->col_groups)){
-                $this->setTypeOfError("text");
-                die($this->error(4043, true));
-            }
-        }
 
         if(@is_null($_SESSION)) // vérification de la déclaration des sessions
             return $this->error(503, true);
@@ -75,7 +57,7 @@ class UsersManager extends SgdbManager{
      * Function for add one user on bdd
      * @param array $user_infos the informations of the user, he nedd have col username and password
      */
-    public static function addUser($user_infos = array()){
+    public function addUser($user_infos = array()){
         if(!isset($user_infos[$this->col_users]) || !isset($user_infos[$this->col_pass])){
             return $this->error(3);
         }
@@ -112,7 +94,7 @@ class UsersManager extends SgdbManager{
      * @param  array  $user_infos new informations
      * @return bol             
      */
-    public static function editUser(int $id_user, $user_infos = array()){
+    public function editUser(int $id_user, $user_infos = array()){
         
         if(!$this->userExist(array('id' => $id_user))){
             return $this->error(4044);
@@ -140,7 +122,7 @@ class UsersManager extends SgdbManager{
      * @param  int    $id_user id of the user
      * @return bol    
      */
-    public static function removeUser(int $id_user){
+    public function removeUser(int $id_user){
         
         if(!$this->userExist(array('id' => $id_user))){
             return $this->error(4044);
@@ -189,7 +171,7 @@ class UsersManager extends SgdbManager{
      * @param  boolean $each       verify user exist for each information or just with full information
      * @return array/bol           return bol or details
      */
-    public static function userExist($user_infos = array(), $details = false, $each = false){
+    public function userExist($user_infos = array(), $details = false, $each = false){
 
         if($each){
             $result_ = array();
@@ -238,7 +220,7 @@ class UsersManager extends SgdbManager{
      * @param  boolean $fatal  this error is fatal and do stop the script ?
      * @return $type_of_error  return what you need
      */
-    public static function error($number, $fatal = false){
+    public function error($number, $fatal = false){
 
         switch($number){
             case 1 :
@@ -308,7 +290,7 @@ class UsersManager extends SgdbManager{
      * @param  str      $pass       the password
      * @return str                  the password encrypted
      */
-    public static function preparePasswd($username, $pass){ //on prépare le mot de passe à un stockage en bdd
+    public function preparePasswd($username, $pass){ //on prépare le mot de passe à un stockage en bdd
         if($this->enable_private_key)
             $pass_temp = $username.$this->private_key.$pass;
         else
@@ -320,7 +302,7 @@ class UsersManager extends SgdbManager{
         return $pass_temp;
     }
 
-    public static function connect($user, $password, $remember_me = false, $need_encrypt = true){ 
+    public function connect($user, $password, $remember_me = false, $need_encrypt = true){ 
         $password = ($need_encrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant 
 
         //on fait une requete du password avec le mot de passe
@@ -340,7 +322,7 @@ class UsersManager extends SgdbManager{
 
     }
 
-    public static function disconnect()
+    public function disconnect()
     {
         $_SESSION[$this->session_name] = "";
         $_COOKIE[$this->cookie_name] = "";
@@ -349,7 +331,7 @@ class UsersManager extends SgdbManager{
 
     }
 
-    public static function isConnect(){
+    public function isConnect(){
 
         $GLOBALS['is_connect'] = false; // on initialise les globales
         $GLOBALS['is_admin'] = false; // on initialise les globales
@@ -388,7 +370,7 @@ class UsersManager extends SgdbManager{
             return false; //si la session n'existe pas, on retourne faux
     }
 
-    public static function getProfileLink($user_id){
+    public function getProfileLink($user_id){
         global $functions, $config;
 
         $user_infos = $this->getUserInfos($user_id);

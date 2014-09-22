@@ -23,7 +23,7 @@ $user = $user_manager->isConnect();
 // $user = new User();
 // $user->sgbdCreate();
 
-if($user->isConnect()){
+if($user){
     Hook::callHook("pre_index_connect");
 }
 else

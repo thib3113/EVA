@@ -1,6 +1,7 @@
 <?php
 
 Class SgdbManager extends PDO{
+    private $nb_text_debug = 0;
 
 	function __construct(){
         if(!is_file(ROOT.DB_NAME))
@@ -40,13 +41,23 @@ Class SgdbManager extends PDO{
         }
     }
 
+    public function debug($texte){
+        if($this->nb_text_debug>0)
+            echo "<br>";
+        echo $texte;
+        $this->nb_text_debug++;
+    }
+
     public function _query($query, $params, $line, $file){
+        if(!is_array($params))
+            $params = array($params);
+
         if(DEBUG){
-            echo "Requete : $query ( ".implode(",", $params)." )".(!empty($this->lastErrorMsg)? "return : ".$this->lastErrorMsg : "")." IN FILE $file LINE $line" ;
+            self::debug("Requete : $query ( ".implode(",", $params)." )".(!empty($this->errorInfo)? "return : ".implode(',',$this->errorInfo) : "")." IN FILE $file LINE $line") ;
         }
 
         if(!$request = $this->prepare($query)){
-            $this->sgdbError($query, $params, $this->lastErrorMsg(), __FILE__, __LINE__);
+            $this->sgdbError($query, $params, $this->errorInfo(), __FILE__, __LINE__);
         }
         else{
             $request->execute($params);
@@ -55,9 +66,11 @@ Class SgdbManager extends PDO{
     }
 
     public function sgdbError($query, $params, $error, $file, $line){
-        Functions::log("Requete : ".$query." ( ".implode(",", $params)." ), return : ".$error." IN FILE ".$file." LINE ".$line, "ERROR");
-        if(DEBUG)
-            exit("Requete : ".$query.", return : ".$error." IN FILE ".$file." LINE ".$line);
+        Functions::log("Requete : ".$query." ( ".implode(",", $params)." ), return : ".implode(',',$error)." IN FILE ".$file." LINE ".$line, "ERROR");
+        if(DEBUG){
+            self::debug("Requete : ".$query.", return : ".implode(',',$error)." IN FILE ".$file." LINE ".$line);
+            exit();
+        }
         else
             exit("Critical SQL error, see logs");
     }
@@ -121,7 +134,11 @@ Class SgdbManager extends PDO{
     }
 
     public function exist_table($table, $autocreate = false){
-        $query = 'SELECT COUNT(*) as count FROM sqlite_master WHERE type=\'table\' AND name=?';
+        if(strtoupper(DB_TYPE) == "SQLITE")
+            $query = 'SELECT COUNT(*) as count FROM sqlite_master WHERE type=\'table\' AND name=?';
+        else
+            $query = 'SELECT COUNT(*) as count FROM sqlite_master WHERE type=\'table\' AND name=?';
+        
         $params = array(DB_PREFIX.$table);  
         $statement = self::_query($query,$params, __LINE__, __FILE__);
         if($statement!=false){
@@ -137,18 +154,5 @@ Class SgdbManager extends PDO{
             return false;
         }
     }
-    public function exist_cols($table, $cols){
-        if($this->exist_table($table)){
-            $query = 'SHOW COLUMNS FROM '.DB_PREFIX.$table.' LIKE '.self::escapeString($cols);
-            $exec = self::_query($query, __LINE__, __FILE__);
-            if($this->sqlite_num_rows($exec) > 0)
-                return true;
-            else
-                return false;
-        }
-        else
-            return false;
-    }
-
 
 }

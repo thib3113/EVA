@@ -1,7 +1,7 @@
 <?php
 
 
-Class User extends Sqlitemanager{
+Class User extends SgdbManager{
     protected $id, $name,$pass, $group_id, $email, $create_time;
     protected $TABLE_NAME = "Users";
     protected $object_fields= array(
@@ -21,13 +21,6 @@ Class User extends Sqlitemanager{
             $this->setId($id);
 
     }
-
-    public function isConnect(){
-        return (bool)$this->getId();
-    }
-
-    
-    
 
     /**
      * Gets the value of id,.
