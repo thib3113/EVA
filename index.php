@@ -4,16 +4,10 @@ require ROOT.'/base.php';
 
 
 if(empty($_['page']) || !is_file(ROOT.'/modeles/'.$_['page'])){
-    Hook::callHook("pre_header");
-    Hook::callHook("header");
-    Hook::callHook("pre_index");
-    Hook::callHook("index");
-    Hook::callHook("pre_footer");
-    Hook::callHook("footer");
+    require ROOT.'/modeles/index.php';
 }
 else
-    require ROOT.'/modeles/'.$_['page'];
-
+    require ROOT.'/modeles/'.$_['page'].'.php';
 
 $template_infos = $config->getTemplateInfos();
 

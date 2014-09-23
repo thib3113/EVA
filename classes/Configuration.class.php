@@ -9,12 +9,14 @@ Class Configuration extends SgdbManager{
 									'value'=>'longstring'
 									);
 
-    private $templateInfos = array();
+    private static $templateInfos = array();
+    private static $menu_items = array();
 
     function __construct(){
-        $this->templateInfos = array(
+        self::$templateInfos = array(
             "tpl" => ROOT.'/vues/index.tpl',
             "title" => PROGRAM_NAME.' '.PROGRAM_VERSION,
+            "menu_items" => "",
         );
 
         parent::__construct();
@@ -39,13 +41,53 @@ Class Configuration extends SgdbManager{
     }
 
     public function getTemplateInfos(){
-        return $this->templateInfos;
+        self::$templateInfos['menu_items'] = self::triMenu();
+        return self::$templateInfos;
     }
 
     public function setTemplateInfos($infos){
         foreach ($infos as $key => $value) {
-            $this->templateInfos[$key] = $value;
+            self::$templateInfos[$key] = $value;
         }
     }
 
+    static public function addMenuItem($name, $slug, $icon, $position = null, $params = null){
+        global $_;
+
+        //on regarde si c'est la page active
+        $active = 0;
+        if(!empty($_['module']))
+            if($_['module'] == $slug)
+                $active = 1;
+
+        self::$menu_items[] = array(
+                                                    "name" => $name,
+                                                    "slug" => $slug, 
+                                                    "icon" => $icon, 
+                                                    "position" => $position, 
+                                                    "params" => $params,
+                                                    "active" => $active,
+                                                    "custom_item" => (!empty($params['custom_item']) )? $name : ""
+                                                    );
+        return count(self::$menu_items)-1;
+    }
+
+    static public function addSubMenuItem($id, $name, $slug, $icon, $position = null, $params = null){
+        self::$menu_items[$id]['sub_menu'][] = array(
+                                                    "name" => $name,
+                                                    "slug" => $slug, 
+                                                    "icon" => $icon, 
+                                                    "position" => $position, 
+                                                    "params" => $params
+                                                    );
+    }
+
+    static public function addDivider($id, $position){
+        self::$menu_items[$id]['sub_menu'][] = array('divider' => 1, "position" => $position );
+    }
+
+    public static function triMenu(){
+        uasort (self::$menu_items , function($a,$b){return $a['position']>$b['position']?1:-1;});
+        return self::$menu_items;
+    }
 }

@@ -5,7 +5,6 @@ $start=microtime(true);
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
-
 require ROOT.'/config.php';
 
 function autoload($name) {  
@@ -31,3 +30,11 @@ $user_manager = new UsersManager();
 $user = $user_manager->isConnect();
 
 $_ = array_merge($_GET, $_POST);
+
+//on charge toutes les fonctions de base
+if($user){
+    Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "home","home", 9999));   
+}
+else{
+    Plugin::addHook("header", "Configuration::addMenuItem", array('<p class="navbar-text"><i class="fa fa-github-alt fa-2x"></i> '.PROGRAM_NAME.' '.PROGRAM_VERSION.'</p>', "","", 0, array("custom_item" => 1))); 
+}

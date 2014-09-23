@@ -51,4 +51,17 @@ Class Functions extends SgdbManager{
         $headers = get_headers($url);
         return substr($headers[0], 9, 3);
     }
+
+    public static function var_dump_advanced($text, $file, $line){
+        $text = (!is_array($text))? array($text) : $text;
+        echo "<pre>";
+        echo "$file : $line";
+        $b = debug_backtrace();
+        var_dump($b[1]['function']);
+        var_dump($b[1]['args'][0]);
+        foreach ($text as $value) {
+            var_dump($value);
+        }
+        echo "</pre>";
+    }
 }
