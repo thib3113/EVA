@@ -11,6 +11,7 @@ Class Configuration extends SgdbManager{
 
     private static $templateInfos = array();
     private static $menu_items = array();
+    private static $js_list = array();
 
     function __construct(){
         self::$templateInfos = array(
@@ -42,6 +43,7 @@ Class Configuration extends SgdbManager{
 
     public function getTemplateInfos(){
         self::$templateInfos['menu_items'] = self::triMenu();
+        self::$templateInfos['js'] = self::$js_list;
         return self::$templateInfos;
     }
 
@@ -89,5 +91,9 @@ Class Configuration extends SgdbManager{
     public static function triMenu(){
         uasort (self::$menu_items , function($a,$b){return $a['position']>$b['position']?1:-1;});
         return self::$menu_items;
+    }
+
+    public static function addJS($url){
+        self::$js_list[] = $url; 
     }
 }

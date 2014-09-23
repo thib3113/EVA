@@ -37,5 +37,5 @@ if($user){
 }
 else{
     Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/signin.tpl'));
-    Plugin::addHook("header", "Configuration::addMenuItem", array('<p class="navbar-brand logo visible-*-*"> '.PROGRAM_NAME.' <i class="fa fa-github-alt fa-2x"></i> '.PROGRAM_VERSION.'</p>', "","", 0, array("custom_item" => 1))); 
+    Configuration::addJs("vues/js/jquery.noty.packaged.min.js");
 }
