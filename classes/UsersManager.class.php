@@ -62,7 +62,7 @@ class UsersManager extends SgdbManager{
             return $this->error(3);
         }
 
-        if($this->userExist(array($this->col_users => $user_infos[$this->col_users], 'active' => 1))){
+        if($this->userExist(array($this->col_users => $user_infos[$this->col_users]))){
             return $this->error(4);
         }
 
@@ -306,11 +306,15 @@ class UsersManager extends SgdbManager{
         $password = ($need_encrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant 
 
         //on fait une requete du password avec le mot de passe
-        $result_query = SgdbManager::_query('SELECT * FROM '.$this->table_users.' WHERE `'.$this->col_users.'`='.SgdbManager::escapeString($user).' AND `'.$this->col_pass.'`='.SgdbManager::escapeString($password));
-        $result = SgdbManager::fetch_assoc($result_query);
+        $result_query = SgdbManager::_query('SELECT * FROM '.$this->table_users.' WHERE `'.$this->col_users.'`=? AND `'.$this->col_pass.'`=?',array($user, $password), __FILE__, __LINE__ );
+        $result = $result_query->fetch();
+
+        // echo $this->preparePasswd($user, $password);
         
-        if(empty($result)) // si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant 
+        if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant 
             return $this->error(5);
+            
+        } 
         else{
             //on crée une session à partir du mot de passe hashé et du nom de compte
             $_SESSION[$this->session_name] = serialize(array($user, $password));

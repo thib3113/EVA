@@ -45,3 +45,12 @@
 .logo a:hover{
   text-decoration: none;
 }
+
+@media (max-width: 768px) { 
+  .logo{
+    text-align: center;
+  }
+  .navbar-brand {
+    float: none;
+  }
+}

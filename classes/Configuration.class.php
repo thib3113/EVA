@@ -58,8 +58,8 @@ Class Configuration extends SgdbManager{
 
         //on regarde si c'est la page active
         $active = 0;
-        if(!empty($_['module']))
-            if($_['module'] == $slug)
+        if(!empty($_['page']))
+            if($_['page'] == $slug)
                 $active = 1;
 
         self::$menu_items[] = array(

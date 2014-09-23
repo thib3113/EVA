@@ -64,4 +64,9 @@ Class Functions extends SgdbManager{
         }
         echo "</pre>";
     }
+
+    public static function isAjax(){
+        $is_ajax = (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')? true : false;
+        return $is_ajax;
+    }
 }

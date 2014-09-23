@@ -11,18 +11,20 @@ Class SgdbManager extends PDO{
             $db_type = "sqlite";
         else
             $db_type = "mysql";
+
         parent::__construct($db_type.':'.ROOT.DB_NAME);
 	}
 
     function __destruct(){
-
-        //on écris les debug
-        $list_debug = '<div id="debug_list">';
-        foreach ($this->debugItem as $value) {
-            $list_debug .= $value;
+        if(DEBUG && !Functions::isAjax()){
+            //on écris les debug
+            $list_debug = '<div id="debug_list">';
+            foreach ($this->debugItem as $value) {
+                $list_debug .= $value;
+            }
+            $list_debug .= '</div>';
+            echo $list_debug;
         }
-        $list_debug .= '</div>';
-        echo $list_debug;
     }
 
     function sgbdType($type){
@@ -86,7 +88,7 @@ Class SgdbManager extends PDO{
     public function sgdbError($query, $params, $error, $file, $line){
         Functions::log("Requete : ".$query." ( ".implode(",", $params)." ), return : ".implode(',',$error)." IN FILE ".$file." LINE ".$line, "ERROR");
         if(DEBUG){
-            self::debug($query, $params, $this->errorInfo, $file, $line);
+            self::debug($query, $params, self::errorInfo(), $file, $line);
             exit();
         }
         else
@@ -157,7 +159,7 @@ Class SgdbManager extends PDO{
         else
             $query = 'SELECT COUNT(*) as count FROM sqlite_master WHERE type=\'table\' AND name=?';
         
-        $params = array(DB_PREFIX.$table);  
+        $params = array($table);  
         $statement = self::_query($query,$params, __LINE__, __FILE__);
         if($statement!=false){
             $result = $statement->fetch();

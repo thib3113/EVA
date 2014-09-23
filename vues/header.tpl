@@ -8,12 +8,12 @@
     <title>{$template_infos.title}</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="vues/css/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 
     <link rel="stylesheet" href="vues/css/font-awesome.min.css">
 
+    <link rel="stylesheet" href="vues/css/style.css">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>

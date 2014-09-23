@@ -26,16 +26,27 @@ $smarty->config_dir = ROOT.'/cache/configs/';
 $smarty->cache_dir = ROOT.'/cache/cache/';
 
 
-$user_manager = new UsersManager();
+$user_manager = new UsersManager(array("table_users" => DB_PREFIX."Users"));
 $user = $user_manager->isConnect();
 
 $_ = array_merge($_GET, $_POST);
 
-//on charge toutes les fonctions de base
-if($user){
-    Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "home","home", 9999));   
+if(Functions::isAjax()){
+    require "modeles/ajax.php";
+    if(!$user)
+        Plugin::addHook("ajax", 'ajax_connect', array(&$user_manager ,$_['user'], $_['pass'], $_['remember_me'] ));
+    
+    Plugin::callHook("ajax");
+    die();
+
 }
 else{
-    Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/signin.tpl'));
-    Configuration::addJs("vues/js/jquery.noty.packaged.min.js");
+    //on charge toutes les fonctions de base
+    if($user){
+        Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "home","home", 9999));   
+    }
+    else{
+        Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/signin.tpl'));
+        Configuration::addJs("vues/js/jquery.noty.packaged.min.js");
+    }
 }
