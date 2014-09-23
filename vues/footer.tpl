@@ -7,6 +7,5 @@
         {if {$smarty.const.DEBUG}==1}
         <script src="vues/js/debug.js"></script>
         {/if}
-        </div>
     </body>
 </html>

@@ -36,5 +36,6 @@ if($user){
     Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "home","home", 9999));   
 }
 else{
-    Plugin::addHook("header", "Configuration::addMenuItem", array('<p class="navbar-text"><i class="fa fa-github-alt fa-2x"></i> '.PROGRAM_NAME.' '.PROGRAM_VERSION.'</p>', "","", 0, array("custom_item" => 1))); 
+    Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/signin.tpl'));
+    Plugin::addHook("header", "Configuration::addMenuItem", array('<p class="navbar-brand logo visible-*-*"> '.PROGRAM_NAME.' <i class="fa fa-github-alt fa-2x"></i> '.PROGRAM_VERSION.'</p>', "","", 0, array("custom_item" => 1))); 
 }

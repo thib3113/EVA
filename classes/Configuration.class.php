@@ -45,7 +45,7 @@ Class Configuration extends SgdbManager{
         return self::$templateInfos;
     }
 
-    public function setTemplateInfos($infos){
+    public static function setTemplateInfos($infos){
         foreach ($infos as $key => $value) {
             self::$templateInfos[$key] = $value;
         }
@@ -62,7 +62,7 @@ Class Configuration extends SgdbManager{
 
         self::$menu_items[] = array(
                                                     "name" => $name,
-                                                    "slug" => $slug, 
+                                                    "link" => '?modele='.$slug.(!empty($params)? '&amp;'.implode('&amp;' ,$params) : ""), 
                                                     "icon" => $icon, 
                                                     "position" => $position, 
                                                     "params" => $params,

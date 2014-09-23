@@ -98,7 +98,6 @@ class Gpio extends SgdbManager{
         return self::exec(self::GPIO_DEFAULT_PATH.' toggle '.$pin);
     }
 
-    
 
     /**
      * envoi state sur le pin
