@@ -16,6 +16,8 @@ $smarty->assign("template_infos", $template_infos);
 
 if(!is_file($template_infos['tpl']))
     $smarty->display(ROOT.'/vues/404.tpl');
-else
+else{
+    $smarty->assign('executionTime',number_format(microtime(true)-$start,3));
     $smarty->display($template_infos['tpl']);
+}
 ?>

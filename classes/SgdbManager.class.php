@@ -12,7 +12,9 @@ Class SgdbManager extends PDO{
         else
             $db_type = "mysql";
 
+        // var_dump(debug_backtrace());
         parent::__construct($db_type.':'.ROOT.DB_NAME);
+        
 	}
 
     function __destruct(){
@@ -72,14 +74,18 @@ Class SgdbManager extends PDO{
         if(!is_array($params))
             $params = array($params);
 
-        if(DEBUG){
-            self::debug($query, $params, $this->errorInfo(), $file, $line);
-        }
+        $request = $this->prepare($query);
 
-        if(!$request = $this->prepare($query)){
-            $this->sgdbError($query, $params, $this->errorInfo(), __FILE__, __LINE__);
+        
+
+        if(!$request){
+            if(DEBUG)
+                self::debug($query, $params, $request->errorInfo(), $file, $line);
+            $this->sgdbError($query, $params, $request->errorInfo(), __FILE__, __LINE__);
         }
         else{
+            if(DEBUG)
+                self::debug($query, $params, $request->errorInfo(), $file, $line);
             $request->execute($params);
             return $request;
         }
@@ -152,6 +158,30 @@ Class SgdbManager extends PDO{
         }
 
     }
+
+    public function sgbdSelect($table, array $cols = null, array $where =null, array $order =null, array $group_by =null, array $limit =null, $file, $line){
+        
+        $cols = (!empty($cols))? implode("`, `, ", $cols) : '*';
+
+        if(!empty($where)){
+            $where_temp = 'WHERE ';
+            $i=0;
+            foreach ($where as $key => $value) {
+                $where_temp .= ($i>0)? ', ' : "";
+                $where_temp .= '`'.$key.'`=?';
+                $i++;
+            }
+            $where = $where_temp;
+        }
+
+        $order = (!empty($order))?'ORDER BY `'.implode("`, ", $order).'`' : '';
+        $group_by = (!empty($group_by))?'GROUP BY `'.implode("`, `", $group_by).'`' : '';
+        $limit = (!empty($limit))?'LIMIT `'.implode("`, `", $limit).'`' : '';
+        $query = "SELECT $cols FROM $table $where $order $group_by $limit";
+        var_dump($query);
+        $this->_query($query, $where, $file, $line);
+        
+    } 
 
     public function exist_table($table, $autocreate = false){
         if(strtoupper(DB_TYPE) == "SQLITE")

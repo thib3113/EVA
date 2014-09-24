@@ -3,12 +3,31 @@
 /*
  @nom: Gpio
  @auteur: Thib3113 (thib3113@gmail.com)
- @description:  Classe de gestion des gpio via wiring PI
+ @description:  Classe de gestion du raspberry pi
  */
 
-class Gpio extends SgdbManager{
+class RaspberryPi extends SgdbManager{
 
     const GPIO_DEFAULT_PATH = '/usr/local/bin/gpio';
+
+    // version du raspberry par revision
+    // http://elinux.org/RPi_HardwareHistory
+    public static $versionByRev = array(
+                          "beta" => "beta",
+                          "0002" => "B1.0",
+                          "0003" => "B1.0",
+                          "0004" => "B2.0",
+                          "0005" => "B2.0",
+                          "0006" => "B2.0",
+                          "0007" => "A2.0",
+                          "0008" => "A2.0",
+                          "0009" => "A2.0",
+                          "000d" => "B2.0",
+                          "000e" => "B2.0",
+                          "000f" => "B2.0",
+                          "0010" => "B+1.0",
+    );
+
     private static $TablePins=array(
                     //Physical =>  (wiringPin, nameOfPin)
                     1  =>   array(  null    ,   "3,3V"      ),
@@ -242,6 +261,20 @@ class Gpio extends SgdbManager{
 
     public static function getNumberOfOptionalPins($version){
         return self::$pinsByVer[$version][1];
+    }
+
+    /**
+     * Permet de récupéré la version du raspberry
+     * @author Thibaut SEVERAC ( thibaut@thib3113.fr )
+     * @param int $pin
+     * @param binary $state
+     * @return false en cas de problème, valeur du pin dans le cas où c'est bon
+    */
+    public static function getRaspVersion(){
+        //retourne la revision du raspberry
+        $revision = exec("cat /proc/cpuinfo | grep Revision | rev  | cut -c1-4 | rev"); // on lis les infos du proc, on cherche la revision, on retourne la chaine ( les versions renvois 00XX, les overclocké renvois 100XX), on récupère les 4 derniers, on retourne la chaine
+        $version = !empty(self::$versionByRev[$revision])? self::$versionByRev[$revision] : false;
+        return $version;
     }
 }
 ?>

@@ -2,12 +2,12 @@ function notify(statut, message){
         statut = typeof statut !== 'undefined' ? statut : "error";
         message = typeof message !== 'undefined' ? message : 'erreur inconnue';
         //choix du layout    
-        if($(document).width() > 750)
+        if($(document).width() > 768)
             choiceLayout = 'bottomLeft';
         else
             choiceLayout = 'bottom';
 
-        noty({
+        return noty({
             layout: choiceLayout,
             theme: 'defaultTheme',
             type: statut,
@@ -19,6 +19,7 @@ function notify(statut, message){
         });
     }
 
+            var last_notif = 0;     
     $("form#form_signin").submit(function(e) {
             message = 'Une erreur inconnue c\'est produite';
             statut = "error";
@@ -26,6 +27,9 @@ function notify(statut, message){
             user   = $("#user").val();
             pass = $("#pass").val();
             remember_me = $("#remember_me").is(":checked");
+
+            if(last_notif != 0)
+                last_notif.close();
 
             $.ajax({
             url: 'index.php',        /* Il s'agit de l'url ou seront traitÃ¯Â¿Â½s les donnÃ¯Â¿Â½es */
@@ -36,7 +40,7 @@ function notify(statut, message){
                 // La fonction à éxécuter avec les données recu 
                 if(!$.parseJSON(data)){ //si le json reçu n'est pas réelement du json
                     message = 'erreur. Ressayer plus tard';
-                    notify(statut, message);
+                    last_notif = notify(statut, message);
                 }
                 donneesRecu = $.parseJSON(data);
                 if(donneesRecu.status == 'success'){
@@ -46,12 +50,12 @@ function notify(statut, message){
                 }
                 message = donneesRecu.message;
                 statut = donneesRecu.status;
-                notify(statut, message);
+                last_notif = notify(statut, message);
+                console.log(last_notif)
             },
             error: function(data){
-                alert($.parseJSON(data));
                 message = 'erreur. Ressayer plus tard';
-                notify(statut, message);
+                last_notif = notify(statut, message);
             }
 
         });

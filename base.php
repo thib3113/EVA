@@ -30,12 +30,10 @@ $user_manager = new UsersManager(array("table_users" => DB_PREFIX."Users"));
 $user = $user_manager->isConnect();
 
 $_ = array_merge($_GET, $_POST);
+global $myUser,$config,$_;
 
 if(Functions::isAjax()){
-    require "modeles/ajax.php";
-    if(!$user)
-        Plugin::addHook("ajax", 'ajax_connect', array(&$user_manager ,$_['user'], $_['pass'], $_['remember_me'] ));
-    
+    require ROOT."/modeles/ajax.php";    
     Plugin::callHook("ajax");
     die();
 
