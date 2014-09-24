@@ -1,7 +1,7 @@
 <?php
 
-Class SgdbManager extends PDO{
-    private $debugItem = array();
+Class SgdbManager{
+    private static $db;
 
 	function __construct(){
         if(!is_file(ROOT.DB_NAME))
@@ -12,22 +12,8 @@ Class SgdbManager extends PDO{
         else
             $db_type = "mysql";
 
-        // var_dump(debug_backtrace());
-        parent::__construct($db_type.':'.ROOT.DB_NAME);
-        
+        self::$db = new PDO($db_type.':'.ROOT.DB_NAME);
 	}
-
-    function __destruct(){
-        if(DEBUG && !Functions::isAjax()){
-            //on écris les debug
-            $list_debug = '<div id="debug_list">';
-            foreach ($this->debugItem as $value) {
-                $list_debug .= $value;
-            }
-            $list_debug .= '</div>';
-            echo $list_debug;
-        }
-    }
 
     function sgbdType($type){
         switch($type){
@@ -56,12 +42,14 @@ Class SgdbManager extends PDO{
         }
     }
 
-    public function debug($query, $params, $errorInfo, $file, $line){
+    public static function debug($query, $params, $errorInfo, $file, $line){
+
         foreach ($errorInfo as $value) {
             if(!empty($value) )
                 $i = 1;
         }
-        $this->debugItem[] = '<div class="debug_content">
+
+        $GLOBALS['debugItems'][] = '<div class="debug_content">
                                         <span class="debug_query">'.$query.'</span>
                                         <span class="debug_params">'.implode(",", $params).'</span>
                                         <span class="debug_error">'.(isset($i)? implode(",", $errorInfo) : "NULL" ).'</span>
@@ -70,38 +58,40 @@ Class SgdbManager extends PDO{
             </div>';
     }
 
-    public function _query($query, $params, $line, $file){
+    public static function _query($query, $params, $line, $file){
         if(!is_array($params))
             $params = array($params);
 
-        $request = $this->prepare($query);
+        $request = self::$db->prepare($query);
 
-        
+        if(DEBUG)
+            self::debug($query, $params, self::$db->errorInfo(), $file, $line);
 
         if(!$request){
-            if(DEBUG)
-                self::debug($query, $params, $request->errorInfo(), $file, $line);
-            $this->sgdbError($query, $params, $request->errorInfo(), __FILE__, __LINE__);
+            self::sgdbError($query, $params, self::$db->errorInfo(), __FILE__, __LINE__);
         }
         else{
-            if(DEBUG)
-                self::debug($query, $params, $request->errorInfo(), $file, $line);
             $request->execute($params);
             return $request;
         }
     }
 
-    public function sgdbError($query, $params, $error, $file, $line){
+    public static function sgdbError($query, $params, $error, $file, $line){
+        global $smarty;
         Functions::log("Requete : ".$query." ( ".implode(",", $params)." ), return : ".implode(',',$error)." IN FILE ".$file." LINE ".$line, "ERROR");
-        if(DEBUG){
-            self::debug($query, $params, self::errorInfo(), $file, $line);
-            exit();
+        if(DEBUG)
+            self::debug($query, $params, self::$db->errorInfo(), $file, $line);
+
+        foreach (self::$db->errorInfo() as $value) {
+            if(!empty($value) )
+                $i = 1;
         }
-        else
-            exit("Critical SQL error, see logs");
+        $smarty->assign("errorInfos", array("query" => $query, "params" => implode(', ', $params), "error" => (isset($i)? self::$db->errorInfo() : "NULL" ), "file" => $file, "line" => $line));
+        $smarty->display(ROOT.'/vues/SQLerror.tpl');
+        die();
     }
 
-	public function sgbdCreate(){
+	public static function sgbdCreate(){
 		$query = 'CREATE TABLE IF NOT EXISTS `'.DB_PREFIX.$this->TABLE_NAME.'` (';
 
 		$i=0;
@@ -159,7 +149,7 @@ Class SgdbManager extends PDO{
 
     }
 
-    public function sgbdSelect($table, array $cols = null, array $where =null, array $order =null, array $group_by =null, array $limit =null, $file, $line){
+    public static function sgbdSelect($table, array $cols = null, array $where =null, array $order =null, array $group_by =null, array $limit =null, $file, $line){
         
         $cols = (!empty($cols))? implode("`, `, ", $cols) : '*';
 
@@ -167,23 +157,21 @@ Class SgdbManager extends PDO{
             $where_temp = 'WHERE ';
             $i=0;
             foreach ($where as $key => $value) {
-                $where_temp .= ($i>0)? ', ' : "";
-                $where_temp .= '`'.$key.'`=?';
+                $where_temp .= ($i>0)? ' AND ' : "";
+                $where_temp .= ''.$key.'=?';
                 $i++;
             }
-            $where = $where_temp;
         }
 
         $order = (!empty($order))?'ORDER BY `'.implode("`, ", $order).'`' : '';
         $group_by = (!empty($group_by))?'GROUP BY `'.implode("`, `", $group_by).'`' : '';
         $limit = (!empty($limit))?'LIMIT `'.implode("`, `", $limit).'`' : '';
-        $query = "SELECT $cols FROM $table $where $order $group_by $limit";
-        var_dump($query);
-        $this->_query($query, $where, $file, $line);
+        $query = "SELECT $cols FROM $table $where_temp $order $group_by $limit";
+        $test = self::_query($query, $where, $file, $line);
         
     } 
 
-    public function exist_table($table, $autocreate = false){
+    public  static function exist_table($table, $autocreate = false){
         if(strtoupper(DB_TYPE) == "SQLITE")
             $query = 'SELECT COUNT(*) as count FROM sqlite_master WHERE type=\'table\' AND name=?';
         else

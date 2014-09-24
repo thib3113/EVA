@@ -6,7 +6,7 @@ function notify(statut, message){
             choiceLayout = 'bottomLeft';
         else
             choiceLayout = 'bottom';
-
+        console.log(statut);
         return noty({
             layout: choiceLayout,
             theme: 'defaultTheme',
@@ -51,7 +51,6 @@ function notify(statut, message){
                 message = donneesRecu.message;
                 statut = donneesRecu.status;
                 last_notif = notify(statut, message);
-                console.log(last_notif)
             },
             error: function(data){
                 message = 'erreur. Ressayer plus tard';

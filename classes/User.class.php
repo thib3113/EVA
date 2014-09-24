@@ -1,7 +1,7 @@
 <?php
 
 
-Class User {
+Class User extends SgdbManager{
     protected $id, $name,$pass, $group_id, $email, $create_time;
     protected $TABLE_NAME = "Users";
     protected $object_fields= array(
@@ -20,30 +20,28 @@ Class User {
     private $cookie_time = 131400000;//100 ans
     private $hash = "md5";
 
-    function __construct($user = null, $password = null, $remember_me = null){
+    function __construct(){
         $this->session_name = PROGRAM_NAME.'_auth';
         $this->cookie_name = PROGRAM_NAME.'_auth';
 
-        if(!empty($user) && !empty($password))
-            $this->connect($user, $password, $remember_me);
-
         parent::__construct();
-        
-
     }
 
     public function connect($user, $password, $remember_me = false, $need_encrypt = true){
         $password = ($need_encrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant 
 
         //on fait une requete du password avec le mot de passe
-        $result_query = SgdbManager::sgbdSelect(DB_PREFIX.$this->TABLE_NAME, array('*'), array("user" => $user,"pass" => $password), null,null,null,  __FILE__, __LINE__ );
+        $result_query = SgdbManager::sgbdSelect(DB_PREFIX.$this->TABLE_NAME, array('*'), array("name" => $user,"pass" => $password), null,null,null,  __FILE__, __LINE__ );
+        
+        if(!$result_query)
+            return false;
+
         $result = $result_query->fetch();
 
         // echo $this->preparePasswd($user, $password);
         
         if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant 
             return false;
-            
         } 
         else{
             //on crée une session à partir du mot de passe hashé et du nom de compte

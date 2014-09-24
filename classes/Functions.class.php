@@ -69,4 +69,16 @@ Class Functions extends SgdbManager{
         $is_ajax = (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')? true : false;
         return $is_ajax;
     }
+
+    public static function echoDebugList(){
+        if(DEBUG && !Functions::isAjax()){
+            //on écris les debug
+            $list_debug = '<div id="debug_list">';
+            foreach ($GLOBALS['debugItems'] as $value) {
+                $list_debug .= $value;
+            }
+            $list_debug .= '</div>';
+            echo $list_debug;
+        }
+    }
 }

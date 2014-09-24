@@ -14,10 +14,13 @@ $template_infos = $config->getTemplateInfos();
 $smarty->assign("template_infos", $template_infos);
 
 
-if(!is_file($template_infos['tpl']))
+if(!is_file($template_infos['tpl'])){
+    Functions::echoDebugList();
     $smarty->display(ROOT.'/vues/404.tpl');
+}
 else{
     $smarty->assign('executionTime',number_format(microtime(true)-$start,3));
+    Functions::echoDebugList();
     $smarty->display($template_infos['tpl']);
 }
 ?>
