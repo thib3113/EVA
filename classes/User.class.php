@@ -3,7 +3,7 @@
 
 Class User extends SgdbManager{
     protected $id, $name,$pass, $group_id, $email, $create_time;
-    protected $TABLE_NAME = "Users";
+    protected $TABLE_NAME = "users";
     protected $object_fields= array(
                                     'id'          => 'key',
                                     'name'        => 'string',
@@ -32,13 +32,13 @@ Class User extends SgdbManager{
 
         //on fait une requete du password avec le mot de passe
         $result_query = SgdbManager::sgbdSelect(DB_PREFIX.$this->TABLE_NAME, array('*'), array("name" => $user,"pass" => $password), null,null,null,  __FILE__, __LINE__ );
-        
+
         if(!$result_query)
             return false;
 
         $result = $result_query->fetch();
 
-        // echo $this->preparePasswd($user, $password);
+        echo $this->preparePasswd($user, $password);
         
         if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant 
             return false;

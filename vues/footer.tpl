@@ -12,10 +12,9 @@
         {if {$smarty.const.DEBUG}==1}
         <script src="vues/js/debug.js"></script>
         {/if}
-        <div id="footer" class="text-center">
-          <div class="container center-block">
+         <div class="navbar navbar-bottom" id="footer">
                 {$executionTime} seconde{if {$executionTime} > 1}s{/if}
-          </div>
+
         </div>
     </body>
 </html>

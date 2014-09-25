@@ -5,8 +5,8 @@ Class Configuration extends SgdbManager{
 	protected $TABLE_NAME = "configuration";
 	protected $object_fields= array(
 									'id'=>'key',
-									'key'=>'longstring',
-									'value'=>'longstring'
+									'key'=>'string',
+									'value'=>'string'
 									);
 
     private static $templateInfos = array();
