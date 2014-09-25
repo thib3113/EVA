@@ -101,6 +101,8 @@ Class SgdbManager{
             if(!empty($value) )
                 $i = 1;
         }
+
+        $smarty->assign('debugList',Functions::getDebugList());
         $smarty->assign("errorInfos", array("query" => $query, "params" => (!empty($params)? implode(', ', $params) : "") , "error" => (isset($i)? self::$db->errorInfo() : "NULL" ), "file" => $file, "line" => $line));
         $smarty->display(ROOT.'/vues/SQLerror.tpl');
         // die();
@@ -193,6 +195,8 @@ Class SgdbManager{
             $query = 'SELECT COUNT(*) as count FROM sqlite_master WHERE type=\'table\' AND name=?';
         else
             $query = 'SELECT COUNT(*) as count FROM sqlite_master WHERE type=\'table\' AND name=?';
+
+
         if($table)
             $params = array($table);
         elseif(!empty($this->TABLE_NAME) )

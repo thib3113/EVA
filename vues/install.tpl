@@ -12,18 +12,63 @@
             </div>
         </div><!-- /.container-fluid -->
     </nav>
-    <form id="form_signin" class="form-signin" role="form">
-        <h2 class="form-signin-heading">Identification requise</h2>
-        <input type="text" id="user" class="form-control" placeholder="Utilisateur" required autofocus>
-        <input type="password" id="pass" class="form-control" placeholder="Mot de passe" required>
-        <div class="form-group form-group-lg">
-            <div class="col-xs-2 col-sm-2 col-md-2">
-                <input type="checkbox" class="cursor_pointer" name="remember_me" id="remember_me" value="remember-me">
+
+    <div class="container">
+    {if $erreurs}  
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title">Les erreurs suivantes empèche l'installation</h3>
+      </div>
+      <div class="panel-body">
+        <ul>
+        {foreach from=$erreurs item=erreur}
+            <li>{$erreur}</li>
+        {/foreach}
+        </ul>
+        <small>nb : toutes les commandes doivent être lancé dans le dossier <kbd>{$smarty.const.ROOT}</kbd>, pour y aller vous pouvez utilisé <kbd>cd {$smarty.const.ROOT}</kbd></small>
+      </div>
+    </div>
+    {/if}
+        <form class="form-horizontal" role="form">
+            <div class="form-group">
+                <label for="inputEmail3" class="col-sm-2 control-label">Username</label>
+                <div class="col-sm-10">
+                    <input type="text" name="username" class="form-control" id="inputEmail3" placeholder="Username">
+                </div>
             </div>
-            <label class="col-xs-10 col-sm-10 col-md-10 control-label cursor_pointer" for="remember_me" class="checkbox">Se souvenir de moi</label>
-        </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Connexion</button>
-    </form>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">Mot de passe</label>
+                <div class="col-sm-10">
+                    <input type="password" name="pass" class="form-control" id="inputPassword3" placeholder="Password">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-sm-2 control-label">Confirmation</label>
+                <div class="col-sm-10">
+                    <input type="password" name="pass_confirm" class="form-control" id="inputPassword3" placeholder="Password">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+                <div class="col-sm-10">
+                    <input type="email" name="email" class="form-control" id="inputEmail3" placeholder="Email">
+                </div>
+            </div>
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <button class="btn btn-lg btn-primary btn-block " {if $erreurs} disabled {/if} type="submit">Installation</button>
+            </div>
+            <div class="col-sm-4"></div>
+        </form>
+    </div>
+
+
+    <ul>
+    {foreach from=$taskList item=task}
+        <li>{$task}</li>
+    {/foreach}
+    </ul>
+
 
 </div>
 {include "{$smarty.const.ROOT}/vues/footer.tpl"}

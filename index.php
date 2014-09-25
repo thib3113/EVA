@@ -15,12 +15,12 @@ $smarty->assign("template_infos", $template_infos);
 
 
 if(!is_file($template_infos['tpl'])){
-    Functions::echoDebugList();
+    $smarty->assign('debugList',Functions::getDebugList());
     $smarty->display(ROOT.'/vues/404.tpl');
 }
 else{
-    $smarty->assign('executionTime',number_format(microtime(true)-$start,3));
-    Functions::echoDebugList();
+    $smarty->assign('executionTime',Functions::getExecutionTime($start));
+    $smarty->assign('debugList',Functions::getDebugList());
     $smarty->display($template_infos['tpl']);
 }
 ?>

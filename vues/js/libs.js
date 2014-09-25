@@ -19,8 +19,8 @@ function notify(statut, message){
         });
     }
 
-            var last_notif = 0;     
-    $("form#form_signin").submit(function(e) {
+    var last_notif = 0;     
+    $("form#form_sign_in").submit(function(e) {
             message = 'Une erreur inconnue c\'est produite';
             statut = "error";
 

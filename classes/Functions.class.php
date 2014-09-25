@@ -70,7 +70,7 @@ Class Functions extends SgdbManager{
         return $is_ajax;
     }
 
-    public static function echoDebugList(){
+    public static function getDebugList(){
         if(DEBUG && !Functions::isAjax()){
             //on écris les debug
             $list_debug = '<div id="debug_list">';
@@ -78,7 +78,30 @@ Class Functions extends SgdbManager{
                 $list_debug .= $value;
             }
             $list_debug .= '</div>';
-            echo $list_debug;
+            return $list_debug;
         }
+    }
+
+    public static function getExecutionTime($start){
+        $total = number_format(microtime(true)-$start,3);
+        if(intval($total)>0)
+            return "$total seconde".($total>1? "s" : "");
+        else{
+            $decimal = substr($total, strpos($total, '.')+1);
+            return "$decimal milliseconde".($decimal>1? "s" : "");
+        }
+    }
+
+    public static function random_str($nbr) {
+        $str = "";
+        $chaine = "abcdefghijklmnpqrstuvwxyABCDEFGHIJKLMNOPQRSUTVWXYZ0123456789";
+        $nb_chars = strlen($chaine);
+
+        for($i=0; $i<$nbr; $i++)
+        {
+            $str .= $chaine[ rand(0, ($nb_chars-1)) ];
+        }
+
+        return $str;
     }
 }

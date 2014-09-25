@@ -1,9 +1,9 @@
 <?php
 
 class UsersManager extends SgdbManager{
-    protected $TABLE_NAME = "User";
+    protected $TABLE_NAME = "users";
 
-    private $table_users = "Users"; //nom de la table contenant les users
+    private $table_users = "users"; //nom de la table contenant les users
     private $col_users = "name"; //nom de la colonne contenant les noms d' users
     private $col_pass = "pass"; //nom de la colonne contenant les mot de pass
     private $hash = "md5"; //methode de hashage du password
@@ -44,7 +44,7 @@ class UsersManager extends SgdbManager{
         }
 
         //vérification de l'existence de la col users
-        if(!SgdbManager::exist_table($this->table_users)){
+        if(!$this->existTable()){
             $this->setTypeOfError("text");
             die($this->error(4040, true));
         }

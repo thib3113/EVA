@@ -35,7 +35,7 @@
   </div><!-- /.container-fluid -->
 </nav>
 
-      <form id="form_signin" class="form-signin" role="form">
+      <form id="form_sign_in" class="form-signin" role="form">
         <h2 class="form-signin-heading">Identification requise</h2>
         <input type="text" id="user" class="form-control" placeholder="Utilisateur" required autofocus>
         <input type="password" id="pass" class="form-control" placeholder="Mot de passe" required>

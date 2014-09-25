@@ -35,9 +35,6 @@ $GLOBALS['debugItems'] = array();
 
 global $user,$config,$_;
 
-// SgdbManager::sgbdSelect(DB_PREFIX.'Users', array('*'), array("user" => "test","pass" => "test"), null,null,null,  __FILE__, __LINE__ );
-SgdbManager::exist_table('test');
-
 if(Functions::isAjax()){
     require ROOT."/modeles/ajax.php";    
     Plugin::callHook("ajax");

@@ -12,9 +12,9 @@
         {if {$smarty.const.DEBUG}==1}
         <script src="vues/js/debug.js"></script>
         {/if}
-         <div class="navbar navbar-bottom" id="footer">
-                {$executionTime} seconde{if {$executionTime} > 1}s{/if}
 
+        <div class="navbar navbar-default navbar-fixed-bottom text-center" id="footer" style="line-height:4em;">
+                Généré en {$executionTime} - Licence CC-by-nc-sa - {$smarty.const.PROGRAM_NAME} {$smarty.const.PROGRAM_VERSION}
         </div>
     </body>
 </html>
