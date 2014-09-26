@@ -31,20 +31,11 @@ $smarty->cache_dir = ROOT.'/cache/cache/';
 
 $taskList = array();
 $erreurs = array();
+$notices = array();
 
 ////////////////////////////////////////
 //on vérifie les droits du dossier db //
 ////////////////////////////////////////
-// do{
-//     $test_file_name = Functions::random_str(20);
-//     $path = ROOT.'/db/'.$test_file_name;
-// }while(is_file($path));
-// if(fopen($path, "a+")){
-//     $perms = fileperms($path);
-//     $owner = fileowner($path);
-//     $group = filegroup($path);
-//     if()
-// }
 
 function createError($error, $resolve = array()){
     global $erreurs;
@@ -53,7 +44,7 @@ function createError($error, $resolve = array()){
     $return  = $error;
     if(!empty($resolve)){
         $return .= ' <i onclick="$(\'#resolve_'.count($erreurs).'\').toggle(200);" title="cliquez pour afficher une solution possible" class="fa fa-question-circle cursor_pointer"></i>';
-        $return .= '<div style="display:none;" id="resolve_'.count($erreurs).'">solutions : <ul>';
+        $return .= '<div style="display:none;" id="resolve_'.count($erreurs).'">solution'.(count($resolve)>1? 's' : '').' : <ul>';
         foreach ($resolve as $solution) {
             $return .= '<li>'.$solution.'</li>';
         }
@@ -62,12 +53,36 @@ function createError($error, $resolve = array()){
     return $return;
 }
 
-if(!is_writable(ROOT.DB_NAME)){
-    $erreurs[] = createError('le fichier '.substr(DB_NAME,1).' n\'est pas disponible en écriture', array("Rendre le fichier inscriptible par tout le monde <kbd>sudo chmod 777 ".substr(DB_NAME,1)."</kbd>","Mettre le www-data comme groupe propriétaire <kbd>sudo chgrp www-data ".substr(DB_NAME,1)."<kbd>") );
+
+$distribution = RaspberryPi::getInfos("distribution");
+$version = RaspberryPi::getInfos("version");
+
+//on test les droits
+if(is_file(ROOT.'/'.DB_NAME)){
+    if(!is_writable(ROOT.'/'.DB_NAME)){
+        $erreurs[] = createError('le fichier '.DB_NAME.' existe mais n\'est pas disponible en écriture', array("Rendre le fichier inscriptible par tout le monde <kbd>sudo chmod 777 ".DB_NAME."</kbd>"));
+    }  
 }
-elseif(!is_writable(ROOT.dirname(DB_NAME))){
-    $erreurs[] = createError('le dossier '.substr(dirname(DB_NAME),1).' n\'est pas disponible en écriture', array("Rendre le fichier inscriptible par tout le monde <kbd>sudo chmod -R 777 ".substr(dirname(DB_NAME),1)."/</kbd>","Mettre le www-data comme groupe propriétaire <kbd>sudo chgrp -R www-data ".substr(dirname(DB_NAME),1)."/<kbd>") );
+if(!is_writable(ROOT.'/'.dirname(DB_NAME))){
+    $erreurs[] = createError('le dossier '.dirname(DB_NAME).' n\'est pas disponible en écriture', array("Rendre le dossier inscriptible par tout le monde <kbd>sudo chmod -R 777 ".dirname(DB_NAME)."/</kbd>") );
 }
+
+if(!is_writable(ROOT.'/'.PLUGIN_DIR))
+    $erreurs[] = createError('le dossier '.PLUGIN_DIR.' n\'est pas disponible en écriture', array("Rendre le dossier inscriptible par tout le monde <kbd>sudo chmod -R 777 ".PLUGIN_DIR."/</kbd>" ));
+
+if(!Functions::checkConnectivity()){
+    $notices[] = createError("votre RaspberryPi ne semble pas relié à internet, il nous es donc impossible de voir si votre version est supportée", array("Connecter votre RaspberryPi à internet"));   
+}
+else{
+    if($supportedVersion = Functions::getSupportedVersion()){
+        if(!Functions::myVersionIsSupport())
+            $notices[] = createError('Votre version ne semble pas faire partie des versions supportées, plus d\'informations sur le site <a href="'.PROGRAM_WEBSITE.'">'.PROGRAM_WEBSITE.'</a> (votre version : '.$distribution.' '.$version.')');
+    }
+    else{
+        $notices[] = createError("votre RaspberryPi n'arrive pas à communiquer avec notre site, nous ne pouvons pas voir si votre version est supportée");
+    }
+}
+
 
 
 
@@ -100,6 +115,7 @@ $template_infos = array(
             );
 $smarty->assign("taskList", $taskList);
 $smarty->assign("erreurs", $erreurs);
+$smarty->assign("notices", $notices);
 $smarty->assign("template_infos", $template_infos);
 $smarty->assign('executionTime',Functions::getExecutionTime($start));
 $smarty->assign('debugList',Functions::getDebugList());

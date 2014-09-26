@@ -38,7 +38,7 @@ Class User extends SgdbManager{
 
         $result = $result_query->fetch();
 
-        echo $this->preparePasswd($user, $password);
+        // echo $this->preparePasswd($user, $password);
         
         if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant 
             return false;

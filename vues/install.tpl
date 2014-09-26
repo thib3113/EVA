@@ -25,7 +25,22 @@
             <li>{$erreur}</li>
         {/foreach}
         </ul>
-        <small>nb : toutes les commandes doivent être lancé dans le dossier <kbd>{$smarty.const.ROOT}</kbd>, pour y aller vous pouvez utilisé <kbd>cd {$smarty.const.ROOT}</kbd></small>
+        <small>nb : toutes les commandes doivent être lancé dans le dossier <kbd>{$smarty.const.ROOT}</kbd>, pour y aller vous pouvez utilisé <kbd>cd {$smarty.const.ROOT}</kbd></small><br>
+        <small>vous pouvez trouver plus d'informations sur le forum : <a href="http://evaproject.net/viewtopic.php?id=2">http://evaproject.net/viewtopic.php?id=2</a></small>
+      </div>
+    </div>
+    {/if}
+    {if $notices}  
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title">Informations</h3>
+      </div>
+      <div class="panel-body">
+        <ul>
+        {foreach from=$notices item=notice}
+            <li>{$notice}</li>
+        {/foreach}
+        </ul>
       </div>
     </div>
     {/if}

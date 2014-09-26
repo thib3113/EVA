@@ -276,5 +276,26 @@ class RaspberryPi extends SgdbManager{
         $version = !empty(self::$versionByRev[$revision])? self::$versionByRev[$revision] : false;
         return $version;
     }
+
+    public static function getInfos($key, $details = false){
+      switch (strtolower($key)) {
+        case 'distribution':
+            $distribution = self::exec("cat /etc/*-release | grep PRETTY_NAME= | cut -c14- | rev | cut -c2- | rev");
+            if(!$details){
+              if(preg_match("~Raspbian~Uis", $distribution))
+                return "Raspbian";
+            }
+            return $distribution;
+
+          break;
+        case 'version':
+          return self::exec("uname -r");
+        break;
+        
+        default:
+            return false;
+          break;
+      }
+    }
 }
 ?>

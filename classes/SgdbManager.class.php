@@ -4,15 +4,13 @@ Class SgdbManager{
     private static $db;
 
 	function __construct(){
-        // if(!is_file(ROOT.DB_NAME))
-        //     fopen(ROOT.DB_NAME, "a+");
 
         if(strtoupper(DB_TYPE) == "SQLITE")
             $db_type = "sqlite";
         else
             $db_type = "mysql";
 
-        self::$db = new PDO($db_type.':'.ROOT.DB_NAME);
+        self::$db = new PDO($db_type.':'.ROOT.'/'.DB_NAME);
 	}
 
     function sgbdType($type){

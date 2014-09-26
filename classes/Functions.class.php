@@ -4,13 +4,13 @@ Class Functions extends SgdbManager{
 
 
     public static function log($log, $label = "notice"){
-        if(!is_file(ROOT.LOG_FILE)){
+        if(!is_file(ROOT.'/'.LOG_FILE)){
             self::createLogFile();
             self::log($log, $label);
         }
         else{
             $timestamp = date("r", time());
-            $fp = fopen(ROOT.LOG_FILE, 'a+');
+            $fp = fopen(ROOT.'/'.LOG_FILE, 'a+');
             if(!fwrite($fp, "$label : $timestamp : $log\n"))
                 return false;
             else
@@ -20,12 +20,12 @@ Class Functions extends SgdbManager{
     }
 
     public static function createLogFile(){
-        if(!$fp = fopen(ROOT.LOG_FILE,"a+")) // ouverture du fichier en écriture
+        if(!$fp = fopen(ROOT.'/'.LOG_FILE,"a+")) // ouverture du fichier en écriture
             return false;
         if(self::log("Création du fichier de log"))
             die('écriture du fichier de log impossible !');
         else
-            chmod(ROOT.LOG_FILE, 0777);
+            chmod(ROOT.'/'.LOG_FILE, 0777);
     }
 
     public static function slugIt($name) {
@@ -92,7 +92,7 @@ Class Functions extends SgdbManager{
         }
     }
 
-    public static function random_str($nbr) {
+    public static function randomStr($nbr) {
         $str = "";
         $chaine = "abcdefghijklmnpqrstuvwxyABCDEFGHIJKLMNOPQRSUTVWXYZ0123456789";
         $nb_chars = strlen($chaine);
@@ -103,5 +103,55 @@ Class Functions extends SgdbManager{
         }
 
         return $str;
+    }
+
+    public static function checkConnectivity($url = "http://www.google.com"){
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,100); 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        $result = curl_exec($ch);
+        $curl_error = curl_errno($ch);
+        if($curl_error>0)
+            return false;
+        else
+            return true;
+    }
+
+    public static function getSupportedVersion(){
+        
+        $url = PROGRAM_WEBSITE."/json.php?get=supported_version"; //ne pas mettre http
+
+        //on vérifie la connexion avec le site
+        if(!self::checkConnectivity($url))
+            return false;
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,1000); 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        $result = curl_exec($ch);
+        $json = json_decode($result, true);
+        if($json['status']){
+            $supported_version = $json['version'];
+            return $supported_version;
+        }
+
+        return false;
+    }
+
+    public static function myVersionIsSupport(){
+        $supported_versions = self::getSupportedVersion();
+        $distribution = RaspberryPi::getInfos("distribution");
+        $version = RaspberryPi::getInfos("version");
+
+        foreach ($supported_versions as $version_support) {
+            if(strtolower($version_support[0]) == strtolower($distribution))
+                if(strtolower($version_support[1]) == strtolower($version))
+                    return true;
+        }
+        return false;
     }
 }
