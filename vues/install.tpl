@@ -44,37 +44,40 @@
       </div>
     </div>
     {/if}
-        <form class="form-horizontal" role="form">
-            <div class="form-group">
+    {if $erreurs && !$error_form}
+    {else}
+        <form class="form-horizontal" method="post" role="form">
+        <h3 class="col-md-offset-1">Création d'un compte administrateur</h3>
+            <div class="form-group {if $error_form.username == 1}has-error{/if}">
                 <label for="inputEmail3" class="col-sm-2 control-label">Username</label>
                 <div class="col-sm-10">
                     <input type="text" name="username" class="form-control" id="inputEmail3" placeholder="Username">
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group {if $error_form.pass == 1}has-error{/if}">
                 <label for="inputPassword3" class="col-sm-2 control-label">Mot de passe</label>
                 <div class="col-sm-10">
                     <input type="password" name="pass" class="form-control" id="inputPassword3" placeholder="Password">
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group {if $error_form.pass_confirm == 1}has-error{/if}">
                 <label for="inputPassword3" class="col-sm-2 control-label">Confirmation</label>
                 <div class="col-sm-10">
                     <input type="password" name="pass_confirm" class="form-control" id="inputPassword3" placeholder="Password">
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group {if $error_form.email == 1}has-error{/if}">
                 <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
                 <div class="col-sm-10">
                     <input type="email" name="email" class="form-control" id="inputEmail3" placeholder="Email">
                 </div>
             </div>
-            <div class="col-sm-4"></div>
-            <div class="col-sm-4">
-                <button class="btn btn-lg btn-primary btn-block " {if $erreurs} disabled {/if} type="submit">Installation</button>
+            <input type="hidden" name="launch_install" value="1">
+            <div class="col-md-offset-4 col-sm-4">
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Installation</button>
             </div>
-            <div class="col-sm-4"></div>
         </form>
+        {/if}
     </div>
 
 

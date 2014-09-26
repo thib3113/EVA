@@ -93,8 +93,21 @@ Class User extends SgdbManager{
      */
     public function setId($id){
         $this->id = $id;
-
-        return $this;
+    }
+    public function setName($name){
+        $this->name = $name;
+    }
+    public function setPass($pass){
+        $this->pass = $pass;
+    }
+    public function setEmail($email){
+        $this->email = $email;
+    }
+    public function setGroupId($group_id){
+        $this->group_id = $group_id;
+    }
+    public function setCreateTime($create_time){
+        $this->create_time = $create_time;
     }
 }
 ?>

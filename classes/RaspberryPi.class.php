@@ -291,7 +291,12 @@ class RaspberryPi extends SgdbManager{
         case 'version':
           return self::exec("uname -r");
         break;
-        
+        case 'wiringpi':
+          return self::exec(self::GPIO_DEFAULT_PATH.' -v | grep "gpio version" | cut -c15-');
+          break;
+        case 'git':
+          return self::exec("git --version");
+          break;
         default:
             return false;
           break;
