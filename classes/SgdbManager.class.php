@@ -85,7 +85,10 @@ Class SgdbManager{
             $result = self::$db->exec($query);
             if($result === false){
                 self::sgdbError($query, null, self::$db->errorInfo(), $file, $line);
+                return false;
             }
+            else
+                return $result;
         }
     }
 
@@ -118,6 +121,8 @@ Class SgdbManager{
         $query .= ');';
 
         self::_query($query, null, __FILE__, __LINE__);
+
+        return self::existTable();
 	}
 
     public function sgbdDrop(){
@@ -162,20 +167,22 @@ Class SgdbManager{
 
             $query .=');';
         }
-        self::_query($query, null, __FILE__, __LINE__);
+        return self::_query($query, null, __FILE__, __LINE__);
 
     }
 
     public function sgbdSelect($table, array $cols = null, array $where =null, array $order =null, array $group_by =null, array $limit =null, $file, $line){
         
-        $cols = (!empty($cols))? implode("`, `, ", $cols) : '*';
+        $cols = (!empty($cols))? implode("`, `", $cols) : '*';
 
+        $params = array();
         if(!empty($where)){
             $where_temp = 'WHERE ';
             $i=0;
             foreach ($where as $key => $value) {
                 $where_temp .= ($i>0)? ' AND ' : "";
-                $where_temp .= ''.$key.'=?';
+                $where_temp .= '`'.$key.'`=?';
+                $params[] = $value;
                 $i++;
             }
         }
@@ -184,7 +191,7 @@ Class SgdbManager{
         $group_by = (!empty($group_by))?'GROUP BY `'.implode("`, `", $group_by).'`' : '';
         $limit = (!empty($limit))?'LIMIT `'.implode("`, `", $limit).'`' : '';
         $query = "SELECT $cols FROM $table $where_temp $order $group_by $limit";
-        return self::_query($query, $where, $file, $line);
+        return self::_query($query, $params, $file, $line);
         
     } 
 

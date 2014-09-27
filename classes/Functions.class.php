@@ -154,4 +154,8 @@ Class Functions extends SgdbManager{
         }
         return false;
     }
+
+    public static function isApache(){
+        return preg_match("~apache~Uis", $_SERVER['SERVER_SOFTWARE']);
+    }
 }

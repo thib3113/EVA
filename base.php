@@ -26,12 +26,13 @@ $smarty->config_dir = ROOT.'/cache/configs/';
 $smarty->cache_dir = ROOT.'/cache/cache/';
 
 
-$user_manager = new UsersManager(array("table_users" => DB_PREFIX."Users"));
-$user = $user_manager->isConnect();
+$user = new User();
+$user->isConnect();
 
 $_ = array_merge($_GET, $_POST);
 
 $GLOBALS['debugItems'] = array();
+$GLOBALS['menuItems'] = array();
 
 global $user,$config,$_;
 
@@ -44,7 +45,8 @@ if(Functions::isAjax()){
 else{
     //on charge toutes les fonctions de base
     if($user){
-        Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "home","home", 9999));   
+        Plugin::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));   
+        Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "index","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));   
     }
     else{
         Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/signin.tpl'));

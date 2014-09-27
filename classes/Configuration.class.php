@@ -30,7 +30,7 @@ Class Configuration extends SgdbManager{
     public function addConfig($key, $value){
         $this->key=$key;
         $this->value=$value;
-        $this->sgbdSave();
+        return $this->sgbdSave();
     }
 
     public function getValue($key){
@@ -62,15 +62,23 @@ Class Configuration extends SgdbManager{
             if($_['page'] == $slug)
                 $active = 1;
 
+        $link = "?modele=$slug";
+        if(!empty($params)){
+            foreach ($params as $key => $value) {
+                $link .= "&amp;".urlencode($key).'='.urlencode($value);
+            }
+        }
+
         self::$menu_items[] = array(
                                                     "name" => $name,
-                                                    "link" => '?modele='.$slug.(!empty($params)? '&amp;'.implode('&amp;' ,$params) : ""), 
+                                                    "link" => $link, 
                                                     "icon" => $icon, 
                                                     "position" => $position, 
                                                     "params" => $params,
                                                     "active" => $active,
                                                     "custom_item" => (!empty($params['custom_item']) )? $name : ""
                                                     );
+        $GLOBALS['menuItems'][] = self::$menu_items;
         return count(self::$menu_items)-1;
     }
 

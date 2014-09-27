@@ -27,8 +27,9 @@ $_ = array_merge($_GET, $_POST);
 
 //on regarde si la db existe déjà, pour empécher l'installaion dans ce cas
 if(is_file(ROOT.'/'.DB_NAME)){
-    header("location: index.php");
-    die();
+    //pour le debug, on supprime le fichier de db à chaque
+    unlink(ROOT.'/'.DB_NAME);
+    // die('<meta charset="utf-8">le fichier de base de donnée existe déjà <a href="index.php">Retour à l\'accueil</a>');
 }
 
 $smarty = new Smarty(); 
@@ -41,10 +42,10 @@ $taskList = array();
 $erreurs = array();
 $notices = array();
 $error_form = array(
-        "username"         => 0,
+        "username"     => 0,
         "pass"         => 0,
         "pass_confirm" => 0,
-        "email"            => 0
+        "email"        => 0
     );
 
 ////////////////////////////////////////
@@ -65,6 +66,10 @@ function createError($error, $resolve = array()){
         $return .= '</ul></div>';
     }
     return $return;
+}
+
+function check($value){
+    return '[ '.($value? '<span style="color:green">OK</span>' : '<span style="color:red">ERREUR</span>').' ]';
 }
 
 
@@ -93,11 +98,15 @@ if(!Functions::checkConnectivity()){
 else{
     if($supportedVersion = Functions::getSupportedVersion()){
         if(!Functions::myVersionIsSupport())
-            $notices[] = createError('Votre version ne semble pas faire partie des versions supportées, plus d\'informations sur le site <a href="'.PROGRAM_WEBSITE.'">'.PROGRAM_WEBSITE.'</a> (votre version : '.$distribution.' '.$version.')');
+            $notices[] = createError('Votre version ne semble pas faire partie des versions supportées, plus d\'informations sur le site <a href="'.PROGRAM_FORUM.'">'.PROGRAM_FORUM.'</a> (votre version : '.$distribution.' '.$version.')');
     }
     else{
         $notices[] = createError("votre RaspberryPi n'arrive pas à communiquer avec notre site, nous ne pouvons pas voir si votre version est supportée");
     }
+}
+
+if(!Functions::isApache()){
+    $notices = createError("Il semble que vous n'utilisez pas un serveur apache, le dossier db est donc visible si vous décidez de le rendre accéssible de l'extérieur !", array('Renseigner vous sur notre forum sur des solutions alternatives ( <a href="'.PROGRAM_FORUM.'">'.PROGRAM_FORUM.'</a> )'));
 }
 
 
@@ -131,19 +140,17 @@ if(!empty($_['launch_install'])){
     }
 
 
-    if(empty($erreurs) && 1==2){
+    if(empty($erreurs)){
         $config = new Configuration();
-        $config->sgbdCreate();
-        $taskList[] = "création de la base<br>";
-        $config->existTable();
-        $config->addConfig("test", "je suis un test");
-        $taskList[] = "Remplissage de la base<br>";
+        $taskList[] = "création de la base ... ".check($config->sgbdCreate());
+        $taskList[] = "Ajout des infos ... ".check( $config->addConfig("base_url", 'http://'.$_SERVER['SERVER_NAME']) );
+
+        $taskList[] = "Vérification de la création de la database ... ".check(filesize(ROOT.'/'.DB_NAME) >1);
 
         $user = new User();
-        $user->sgbdCreate();
-        $taskList[] = "création de la table User<br>";
-        $user->existTable();
-        $taskList[] = "Remplissage de la table<br>";
+        $taskList[] = "création de la table User ... ".check($user->sgbdCreate());
+        $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser($_['username'], $_['pass'], $_['email']));
+        // $user->
     }
 
 }
