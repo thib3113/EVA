@@ -32,7 +32,7 @@ function notify(statut, message){
                 last_notif.close();
 
             $.ajax({
-            url: 'index.php',        /* Il s'agit de l'url ou seront traitÃ¯Â¿Â½s les donnÃ¯Â¿Â½es */
+            url: 'index.php?page=signin',        /* Il s'agit de l'url ou seront traitÃ¯Â¿Â½s les donnÃ¯Â¿Â½es */
             type: 'POST',            /* Il s'agit de la mÃ¯Â¿Â½thode employÃ¯Â¿Â½e */
             data : {user : user, pass : pass, remember_me : remember_me},
             datatype: 'json',

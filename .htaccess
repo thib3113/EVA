@@ -31,35 +31,3 @@ AddOutputFilterByType DEFLATE application/x-javascript
     Order Deny,Allow
     Deny from all
 </FilesMatch>
-
-
-#liste des rewrite
-
-
-
-#on init
-
-RewriteEngine On
-
-RewriteRule ^feed$ /rss/articles.rss [R=301,L]
-RewriteRule ^rss$ /rss/articles.rss [R=301,L]
-
-RewriteRule ^rss/(.+):([0-9]+).rss$ index.php?modele=rss&rss=$1&id=$2 [L]
-RewriteRule ^rss/(.+).rss$ index.php?modele=rss&rss=$1 [L]
-
-
-RewriteRule ^([^/]*)/(.*)\.html index.php?modele=$1&query=$2 [L]
-RewriteRule ^([^/]*).html index.php?modele=$1 [L]
-
-RewriteCond %{REQUEST_URI} !vues
-RewriteRule ^([^/]*)/ index.php?modele=$1&query= [L]
-
-RewriteCond %{REQUEST_URI} !index\.php
-RewriteCond %{REQUEST_URI} !vues
-RewriteRule ^(.*) index.php?req=$1 [L]
-
-
-
-
-
-

@@ -1,5 +1,5 @@
 <?php
-session_start();
+@session_start();
 $start=microtime(true);
 
 ini_set('display_errors', 'On');
@@ -31,14 +31,14 @@ $smarty->config_dir = ROOT.'/cache/configs/';
 $smarty->cache_dir = ROOT.'/cache/cache/';
 
 $user = new User();
-$user->isConnect();
+$Myuser = $user->isConnect();
 
 $_ = array_merge($_GET, $_POST);
 
 $GLOBALS['debugItems'] = array();
 $GLOBALS['menuItems'] = array();
 
-global $user,$config,$_;
+global $Myuser,$config,$_;
 
 if(Functions::isAjax()){
     require ROOT."/modeles/ajax.php";    
@@ -48,7 +48,7 @@ if(Functions::isAjax()){
 }
 else{
     //on charge toutes les fonctions de base
-    if($user){
+    if($Myuser){
         Plugin::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));   
         Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "index","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));
         Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/index.tpl'));

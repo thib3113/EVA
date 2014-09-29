@@ -62,7 +62,7 @@ Class Configuration extends SgdbManager{
             if($_['page'] == $slug)
                 $active = 1;
 
-        $link = "?modele=$slug";
+        $link = "?page=$slug";
         if(!empty($params)){
             foreach ($params as $key => $value) {
                 $link .= "&amp;".urlencode($key).'='.urlencode($value);
