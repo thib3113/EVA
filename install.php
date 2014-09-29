@@ -26,10 +26,10 @@ spl_autoload_register("autoload");
 $_ = array_merge($_GET, $_POST);
 
 //on regarde si la db existe déjà, pour empécher l'installaion dans ce cas
-if(is_file(ROOT.'/'.DB_NAME)){
+if(is_file(DB_NAME)){
     //pour le debug, on supprime le fichier de db à chaque
-    unlink(ROOT.'/'.DB_NAME);
-    // die('<meta charset="utf-8">le fichier de base de donnée existe déjà <a href="index.php">Retour à l\'accueil</a>');
+    // unlink(DB_NAME);
+    die('<meta charset="utf-8">le fichier de base de donnée existe déjà <a href="index.php">Retour à l\'accueil</a>');
 }
 
 $smarty = new Smarty(); 
@@ -77,8 +77,8 @@ $distribution = RaspberryPi::getInfos("distribution");
 $version = RaspberryPi::getInfos("version");
 
 //on test les erreurs
-if(!is_writable(ROOT.'/'.dirname(DB_NAME))){
-    $erreurs[] = createError('le dossier '.dirname(DB_NAME).' n\'est pas disponible en écriture', array("Rendre le dossier inscriptible par tout le monde <kbd>sudo chmod -R 777 ".dirname(DB_NAME)."/</kbd>") );
+if(!is_writable(dirname(DB_NAME))){
+    $erreurs[] = createError('le dossier '.basename(dirname(DB_NAME)).' n\'est pas disponible en écriture', array("Rendre le dossier inscriptible par tout le monde <kbd>sudo chmod -R 777 ".basename(dirname(DB_NAME))."/</kbd>") );
 }
 
 if(!is_writable(ROOT.'/'.PLUGIN_DIR))
@@ -145,12 +145,11 @@ if(!empty($_['launch_install'])){
         $taskList[] = "création de la base ... ".check($config->sgbdCreate());
         $taskList[] = "Ajout des infos ... ".check( $config->addConfig("base_url", 'http://'.$_SERVER['SERVER_NAME']) );
 
-        $taskList[] = "Vérification de la création de la database ... ".check(filesize(ROOT.'/'.DB_NAME) >1);
+        $taskList[] = "Vérification de la création de la database ... ".check(filesize(DB_NAME) >1);
 
         $user = new User();
         $taskList[] = "création de la table User ... ".check($user->sgbdCreate());
         $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser($_['username'], $_['pass'], $_['email']));
-        // $user->
     }
 
 }

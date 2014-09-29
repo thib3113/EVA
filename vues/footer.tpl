@@ -6,7 +6,7 @@
         <!-- /Bootstrap -->
         <script src="vues/js/libs.js"></script>
 
-        {foreach from=$template_infos.js item=script}
+        {foreach from=$template_infos.externjs item=script}
         <script src="{$script}"></script>
         {/foreach}
         {if {$smarty.const.DEBUG}==1}

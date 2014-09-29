@@ -10,7 +10,9 @@ Class SgdbManager{
         else
             $db_type = "mysql";
 
-        self::$db = new PDO($db_type.':'.ROOT.'/'.DB_NAME);
+        self::$db = new PDO($db_type.':'.DB_NAME);
+        self::$db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        self::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // ERRMODE_WARNING | ERRMODE_EXCEPTION | ERRMODE_SILENT
 	}
 
     function sgbdType($type){

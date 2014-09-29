@@ -17,6 +17,11 @@ function autoload($name) {
 
 spl_autoload_register("autoload");
 
+if(!is_file(DB_NAME) && basename($_SERVER['SCRIPT_FILENAME']) != "install.php"){
+    header("location: install.php");
+    die();
+}
+
 $config = new Configuration();
 
 $smarty = new Smarty(); 
@@ -24,7 +29,6 @@ $smarty->template_dir = ROOT.'/cache/templates/';
 $smarty->compile_dir = ROOT.'/cache/templates_c/';
 $smarty->config_dir = ROOT.'/cache/configs/';
 $smarty->cache_dir = ROOT.'/cache/cache/';
-
 
 $user = new User();
 $user->isConnect();
@@ -46,7 +50,9 @@ else{
     //on charge toutes les fonctions de base
     if($user){
         Plugin::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));   
-        Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "index","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));   
+        Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "index","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));
+        Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/index.tpl'));
+        Configuration::addJs("vues/js/jquery.noty.packaged.min.js");
     }
     else{
         Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/signin.tpl'));
