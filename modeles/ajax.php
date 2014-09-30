@@ -24,7 +24,10 @@ if(!empty($_)){
                             break;
                             case 'active_users':
                                 $content = '';
-                                $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_content" => $content);
+                                $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_title" => "Users actif", "dash_content" => $content);
+                            break;
+                            case 'default':
+                                $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_title" => "lorem", "dash_content" => "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam aut sequi nobis corporis veniam voluptatem reiciendis animi necessitatibus fugit! At quos dolor iusto libero. Ullam reiciendis, soluta ea dolore distinctio. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet eaque neque quaerat voluptates obcaecati aspernatur, minima iure quas. Natus ea eius voluptates. Sed iure, iste omnis natus similique quidem fugit?Vous n'avez pas encore ajouté de dashboard");
                             break;
                             
                             default:

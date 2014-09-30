@@ -87,24 +87,26 @@ body {
 
 .dashboard_element{
   min-height: 100px;
+  -webkit-transition:display 1s;
+   -moz-transition:display 1s;
+     -o-transition:display 1s;
+        transition:display 1s;
 }
 
 #add_dashboard .panel-body:hover{
   background-color: #CCCCCC;
+  color:white;
 }
 
 #add_dashboard .panel-body{
-  height: 100%;
   vertical-align: middle;
   text-align: center;
-  line-height:200px;
-  color: white;
+  color: #ddd;
   padding: 12%;
-  background-color: #B5B5B5;
-  -webkit-transition:background-color 1s;
-   -moz-transition:background-color 1s;
-     -o-transition:background-color 1s;
-        transition:background-color 1s;
+  -webkit-transition:background-color 1s, color 1s;
+   -moz-transition:background-color 1s, color 1s;
+     -o-transition:background-color 1s, color 1s;
+        transition:background-color 1s, color 1s;
 }
 
 .full_height{
