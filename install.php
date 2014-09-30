@@ -69,10 +69,12 @@ function createError($error, $resolve = array()){
 }
 
 function check($value){
+    if(!$value)
+        $GLOBALS['error'] = 1;
     return '[ '.($value? '<span style="color:green">OK</span>' : '<span style="color:red">ERREUR</span>').' ]';
 }
 
-
+$GLOBALS['error'] = 0;
 $distribution = RaspberryPi::getInfos("distribution");
 $version = RaspberryPi::getInfos("version");
 
@@ -150,14 +152,16 @@ if(!empty($_['launch_install'])){
         $user = new User();
         $taskList[] = "création de la table User ... ".check($user->sgbdCreate());
         $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser($_['username'], $_['pass'], $_['email']));
+        
     }
 
 }
 
 $template_infos = array(
             "title" => 'Installation - '.PROGRAM_NAME.' '.PROGRAM_VERSION,
-            "js"    => ''
+            "externjs"    => ''
             );
+$smarty->assign("all_is_good", !$GLOBALS['error']);
 $smarty->assign("error_form", $error_form);
 $smarty->assign("taskList", $taskList);
 $smarty->assign("erreurs", $erreurs);

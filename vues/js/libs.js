@@ -6,7 +6,6 @@ function notify(statut, message){
             choiceLayout = 'bottomLeft';
         else
             choiceLayout = 'bottom';
-        console.log(statut);
         return noty({
             layout: choiceLayout,
             theme: 'defaultTheme',

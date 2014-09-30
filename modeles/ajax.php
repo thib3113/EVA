@@ -13,6 +13,27 @@ if(!empty($_)){
                 else
                     $GLOBALS['json_returns'] = array("status" => "error","message" => "Le nom d'utilisateur et/ou le mot de passe est incorrect");
             break;
+
+            case 'index':
+
+                if($myUser){
+                    if (!empty($_['dashboard'])) {
+                        switch ($_['dashboard']) {
+                            case 'get_all':
+                                $GLOBALS['json_returns'] = array("status" => true, "dashboard_list" => $user->getDashboardList(), "message" => "ok");
+                            break;
+                            case 'active_users':
+                                $content = '';
+                                $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_content" => $content);
+                            break;
+                            
+                            default:
+                            
+                            break;
+                        }
+                    }
+                }
+            break;
             
             default:
                 # code...

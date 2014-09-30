@@ -31,14 +31,14 @@ $smarty->config_dir = ROOT.'/cache/configs/';
 $smarty->cache_dir = ROOT.'/cache/cache/';
 
 $user = new User();
-$Myuser = $user->isConnect();
+$myUser = $user->isConnect();
 
 $_ = array_merge($_GET, $_POST);
 
 $GLOBALS['debugItems'] = array();
 $GLOBALS['menuItems'] = array();
 
-global $Myuser,$config,$_;
+global $myUser,$config,$_;
 
 if(Functions::isAjax()){
     require ROOT."/modeles/ajax.php";    
@@ -48,14 +48,14 @@ if(Functions::isAjax()){
 }
 else{
     //on charge toutes les fonctions de base
-    if($Myuser){
+    if($myUser){
         Plugin::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));   
         Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "index","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));
         Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/index.tpl'));
-        Configuration::addJs("vues/js/jquery.noty.packaged.min.js");
+        Configuration::addJs('vues/js/index.js');
     }
     else{
         Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/signin.tpl'));
-        Configuration::addJs("vues/js/jquery.noty.packaged.min.js");
     }
+        Configuration::addJs("vues/js/jquery.noty.packaged.min.js");
 }

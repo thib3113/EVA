@@ -1,35 +1,42 @@
 $(function () {
-    $("form#form_sign_in").submit(function(e) {
-            if(last_notif != 0)
-                last_notif.close();
+    var dashboard_list;
 
-            $.ajax({
-            url: 'index.php?page=index&dashboard=get_all',        /* Il s'agit de l'url ou seront traitÃ¯Â¿Â½s les donnÃ¯Â¿Â½es */
+    function getDashboard(dashboard){
+        $.ajax({
+            url: 'index.php?page=index&dashboard='+dashboard,        /* Il s'agit de l'url ou seront traitÃ¯Â¿Â½s les donnÃ¯Â¿Â½es */
             type: 'POST',            /* Il s'agit de la mÃ¯Â¿Â½thode employÃ¯Â¿Â½e */
             data : {},
+            async: false,
             datatype: 'json',
             success: function(data){
                 // La fonction à éxécuter avec les données recu 
                 if(!$.parseJSON(data)){ //si le json reçu n'est pas réelement du json
                     message = 'erreur. Ressayer plus tard';
-                    last_notif = notify(statut, message);
+                    notify(statut, message);
                 }
                 donneesRecu = $.parseJSON(data);
-                if(donneesRecu.status == 'success'){
-                    
+                if(donneesRecu.status){
+                    return donneesRecu;
                 }else{
-                    //anything else
+                    return false;
                 }
-                message = donneesRecu.message;
-                statut = donneesRecu.status;
-                last_notif = notify(statut, message);
             },
             error: function(data){
                 message = 'erreur. Ressayer plus tard';
-                last_notif = notify(statut, message);
+                notify(statut, message);
             }
 
         });
-            return false;
-    });
+    }
+
+    dashboard_list = getDashboard('get_all');
+    
+    if(!dashboard_list)
+        dashboard_list = ['default'];
+    
+    for (var i = 0; i < dashboard_list.length; i++) {
+
+        console.log(dashboard_list[i]);
+        getDashboard(dashboard_list[i]);
+    };
 });

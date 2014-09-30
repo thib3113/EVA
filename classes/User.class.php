@@ -2,17 +2,19 @@
 
 
 Class User extends SgdbManager{
-    protected $id, $name,$pass, $group_id, $email, $create_time;
+    protected $id, $name,$pass, $group_id, $email, $create_time, $plugins_list, $dashboard_list;
     protected $TABLE_NAME = "users";
     protected $object_fields= array(
-                                    'id'          => 'key',
-                                    'name'        => 'string',
-                                    'pass'        => 'string',
-                                    'group_id'    => 'int',
-                                    'email'       => 'longstring',
-                                    'create_time' => 'timestamp',
-                                    'email'       => 'longstring',
-                                    'avatar'      =>  'longstring'
+                                    'id'             => 'key',
+                                    'name'           => 'string',
+                                    'pass'           => 'string',
+                                    'group_id'       => 'int',
+                                    'email'          => 'longstring',
+                                    'create_time'    => 'timestamp',
+                                    'dashboard_list' => 'TEXT',
+                                    'plugins_list'   => 'TEXT',
+                                    'email'          => 'longstring',
+                                    'avatar'         =>  'longstring'
                                     );
 
     //gravatar
@@ -191,7 +193,32 @@ Class User extends SgdbManager{
         return true;
     }
 
-        /*******************
+    public function setPluginsList(array $plugins_list){
+        $this->plugins_list = serialize($plugins_list);
+    }
+
+    public function getPluginsList(){
+        return unserialize($this->plugins_list);
+    }
+
+    public function setDashboardList(array $dashboard_list){
+        $this->dashboard_list = serialize($dashboard_list);
+    }
+
+    public function getDashboardList(){
+        $dashboard_list = unserialize($this->dashboard_list);
+        if($dashboard_list){
+            uasort($dashboard_list, function($a,$b){
+                                                if(!empty($a['position']) && !empty($b['position']) )
+                                                    return $a['position']>$b['position']?1:-1;
+                                                else
+                                                    return 0; 
+                                                });
+        }
+        return $dashboard_list;
+    }
+
+    /*******************
     
     Gestion du gravatar
 
