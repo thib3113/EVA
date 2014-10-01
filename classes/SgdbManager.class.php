@@ -3,7 +3,7 @@
 Class SgdbManager{
     private static $db;
 
-	function __construct(){
+	function __construct($id = null){
 
         if(strtoupper(DB_TYPE) == "SQLITE")
             $db_type = "sqlite";
@@ -173,11 +173,13 @@ Class SgdbManager{
 
     }
 
-    public function sgbdSelect($table, array $cols = null, array $where =null, array $order =null, array $group_by =null, array $limit =null, $file, $line){
+    public function sgbdSelect(array $cols = null, array $where =null, array $order =null, array $group_by =null, array $limit =null, $file, $line){
         
-        $cols = (!empty($cols))? implode("`, `", $cols) : '*';
+        $cols = (!empty($cols))? implode(", ", $cols) : '*';
+        $table = DB_PREFIX.$this->TABLE_NAME;
 
         $params = array();
+        $where_temp = null;
         if(!empty($where)){
             $where_temp = 'WHERE ';
             $i=0;
@@ -193,7 +195,11 @@ Class SgdbManager{
         $group_by = (!empty($group_by))?'GROUP BY `'.implode("`, `", $group_by).'`' : '';
         $limit = (!empty($limit))?'LIMIT `'.implode("`, `", $limit).'`' : '';
         $query = "SELECT $cols FROM $table $where_temp $order $group_by $limit";
-        return self::_query($query, $params, $file, $line);
+        $return = self::_query($query, $params, $file, $line);
+        var_dump($params);
+        $a = $return->fetch();
+        var_dump($a);
+        return $a;
         
     } 
 

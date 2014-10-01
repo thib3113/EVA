@@ -17,6 +17,8 @@ if(!empty($_)){
             case 'index':
 
                 if($myUser){
+                    $user->setDashboardList(array("active_users", "position" => 0), array("default", "position" => 1));
+                    $user->sgbdSave();
                     if (!empty($_['dashboard'])) {
                         switch ($_['dashboard']) {
                             case 'get_all':

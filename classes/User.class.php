@@ -2,7 +2,7 @@
 
 
 Class User extends SgdbManager{
-    protected $id, $name,$pass, $group_id, $email, $create_time, $plugins_list, $dashboard_list;
+    protected $id, $name,$pass, $group_id, $email, $create_time, $plugins_list, $dashboard_list, $avatar;
     protected $TABLE_NAME = "users";
     protected $object_fields= array(
                                     'id'             => 'key',
@@ -11,9 +11,8 @@ Class User extends SgdbManager{
                                     'group_id'       => 'int',
                                     'email'          => 'longstring',
                                     'create_time'    => 'timestamp',
-                                    'dashboard_list' => 'TEXT',
                                     'plugins_list'   => 'TEXT',
-                                    'email'          => 'longstring',
+                                    'dashboard_list' => 'TEXT',
                                     'avatar'         =>  'longstring'
                                     );
 
@@ -30,7 +29,6 @@ Class User extends SgdbManager{
     private $session_name = '';
     private $cookie_name = '';
     private $cookie_time = 131400000;//100 ans
-    private $hash = "md5";
     private $default_g_id = 1;
     private $col_groups = "group_id"; //nom de la colonne du groupe
     private $group_id_admin = 0; //valeur du groupe si l'utilisateur es admin
@@ -46,7 +44,7 @@ Class User extends SgdbManager{
         $password = ($need_encrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant 
 
         //on fait une requete du password avec le mot de passe
-        $result_query = SgdbManager::sgbdSelect(DB_PREFIX.$this->TABLE_NAME, array('*'), array("name" => $user,"pass" => $password), null,null,null,  __FILE__, __LINE__ );
+        $result_query = SgdbManager::sgbdSelect(array('*'), array("name" => $user,"pass" => $password), null,null,null,  __FILE__, __LINE__ );
 
         if(!$result_query)
             return false;
@@ -108,7 +106,7 @@ Class User extends SgdbManager{
     public function getUserInfos(){
         $id = $this->id;
         //création de la query
-        $result_query = SgdbManager::sgbdSelect(DB_PREFIX.$this->TABLE_NAME, array('*'), array("id" => $id), null,null,null,  __FILE__, __LINE__ );
+        $result_query = SgdbManager::sgbdSelect(array('*'), array("id" => $id), null,null,null,  __FILE__, __LINE__ );
 
         $return = $result_query->fetch();
         $return['avatar'] = empty($return['avatar'])? $this->getGravatar($return['email']) : $config['base_url'].'/vues/img_up/profils/'.$return['avatar'];
@@ -119,8 +117,8 @@ Class User extends SgdbManager{
     public function preparePasswd($username, $pass){ //on prépare le mot de passe à un stockage en bdd
 
         $pass_temp = $username.$pass;
-        if($this->hash)
-            $pass_temp = hash($this->hash, $pass_temp);
+        if(DB_HASH)
+            $pass_temp = hash(DB_HASH, $pass_temp);
 
         return $pass_temp;
     }
@@ -197,12 +195,12 @@ Class User extends SgdbManager{
         $this->plugins_list = serialize($plugins_list);
     }
 
-    public function getPluginsList(){
-        return unserialize($this->plugins_list);
-    }
-
     public function setDashboardList(array $dashboard_list){
         $this->dashboard_list = serialize($dashboard_list);
+    }
+
+    public function getPluginsList(){
+        return unserialize($this->plugins_list);
     }
 
     public function getDashboardList(){
