@@ -2,11 +2,11 @@
 
 
 Class User extends SgdbManager{
-    protected $id, $name,$pass, $group_id, $email, $create_time, $plugins_list, $dashboard_list, $avatar;
+    protected $id, $username,$pass, $group_id, $email, $create_time, $plugins_list, $dashboard_list, $avatar;
     protected $TABLE_NAME = "users";
     protected $object_fields= array(
                                     'id'             => 'key',
-                                    'name'           => 'string',
+                                    'username'           => 'string',
                                     'pass'           => 'string',
                                     'group_id'       => 'int',
                                     'email'          => 'longstring',
@@ -44,12 +44,10 @@ Class User extends SgdbManager{
         $password = ($need_encrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant 
 
         //on fait une requete du password avec le mot de passe
-        $result_query = SgdbManager::sgbdSelect(array('*'), array("name" => $user,"pass" => $password), null,null,null,  __FILE__, __LINE__ );
-
-        if(!$result_query)
+        $result = SgdbManager::sgbdSelect(array('*'), array("username" => $user,"pass" => $password), null,null,null,  __FILE__, __LINE__ );
+        $result = $result->fetch();
+        if(!$result)
             return false;
-
-        $result = $result_query->fetch();
         
         if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant 
             return false;
@@ -59,11 +57,24 @@ Class User extends SgdbManager{
             $_SESSION[$this->session_name] = serialize(array($user, $password));
             if($remember_me)// si on demande de se souvenir, on crée un cookie
                 setcookie($this->cookie_name, serialize( array($user, $password) ), time()+$this->cookie_time, '/' );
-            $this->id = $result['id'];
+            $this->fillObject($result['id']);
             return $this->getUserInfos();
         }
 
 
+    }
+
+    private function fillObject($id){
+        if(!is_numeric($id))
+            return false;
+
+            $result = self::sgbdSelect( array_keys($this->object_fields) , array("id" => $id), null, null, null, __FILE__, __LINE__);
+            $result = $result->fetch();
+            $i = 0;
+            foreach($this->object_fields as $field=>$type){
+                    $this->$field = $result[$field];
+                    $i++;
+            }
     }
 
     public function isConnect(){
@@ -89,7 +100,7 @@ Class User extends SgdbManager{
             $GLOBALS['is_admin'] = $this->is_admin; // on initialise les globales
             if($result_connect){ //si le résultat de la connexion n'est pas faux
                 $user = $this->getUserInfos($result_connect); //on retourne les informations de l'utilisateur
-                if($this->enable_admin && $user[$this->col_groups] == $this->group_id_admin) //si les admins sont activés, et que l'utilisateur est un admin
+                if($this->enable_admin && $this->object_fields['group_id'] == $this->group_id_admin) //si les admins sont activés, et que l'utilisateur est un admin
                     $GLOBALS['is_admin'] = true; //on crée une variable $is_admin qui sortira
                 else
                     $GLOBALS['is_admin'] = false;
@@ -123,13 +134,13 @@ Class User extends SgdbManager{
         return $pass_temp;
     }
 
-    public function createUser($name, $pass, $email, $g_id = null){
+    public function createUser($username, $pass, $email, $g_id = null){
         if(empty($g_id) )
             $g_id = $this->default_g_id;
 
-        if(!$this->setName($name))
+        if(!$this->setUsername($username))
             return false;
-        if(!$this->setPass($pass, $name, true))
+        if(!$this->setPass($pass, $username, true))
             return false;
         if(!$this->setEmail($email))
             return false;
@@ -139,7 +150,6 @@ Class User extends SgdbManager{
             return false;
         if(!$this->setAvatar(""))
             return false;
-
         if(!$this->sgbdSave())
             return false;
 
@@ -165,8 +175,8 @@ Class User extends SgdbManager{
     public function setId($id){
         $this->id = $id;
     }
-    public function setName($name){
-        $this->name = $name;
+    public function setusername($username){
+        $this->username = $username;
         return true;
     }
     public function setPass($pass, $name = false, $need_encode = false){
@@ -199,21 +209,39 @@ Class User extends SgdbManager{
         $this->dashboard_list = serialize($dashboard_list);
     }
 
+    public function addDashboard(array $dashboard){
+        $currentDashboardList = unserialize($this->dashboard_list);
+        $currentDashboardList[] = $dashboard;
+        $this->setDashboardList($currentDashboardList); 
+    }
+
     public function getPluginsList(){
         return unserialize($this->plugins_list);
     }
 
     public function getDashboardList(){
-        $dashboard_list = unserialize($this->dashboard_list);
-        if($dashboard_list){
-            uasort($dashboard_list, function($a,$b){
+        $dashboard_list = array();
+        $dashboard_list_temp = unserialize($this->dashboard_list);
+        if($dashboard_list_temp){
+            uasort($dashboard_list_temp, function($a,$b){
                                                 if(!empty($a['position']) && !empty($b['position']) )
                                                     return $a['position']>$b['position']?1:-1;
                                                 else
                                                     return 0; 
                                                 });
+            foreach ($dashboard_list_temp as $key => $value) {
+                $dashboard_list[$key] = $value[0];
+            }
         }
         return $dashboard_list;
+    }
+
+    public function getAvatar(){
+        return !empty($this->avatar)? $this->avatar : $this->getGravatar();
+    }
+
+    public function getName(){
+        return !empty($this->name) && !empty($this->forname)? $this->username." ".$this->forname : $this->username;
     }
 
     /*******************

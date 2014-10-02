@@ -39,12 +39,12 @@ $(function () {
     }
 
     result = getDashboard('get_all');
-    
     if(!result['dashboard_list'])
         dashboard_list = ['default'];
     else
         dashboard_list = result['dashboard_list'];
     
+        console.log(dashboard_list);
     for (var i = 0; i < dashboard_list.length; i++) {
         dashboard_element = getDashboard(dashboard_list[i]);
         $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" style="display:none;" id="dashboard_id'+i+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading">'+dashboard_element['dash_title']+'</div>\n<div class="panel-body">'+dashboard_element['dash_content']+'\n</div>\n</div>\n</div>');

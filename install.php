@@ -75,6 +75,7 @@ function check($value){
 }
 
 $GLOBALS['error'] = 0;
+$all_is_not_good_message = "";
 $distribution = RaspberryPi::getInfos("distribution");
 $version = RaspberryPi::getInfos("version");
 
@@ -151,17 +152,35 @@ if(!empty($_['launch_install'])){
 
         $user = new User();
         $taskList[] = "création de la table User ... ".check($user->sgbdCreate());
-        $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser($_['username'], $_['pass'], $_['email']));
+        $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser($_['username'], $_['pass'], $_['email'], 0));
+        if($GLOBALS['error']){
+            $i = 0;
+            do{
+                if(is_file(DB_NAME.".backup".($i>0?$i:"") )){
+                    $i++;
+                    $result = false;
+                }
+                else
+                    $result = true;
+            }while(!$result);
+            if(rename(DB_NAME, DB_NAME.".backup".($i>0?$i:""))){
+                $all_is_not_good_message = "nous avons réussi à crée un backup de la base de donnée ( ".DB_NAME.".backup".($i>0?$i:"")." ), il pourras vous être demandé sur le forum";
+            }
+            else{
+                $all_is_not_good_message = "Nous avons réussi à trouvé un nom pour le backup de la base de donnée, mais pas à la sauvegardé. Celà peut être du à un problème de droits";
+                $result = false;
+            }
+        }
         
     }
 
 }
-
 $template_infos = array(
             "title" => 'Installation - '.PROGRAM_NAME.' '.PROGRAM_VERSION,
             "externjs"    => ''
             );
 $smarty->assign("all_is_good", !$GLOBALS['error']);
+$smarty->assign("all_is_not_good_message", $all_is_not_good_message);
 $smarty->assign("error_form", $error_form);
 $smarty->assign("taskList", $taskList);
 $smarty->assign("erreurs", $erreurs);

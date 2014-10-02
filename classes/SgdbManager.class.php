@@ -3,7 +3,7 @@
 Class SgdbManager{
     private static $db;
 
-	function __construct($id = null){
+	function __construct(){
 
         if(strtoupper(DB_TYPE) == "SQLITE")
             $db_type = "sqlite";
@@ -12,7 +12,6 @@ Class SgdbManager{
 
         self::$db = new PDO($db_type.':'.DB_NAME);
         self::$db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        self::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // ERRMODE_WARNING | ERRMODE_EXCEPTION | ERRMODE_SILENT
 	}
 
     function sgbdType($type){
@@ -134,18 +133,19 @@ Class SgdbManager{
     }
 
     public function sgbdSave(){
+        $params = array();
         if(!empty($this->id)){
             $query = 'UPDATE `'.DB_PREFIX.$this->TABLE_NAME.'` ';
             $query .= 'SET ';
             $i =0;
-            foreach($this->object_fields as $field=>$type){
-                $id = eval('return htmlentities($this->'.$field.');');
-                // var_dump($id);
-                $id = htmlentities($this->$field);
-                // var_dump($id);
-                $query .= ($i>0?',' : '').'`'.$field.'`="'.$id.'"';
-                $i++;
+            foreach($this->object_fields as $field=>$value){
+                if($field != "id"){
+                    $params[] = $this->$field;
+                    $query .= ($i>0?',' : '').'`'.$field.'`=?';
+                    $i++;
+                }
             }
+            $query .= ' WHERE id='.$this->id;
         }
         else{
             $query = 'INSERT INTO `'.DB_PREFIX.$this->TABLE_NAME.'` (';
@@ -169,7 +169,7 @@ Class SgdbManager{
 
             $query .=');';
         }
-        return self::_query($query, null, __FILE__, __LINE__);
+        return self::_query($query, $params, __FILE__, __LINE__);
 
     }
 
@@ -196,10 +196,7 @@ Class SgdbManager{
         $limit = (!empty($limit))?'LIMIT `'.implode("`, `", $limit).'`' : '';
         $query = "SELECT $cols FROM $table $where_temp $order $group_by $limit";
         $return = self::_query($query, $params, $file, $line);
-        var_dump($params);
-        $a = $return->fetch();
-        var_dump($a);
-        return $a;
+        return $return;
         
     } 
 

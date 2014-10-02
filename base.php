@@ -2,11 +2,16 @@
 @session_start();
 $start=microtime(true);
 
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
 
 require ROOT.'/config.php';
-
+if(DEBUG){
+    ini_set('display_errors', 'On');
+    error_reporting(E_ALL);
+}
+else{
+    ini_set("display_errors",0);
+    error_reporting(0);
+}
 function autoload($name) {  
     if (file_exists(ROOT.'/classes/'.$name.".class.php")) { 
         require_once(ROOT.'/classes/'.$name.".class.php"); 

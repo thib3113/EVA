@@ -17,7 +17,7 @@ if(!empty($_)){
             case 'index':
 
                 if($myUser){
-                    $user->setDashboardList(array("active_users", "position" => 0), array("default", "position" => 1));
+                    $user->setDashboardList(array(array("active_users", "position" => 0)), array(array("default", "position" => 1) ));
                     $user->sgbdSave();
                     if (!empty($_['dashboard'])) {
                         switch ($_['dashboard']) {
@@ -25,7 +25,8 @@ if(!empty($_)){
                                 $GLOBALS['json_returns'] = array("status" => true, "dashboard_list" => $user->getDashboardList(), "message" => "ok");
                             break;
                             case 'active_users':
-                                $content = '';
+                                $avatar = '<img src="'.$user->getAvatar().'" alt="avatar de '.$user->getName().'" class="img-circle">';
+                                $content = "$avatar <br> ".$user->getName()."";
                                 $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_title" => "Users actif", "dash_content" => $content);
                             break;
                             case 'default':

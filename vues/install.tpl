@@ -88,7 +88,8 @@
     {if $all_is_good}
         <li>Tout c'est passé sans problème, <a href="index.php">cliquez ici pour commencer à utiliser EVA</a></li>
     {else}
-        <li>Une erreur s'est produite, merci de la reporter sur le <a href="{$smarty.const.PROGRAM_FORUM}">forum</a>, et de recommencer <a href="install.php?token=aaaaaa"></a></li>
+        <li>{$all_is_not_good_message}</li>
+        <li>Une erreur s'est produite, merci de la reporter sur le <a href="{$smarty.const.PROGRAM_FORUM}">forum</a>, et de <a href="install.php?token=aaaaaa">recommencer</a></li>
     {/if}
     </ul>
     {/if}
