@@ -17,7 +17,7 @@ if(!empty($_)){
             case 'index':
 
                 if($myUser){
-                    $user->setDashboardList(array(array("active_users", "position" => 0)), array(array("default", "position" => 1) ));
+                    $user->setDashboardList(array(array("active_users", "position" => 0), array("default", "position" => 1) ));
                     $user->sgbdSave();
                     if (!empty($_['dashboard'])) {
                         switch ($_['dashboard']) {
@@ -27,7 +27,7 @@ if(!empty($_)){
                             case 'active_users':
                                 $avatar = '<img src="'.$user->getAvatar().'" alt="avatar de '.$user->getName().'" class="img-circle">';
                                 $content = "$avatar <br> ".$user->getName()."";
-                                $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_title" => "Users actif", "dash_content" => $content);
+                                $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_title" => "User actif", "dash_content" => $content, "dash_width" => 12);
                             break;
                             case 'default':
                                 $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_title" => "lorem", "dash_content" => "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam aut sequi nobis corporis veniam voluptatem reiciendis animi necessitatibus fugit! At quos dolor iusto libero. Ullam reiciendis, soluta ea dolore distinctio. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet eaque neque quaerat voluptates obcaecati aspernatur, minima iure quas. Natus ea eius voluptates. Sed iure, iste omnis natus similique quidem fugit?Vous n'avez pas encore ajouté de dashboard");

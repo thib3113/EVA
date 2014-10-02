@@ -55,7 +55,7 @@ else{
     //on charge toutes les fonctions de base
     if($myUser){
         Plugin::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));   
-        Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "index","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));
+        Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "sign","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));
         Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/index.tpl'));
         Configuration::addJs('vues/js/index.js');
     }

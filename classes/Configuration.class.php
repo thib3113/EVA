@@ -58,9 +58,14 @@ Class Configuration extends SgdbManager{
 
         //on regarde si c'est la page active
         $active = 0;
-        if(!empty($_['page']))
+        if(!empty($_['page'])){
             if($_['page'] == $slug)
                 $active = 1;
+        }
+        else{
+            if($slug == 'index')
+                $active = 1;
+        }
 
         $link = "?page=$slug";
         if(!empty($params)){

@@ -39,15 +39,16 @@ $(function () {
     }
 
     result = getDashboard('get_all');
-    if(!result['dashboard_list'])
+
+    if(!result.dashboard_list)
         dashboard_list = ['default'];
     else
-        dashboard_list = result['dashboard_list'];
+        dashboard_list = $.map(result.dashboard_list, function(value, index) {return [value];});
     
-        console.log(dashboard_list);
+
     for (var i = 0; i < dashboard_list.length; i++) {
         dashboard_element = getDashboard(dashboard_list[i]);
-        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" style="display:none;" id="dashboard_id'+i+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading">'+dashboard_element['dash_title']+'</div>\n<div class="panel-body">'+dashboard_element['dash_content']+'\n</div>\n</div>\n</div>');
+        $("#add_dashboard").before('<div class="col-sm-'+($.isNumeric(dashboard_element['dash_width'])? dashboard_element['dash_width'] : 3)+' tiers_height dashboard_element" style="display:none;" id="dashboard_id'+i+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading">'+dashboard_element['dash_title']+'</div>\n<div class="panel-body">'+dashboard_element['dash_content']+'\n</div>\n</div>\n</div>');
         $('#dashboard_id'+i+'').show(500);
     };
 
