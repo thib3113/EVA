@@ -8,7 +8,7 @@
     define('DB_TYPE','SQLITE');//SQLITE ou MYSQL
     define('DB_PREFIX','EVA_');
     define('DB_NAME',ROOT.'/db/.database.db');
-	define('DB_HASH','md5');
+	define('DB_HASH','sha512');
     define('LOG_FILE','log/log.txt');
 	define('PLUGIN_DIR','plugins');
 	define('DEBUG', 1);

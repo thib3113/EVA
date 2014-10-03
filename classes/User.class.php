@@ -28,7 +28,7 @@ Class User extends SgdbManager{
 
     private $session_name = '';
     private $cookie_name = '';
-    private $cookie_time = 131400000;//100 ans
+    private $cookie_time = 63072000;//2 ans
     private $default_g_id = 1;
     private $col_groups = "group_id"; //nom de la colonne du groupe
     private $group_id_admin = 0; //valeur du groupe si l'utilisateur es admin
@@ -127,7 +127,8 @@ Class User extends SgdbManager{
 
     public function preparePasswd($username, $pass){ //on prépare le mot de passe à un stockage en bdd
 
-        $pass_temp = $username.$pass;
+        $hashKey = hash("adler32", $username);
+        $pass_temp = $username.$hash.$pass;
         if(DB_HASH)
             $pass_temp = hash(DB_HASH, $pass_temp);
 

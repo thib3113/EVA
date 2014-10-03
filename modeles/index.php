@@ -1,4 +1,9 @@
 <?php
+
+function widgetDefault(){
+    
+}
+
 Plugin::callHook("pre_header");
 Plugin::callHook("header");
 Plugin::callHook("pre_content");

@@ -11,7 +11,9 @@ Class Configuration extends SgdbManager{
 
     private static $templateInfos = array();
     private static $menu_items = array();
+    private static $dashboard_list = array();
     private static $js_list = array();
+    private static $DashboardWidgetList = array();
 
     function __construct(){
         self::$templateInfos = array(
@@ -108,5 +110,20 @@ Class Configuration extends SgdbManager{
 
     public static function addJS($url){
         self::$js_list[] = $url; 
+    }
+
+    public static function addDashboardWidget($title, $function, $position, $width = 4){
+        if(!empty(self::$DashboardWidgetList[$title]))
+            return false;
+        
+        self::$DashboardWidgetList[$title] = array(
+                                                "function" => $function,
+                                                "position" => $position,
+                                                "width" => $width
+                                            );
+    }
+
+    public static function getDashboardWidgetList(){
+        return self::$DashboardWidgetList;
     }
 }

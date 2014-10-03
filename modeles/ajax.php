@@ -24,6 +24,9 @@ if(!empty($_)){
                             case 'get_all':
                                 $GLOBALS['json_returns'] = array("status" => true, "dashboard_list" => $user->getDashboardList(), "message" => "ok");
                             break;
+                            case 'get_list':
+                                $GLOBALS['json_returns'] = array("status" => true, "dashboard_list" => $user->getDashboardList(), "message" => "ok");
+                            break;
                             case 'active_users':
                                 $avatar = '<img src="'.$user->getAvatar().'" alt="avatar de '.$user->getName().'" class="img-circle">';
                                 $content = "$avatar <br> ".$user->getName()."";
