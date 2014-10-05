@@ -158,4 +158,22 @@ Class Functions extends SgdbManager{
     public static function isApache(){
         return preg_match("~apache~Uis", $_SERVER['SERVER_SOFTWARE']);
     }
+
+    public static function backupDb($db_name = DB_NAME){
+        $i = 0;
+        do{
+            if(is_file(DB_NAME.'.'.time().".backup".($i>0?$i:"") )){
+                $i++;
+                $result = false;
+            }
+            else
+                $result = true;
+        }while(!$result);
+        if(rename(DB_NAME, DB_NAME.'.'.time().".backup".($i>0?$i:""))){
+            return DB_NAME.'.'.time().".backup".($i>0?$i:"");
+        }
+        else{
+            return false;
+        }
+    }
 }

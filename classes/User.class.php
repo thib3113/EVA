@@ -2,18 +2,30 @@
 
 
 Class User extends SgdbManager{
-    protected $id, $username,$pass, $group_id, $email, $create_time, $plugins_list, $dashboard_list, $avatar;
+    protected $id;
+    protected $uid;
+    protected $username;
+    protected $pass;
+    protected $group_id;
+    protected $email;
+    protected $create_time;
+    protected $plugins_list;
+    protected $dashboard_list;
+    protected $avatar;
+    protected $token;
     protected $TABLE_NAME = "users";
     protected $object_fields= array(
                                     'id'             => 'key',
-                                    'username'           => 'string',
+                                    'uid'            => 'int',
+                                    'username'       => 'string',
                                     'pass'           => 'string',
                                     'group_id'       => 'int',
                                     'email'          => 'longstring',
                                     'create_time'    => 'timestamp',
                                     'plugins_list'   => 'TEXT',
                                     'dashboard_list' => 'TEXT',
-                                    'avatar'         =>  'longstring'
+                                    'avatar'         =>  'longstring',
+                                    'token'         =>  'TEXT'
                                     );
 
     //gravatar
@@ -40,28 +52,39 @@ Class User extends SgdbManager{
         parent::__construct();
     }
 
-    public function connect($user, $password, $remember_me = false, $need_encrypt = true){
-        $password = ($need_encrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant 
+    public function connect($user, $password, $rememberMe = false, $needEncrypt = true){
+        $password = ($needEncrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant 
 
         //on fait une requete du password avec le mot de passe
         $result = SgdbManager::sgbdSelect(array('*'), array("username" => $user,"pass" => $password), null,null,null,  __FILE__, __LINE__ );
         $result = $result->fetch();
-        if(!$result)
-            return false;
         
         if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant 
             return false;
-        } 
-        else{
-            //on crée une session à partir du mot de passe hashé et du nom de compte
-            $_SESSION[$this->session_name] = serialize(array($user, $password));
-            if($remember_me)// si on demande de se souvenir, on crée un cookie
-                setcookie($this->cookie_name, serialize( array($user, $password) ), time()+$this->cookie_time, '/' );
-            $this->fillObject($result['id']);
-            return $this->getUserInfos();
         }
+        else{
+            $this->createSession($rememberMe);
+            $this->fillObject($result['id']);
+            return true;
+        }
+    }
 
+    public function createSession($cookie){
+        $_SESSION[$this->session_name] = serialize(array($this->username, $this->uid, $this->token));
+        if($cookie)// si on demande de se souvenir, on crée un cookie
+            setcookie($this->cookie_name, serialize( array($this->username, $this->uid, $this->token) ), time()+$this->cookie_time, '/' );
+    }
 
+    public function setToken(){
+        $this->token = Functions::randomStr(rand(15, 127));
+    }
+
+    public function setUid(){
+        $uid = rand(0,9);
+        for ($i=0; $i <= 99 ; $i++) { 
+            $uid .= rand(0,9);
+        }
+        $this->uid = $uid;
     }
 
     private function fillObject($id){
@@ -93,25 +116,29 @@ Class User extends SgdbManager{
 
             //on met les bons résultats dans les bonnes variables
             $username = $session_infos[0]; 
-            $password = $session_infos[1];
+            $uid = $session_infos[1];
+            $token = $session_infos[2];
+        
+            $result = SgdbManager::sgbdSelect(array('*'), array("username" => $username,"uid" => $uid), null,null,null,  __FILE__, __LINE__ );
+            $result = $result->fetch();
 
-            $result_connect = $this->connect($username, $password, false, false); //on tente de connecter l'utilisateur
-            $GLOBALS['is_connect'] = $this->is_connect; // on initialise les globales
-            $GLOBALS['is_admin'] = $this->is_admin; // on initialise les globales
-            if($result_connect){ //si le résultat de la connexion n'est pas faux
-                $user = $this->getUserInfos($result_connect); //on retourne les informations de l'utilisateur
-                if($this->enable_admin && $this->object_fields['group_id'] == $this->group_id_admin) //si les admins sont activés, et que l'utilisateur est un admin
-                    $GLOBALS['is_admin'] = true; //on crée une variable $is_admin qui sortira
-                else
-                    $GLOBALS['is_admin'] = false;
-                $GLOBALS['is_connect'] = true;//on crée la variable $is_connect
-                return $user;
-            }
-            else
+
+
+            if(empty($result))
                 return false;
-        }
-        else
-            return false; //si la session n'existe pas, on retourne faux
+
+            //on vérifie que le token soit le bon
+            if($token != $result["token"]){
+                /*si il n'est pas bon, cela peut être une attaque par vol de cookie
+                on génère un nouveau token, ce qui au pire déconnectera le vrai utilisateur */
+                $this->setToken();
+                $this->save("token");
+
+            }
+
+
+            var_dump($result);
+        }  
     }
 
     public function getUserInfos(){
@@ -128,7 +155,7 @@ Class User extends SgdbManager{
     public function preparePasswd($username, $pass){ //on prépare le mot de passe à un stockage en bdd
 
         $hashKey = hash("adler32", $username);
-        $pass_temp = $username.$hash.$pass;
+        $pass_temp = $username.$hashKey.$pass;
         if(DB_HASH)
             $pass_temp = hash(DB_HASH, $pass_temp);
 
@@ -150,6 +177,10 @@ Class User extends SgdbManager{
         if(!$this->setCreateTime(time()))
             return false;
         if(!$this->setAvatar(""))
+            return false;
+        if(!$this->setToken())
+            return false;
+        if(!$this->setUid())
             return false;
         if(!$this->sgbdSave())
             return false;

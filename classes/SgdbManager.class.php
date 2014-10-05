@@ -129,7 +129,17 @@ Class SgdbManager{
     public function sgbdDrop(){
         $query = 'DROP TABLE `'.DB_PREFIX.$this->TABLE_NAME.'`;';
         
-        $this->_query($query, __LINE__, __FILE__);
+        $this->_query($query, __FILE__, __LINE__);
+    }
+
+    public function save($input){
+        if(empty($input))
+            return false;
+
+        $query = 'UPDATE `'.DB_PREFIX.$this->TABLE_NAME.'` SET `'.$input.'`=?';
+        $params = array($input => $this->$input);
+        self::_query($query, $params, __FILE__, __LINE__ );
+
     }
 
     public function sgbdSave(){

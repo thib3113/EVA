@@ -154,22 +154,10 @@ if(!empty($_['launch_install'])){
         $taskList[] = "création de la table User ... ".check($user->sgbdCreate());
         $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser($_['username'], $_['pass'], $_['email'], 0));
         if($GLOBALS['error']){
-            $i = 0;
-            do{
-                if(is_file(DB_NAME.".backup".($i>0?$i:"") )){
-                    $i++;
-                    $result = false;
-                }
-                else
-                    $result = true;
-            }while(!$result);
-            if(rename(DB_NAME, DB_NAME.".backup".($i>0?$i:""))){
-                $all_is_not_good_message = "nous avons réussi à crée un backup de la base de donnée ( ".DB_NAME.".backup".($i>0?$i:"")." ), il pourras vous être demandé sur le forum";
-            }
-            else{
-                $all_is_not_good_message = "Nous avons réussi à trouvé un nom pour le backup de la base de donnée, mais pas à la sauvegardé. Celà peut être du à un problème de droits";
-                $result = false;
-            }
+            if(!$createBackup = Functions::backupDb())
+                $all_is_not_good_message = "Une erreur est intervenue, un backup de la base de donnée à était crée : ".basename($createBackup);
+            else
+                $all_is_not_good_message = "Une erreur est intervenue mais nous n'avons pas pu crée de backup de la base de donnée. Celà peut être du à un problème de droits.";
         }
         
     }
