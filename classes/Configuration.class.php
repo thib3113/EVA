@@ -17,11 +17,13 @@ Class Configuration extends SgdbManager{
 
     function __construct(){
         self::$templateInfos = array(
-            "tpl" => ROOT.'/vues/index.tpl',
-            "title" => PROGRAM_NAME.' '.PROGRAM_VERSION,
-            "menu_items" => "",
-        );
-
+            "tpl"          => ROOT.'/vues/index.tpl',
+            "title"        => PROGRAM_NAME.' '.PROGRAM_VERSION,
+            "menu_items"   => "",
+            "distribution" =>RaspberryPi::getInfos("distribution"),
+            "version"      => RaspberryPi::getInfos("version")
+            );
+        
         parent::__construct();
     }
 

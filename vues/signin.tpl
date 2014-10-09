@@ -49,4 +49,7 @@
       </form>
 
     </div>
+    {foreach from=$debugList item=debug}
+    {$debug}
+    {/foreach}
 {include "{$smarty.const.ROOT}/vues/footer.tpl"}

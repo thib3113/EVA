@@ -29,7 +29,8 @@
                 <h3 class="panel-title">Erreur sql dans le fichier {$errorInfos.file} ligne {$errorInfos.line}</h3>
             </div>
             <div class="panel-body">
-            {$errorInfos.query} ({foreach from=$errorInfos.params item=params}{$params}{foreachelse}aucun paramètre{/foreach})
+            {$errorInfos.query} ({foreach from=$errorInfos.params item=params}{$params}{foreachelse}aucun paramètre{/foreach}) <br>
+            Rendu : {$errorInfos.bound}
                 <div class="panel panel-danger">
                     <div class="panel-heading">
                         <h3 class="panel-title">Erreur {if {$errorInfos.error|is_array}}{$errorInfos.error.0} code {$errorInfos.error.1}{/if}</h3>
@@ -46,7 +47,7 @@
                 <h3 class="panel-title">Erreur sql</h3>
             </div>
             <div class="panel-body">
-                Une erreur SQL est intervenue
+                Une erreur de base de donnée est intervenue
             </div>
         </div>
     {/if}

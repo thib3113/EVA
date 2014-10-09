@@ -35,6 +35,7 @@ $smarty->compile_dir = ROOT.'/cache/templates_c/';
 $smarty->config_dir = ROOT.'/cache/configs/';
 $smarty->cache_dir = ROOT.'/cache/cache/';
 
+
 $user = new User();
 $myUser = $user->isConnect();
 

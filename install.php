@@ -164,8 +164,10 @@ if(!empty($_['launch_install'])){
 
 }
 $template_infos = array(
-            "title" => 'Installation - '.PROGRAM_NAME.' '.PROGRAM_VERSION,
-            "externjs"    => ''
+            "title"        => 'Installation - '.PROGRAM_NAME.' '.PROGRAM_VERSION,
+            "externjs"     => '',
+            "distribution" => RaspberryPi::getInfos("distribution"),
+            "version"      => RaspberryPi::getInfos("version")
             );
 $smarty->assign("all_is_good", !$GLOBALS['error']);
 $smarty->assign("all_is_not_good_message", $all_is_not_good_message);

@@ -49,6 +49,7 @@ Class SgdbManager{
         return $DBType;
     }
 
+
     public static function debug($query, $params, $errorInfo, $file, $line){
 
         foreach ($errorInfo as $value) {
@@ -70,16 +71,44 @@ Class SgdbManager{
             if(!is_array($params))
                 $params = array($params);
 
+
             $request = self::$db->prepare($query);
 
-            self::debug($query, $params, self::$db->errorInfo(), $file, $line);
+            $paramsTemp = array();
+            $i = 1;
+            foreach ($params as $param) {
+
+                switch (gettype($param)) {
+                    case 'boolean':
+                        $typeOfFormat = PDO::PARAM_BOOL;
+                    break;
+                    case 'integer':
+                        $typeOfFormat = PDO::PARAM_INT;
+                    break;
+                    case 'array':
+                        $param = serialize($param);
+                        $typeOfFormat = PDO::PARAM_STR;
+                    break;
+                    case 'null':
+                        $typeOfFormat = PDO::PARAM_NULL;
+                    break;
+                    break;
+                    case 'string':                    
+                    default:
+                        $typeOfFormat = PDO::PARAM_STR;
+                        break;
+                }
+                
+
+                $request->bindValue($i++, $param, $typeOfFormat);
+            }
 
             if(!$request){
                 self::sgdbError($query, $params, self::$db->errorInfo(), $file, $line);
             }
             else{
                 $request->execute($params);
-                return $request;
+                $return = $request;
             }
         }
         else{
@@ -89,8 +118,40 @@ Class SgdbManager{
                 return false;
             }
             else
-                return $result;
+                $return = $result;
         }
+
+        self::debug($query, $params, self::$db->errorInfo(), $file, $line);  
+
+        //return peux valoir 0 si aucune ligne n'est affectée
+        if($return instanceof PDO)
+            if($return->errorCode() !== "00000")
+                self::sgdbError($query, $params, self::$db->errorInfo(), $file, $line);
+            
+        return $return;
+    }
+
+    private static function boundQuery($db, $query, $values) {
+        return preg_replace_callback(
+            '#\\?#',
+            // Notice the &$values - here, we want to modify it.
+            function($match) use ($db, &$values) {
+                if (empty($values)) {
+                    throw new PDOException('not enough values for query');
+                }
+                $value  = array_shift($values);
+
+                // Handle special cases: do not quote numbers, booleans, or NULL.
+                if (is_null($value)) return 'NULL';
+                if (true === $value) return 'true';
+                if (false === $value) return 'false';
+                if (is_numeric($value)) return $value;
+
+                // Handle default case with $db charset
+                return $db->quote($value);
+            },
+            $query
+        );
     }
 
     public static function sgdbError($query, $params, $error, $file, $line){
@@ -105,9 +166,17 @@ Class SgdbManager{
         }
 
         $smarty->assign('debugList',Functions::getDebugList());
-        $smarty->assign("errorInfos", array("query" => $query, "params" => (!empty($params)? implode(', ', $params) : "") , "error" => (isset($i)? self::$db->errorInfo() : "NULL" ), "file" => $file, "line" => $line));
+        $smarty->assign("errorInfos", array(
+            "query" => $query,
+            "params" => (!empty($params)? implode(', ', $params) : ""),
+            "error" => (isset($i)? self::$db->errorInfo() : "NULL" ),
+            "file" => $file,
+            "line" => $line,
+            "bound" => self::boundQuery(self::$db, $query, $params)
+            )
+        );
         $smarty->display(ROOT.'/vues/SQLerror.tpl');
-        // die();
+        die();
     }
 
 	public function sgbdCreate(){
@@ -126,23 +195,35 @@ Class SgdbManager{
         return self::existTable();
 	}
 
-    public function sgbdDrop(){
+    public function sgbdDrop($file = NULL, $line = NULL){
+        //debug
+        $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
+        $debug = $debug[0];
+
         $query = 'DROP TABLE `'.DB_PREFIX.$this->TABLE_NAME.'`;';
         
-        $this->_query($query, __FILE__, __LINE__);
+        $this->_query($query, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
     }
 
-    public function save($input){
+    public function save($input, $optionnalParams=NULL, $file = NULL, $line = NULL){
+        $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
+        $debug = $debug[0];
         if(empty($input))
             return false;
-
-        $query = 'UPDATE `'.DB_PREFIX.$this->TABLE_NAME.'` SET `'.$input.'`=?';
-        $params = array($input => $this->$input);
-        self::_query($query, $params, __FILE__, __LINE__ );
+        
+        $query = 'UPDATE '.DB_PREFIX.$this->TABLE_NAME.' SET '.$input.'='.self::$db->quote($this->$input).' WHERE ';
+        if(!empty($optionnalParams))
+            $query .= $optionnalParams.'='.self::$db->quote($this->$optionnalParams);
+        else
+            $query .= 'id='.$this->id;
+        // $params = array($input => $this->$input, 'id' => $this->id);
+        self::_query($query, null, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
 
     }
 
-    public function sgbdSave(){
+    public function sgbdSave( $file = NULL, $line = NULL){
+        $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
+        $debug = $debug[0];
         $params = array();
         if(!empty($this->id)){
             $query = 'UPDATE `'.DB_PREFIX.$this->TABLE_NAME.'` ';
@@ -179,11 +260,13 @@ Class SgdbManager{
 
             $query .=');';
         }
-        return self::_query($query, $params, __FILE__, __LINE__);
+        return self::_query($query, $params, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
 
     }
 
-    public function sgbdSelect(array $cols = null, array $where =null, array $order =null, array $group_by =null, array $limit =null, $file, $line){
+    public function sgbdSelect(array $cols = null, array $where =null, array $order =null, array $group_by =null, array $limit =null, $file=NULL, $line=NULL){
+        $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
+        $debug = $debug[0];
         
         $cols = (!empty($cols))? implode(", ", $cols) : '*';
         $table = DB_PREFIX.$this->TABLE_NAME;
@@ -205,7 +288,7 @@ Class SgdbManager{
         $group_by = (!empty($group_by))?'GROUP BY `'.implode("`, `", $group_by).'`' : '';
         $limit = (!empty($limit))?'LIMIT `'.implode("`, `", $limit).'`' : '';
         $query = "SELECT $cols FROM $table $where_temp $order $group_by $limit";
-        $return = self::_query($query, $params, $file, $line);
+        $return = self::_query($query, $params, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
         return $return;
         
     } 
@@ -224,7 +307,7 @@ Class SgdbManager{
         else
             return false;
 
-        $statement = self::_query($query,$params, __LINE__, __FILE__);
+        $statement = self::_query($query,$params, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
         if($statement!=false){
             $result = $statement->fetch();
             if($result['count']>0){

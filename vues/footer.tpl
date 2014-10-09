@@ -14,7 +14,7 @@
         {/if}
 
         <div class="navbar navbar-default navbar-fixed-bottom text-center" id="footer" style="line-height:4em;">
-                Généré en {$executionTime} - Licence CC-by-nc-sa - {$smarty.const.PROGRAM_NAME} {$smarty.const.PROGRAM_VERSION}
+                Généré en {$executionTime} - Licence CC-by-nc-sa - {$smarty.const.PROGRAM_NAME} {$smarty.const.PROGRAM_VERSION} pour {$template_infos.distribution} {$template_infos.version}
         </div>
     </body>
 </html>

@@ -63,28 +63,40 @@ Class User extends SgdbManager{
             return false;
         }
         else{
-            $this->createSession($rememberMe);
             $this->fillObject($result['id']);
+            $this->createSession($rememberMe);
             return true;
         }
     }
 
-    public function createSession($cookie){
+    public function createSession($cookie = false){
+
+        //on génère un nouveau token
+        $this->setToken();
+        $this->save("token");
+
+
+        //on crée la session
         $_SESSION[$this->session_name] = serialize(array($this->username, $this->uid, $this->token));
-        if($cookie)// si on demande de se souvenir, on crée un cookie
+
+        //et un cookie au besoin
+        if($cookie || !empty($_COOKIE[$this->cookie_name]))
             setcookie($this->cookie_name, serialize( array($this->username, $this->uid, $this->token) ), time()+$this->cookie_time, '/' );
+
     }
 
     public function setToken(){
-        $this->token = Functions::randomStr(rand(15, 127));
+        $this->token = Functions::randomStr(rand(100, 127));
+        return true;
     }
 
     public function setUid(){
         $uid = rand(0,9);
-        for ($i=0; $i <= 99 ; $i++) { 
+        for ($i=0; $i <= 20 ; $i++) { 
             $uid .= rand(0,9);
         }
         $this->uid = $uid;
+        return true;
     }
 
     private function fillObject($id){
@@ -115,29 +127,28 @@ Class User extends SgdbManager{
             $session_infos = unserialize($session_infos); //on explose la session ( celle ci est de la forme username-passwordhashé )
 
             //on met les bons résultats dans les bonnes variables
-            $username = $session_infos[0]; 
-            $uid = $session_infos[1];
-            $token = $session_infos[2];
+            $this->username = $session_infos[0]; 
+            $this->uid = $session_infos[1];
+            $this->token = $session_infos[2];
         
-            $result = SgdbManager::sgbdSelect(array('*'), array("username" => $username,"uid" => $uid), null,null,null,  __FILE__, __LINE__ );
+            $result = SgdbManager::sgbdSelect(array('*'), array("username" => $this->username,"uid" => $this->uid), null,null,null,  __FILE__, __LINE__ );
             $result = $result->fetch();
-
-
 
             if(empty($result))
                 return false;
 
             //on vérifie que le token soit le bon
-            if($token != $result["token"]){
-                /*si il n'est pas bon, cela peut être une attaque par vol de cookie
-                on génère un nouveau token, ce qui au pire déconnectera le vrai utilisateur */
+            if($this->token != $result["token"]){
                 $this->setToken();
-                $this->save("token");
-
+                $this->save("token", "uid");
+                return false;
             }
-
-
-            var_dump($result);
+            else{
+                $this->fillObject($result['id']);
+                //si le token est bon on connecte
+                $this->createSession();
+                return true;
+            }
         }  
     }
 
