@@ -117,3 +117,7 @@ body { padding-bottom: 70px; }
   height: 30%;
   padding:15px;
 }
+
+#clear_footer{
+  height:59px;
+}

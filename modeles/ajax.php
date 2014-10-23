@@ -27,10 +27,13 @@ if(!empty($_)){
                             case 'get_list':
                                 $GLOBALS['json_returns'] = array("status" => true, "dashboard_list" => $user->getDashboardList(), "message" => "ok");
                             break;
+                            case 'network':
+                                $GLOBALS['json_returns'] = array('status' => true, "dash_title" => "User actif");
+                            break;
                             case 'active_users':
                                 $avatar = '<img src="'.$user->getAvatar().'" alt="avatar de '.$user->getName().'" class="img-circle">';
                                 $content = "$avatar <br> ".$user->getName()."";
-                                $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_title" => "User actif", "dash_content" => $content, "dash_width" => 12);
+                                $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_title" => "User actif", "dash_content" => $content, "dash_width" => 4);
                             break;
                             case 'default':
                                 $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_title" => "lorem", "dash_content" => "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam aut sequi nobis corporis veniam voluptatem reiciendis animi necessitatibus fugit! At quos dolor iusto libero. Ullam reiciendis, soluta ea dolore distinctio. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet eaque neque quaerat voluptates obcaecati aspernatur, minima iure quas. Natus ea eius voluptates. Sed iure, iste omnis natus similique quidem fugit?Vous n'avez pas encore ajouté de dashboard");

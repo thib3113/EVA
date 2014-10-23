@@ -51,19 +51,15 @@ Class SgdbManager{
 
 
     public static function debug($query, $params, $errorInfo, $file, $line){
+        global $debugObject;
 
-        foreach ($errorInfo as $value) {
-            if(!empty($value) )
-                $i = 1;
-        }
+        if($errorInfo[0] == 0)
+            $status = '<span class="label label-success">'.$errorInfo[0].'</span>';
+        else
+            $status = '<span class="label label-danger">'.$errorInfo[0].' ( '.$errorInfo[1].' ) : '.$errorInfo[2].'</span>';
 
-        $GLOBALS['debugItems'][] = '<div class="debug_content">
-                                        <span class="debug_query">'.$query.'</span>'.(empty($params)?'' :'
-                                        <span class="debug_params">'.implode(",", $params).'</span>' ).'
-                                        <span class="debug_error">'.(isset($i)? implode(",", $errorInfo) : "NULL" ).'</span>
-                                        <span class="debug_file">'.$file.'</span>
-                                        <span class="debug_line">'.$line.'</span>
-            </div>';
+        $list = '<kbd>'.self::boundQuery(self::$db, $query, $params).'</kbd>&nbsp;'.$status.' ON '.Functions::removeRootPath($file).' LINE '.$line;
+        $debugObject->addDebugList(array("SQL" => $list));
     }
 
     public static function _query($query, $params, $file, $line){
@@ -210,7 +206,7 @@ Class SgdbManager{
         $debug = $debug[0];
         if(empty($input))
             return false;
-        
+
         $query = 'UPDATE '.DB_PREFIX.$this->TABLE_NAME.' SET '.$input.'='.self::$db->quote($this->$input).' WHERE ';
         if(!empty($optionnalParams))
             $query .= $optionnalParams.'='.self::$db->quote($this->$optionnalParams);
@@ -274,7 +270,7 @@ Class SgdbManager{
         $params = array();
         $where_temp = null;
         if(!empty($where)){
-            $where_temp = 'WHERE ';
+            $where_temp = ' WHERE ';
             $i=0;
             foreach ($where as $key => $value) {
                 $where_temp .= ($i>0)? ' AND ' : "";
@@ -284,10 +280,12 @@ Class SgdbManager{
             }
         }
 
-        $order = (!empty($order))?'ORDER BY `'.implode("`, ", $order).'`' : '';
-        $group_by = (!empty($group_by))?'GROUP BY `'.implode("`, `", $group_by).'`' : '';
-        $limit = (!empty($limit))?'LIMIT `'.implode("`, `", $limit).'`' : '';
-        $query = "SELECT $cols FROM $table $where_temp $order $group_by $limit";
+        $order = (!empty($order))?' ORDER BY `'.implode("`, ", $order).'`' : '';
+        $group_by = (!empty($group_by))?' GROUP BY `'.implode("`, `", $group_by).'`' : '';
+        $limit = (!empty($limit))?' LIMIT `'.implode("`, `", $limit).'`' : '';
+
+
+        $query = "SELECT $cols FROM ".$table.$where_temp.$order.$group_by.$limit;
         $return = self::_query($query, $params, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
         return $return;
         

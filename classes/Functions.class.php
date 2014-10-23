@@ -2,7 +2,6 @@
 
 Class Functions extends SgdbManager{
 
-
     public static function log($log, $label = "notice"){
         if(!is_file(ROOT.'/'.LOG_FILE)){
             self::createLogFile();
@@ -52,6 +51,10 @@ Class Functions extends SgdbManager{
         return substr($headers[0], 9, 3);
     }
 
+    public static function removeRootPath($path){
+        return substr($path, strlen(ROOT)+1);
+    }
+
     public static function var_dump_advanced($text, $file, $line){
         $text = (!is_array($text))? array($text) : $text;
         echo "<pre>";
@@ -70,25 +73,20 @@ Class Functions extends SgdbManager{
         return $is_ajax;
     }
 
-    public static function getDebugList(){
-        if(DEBUG && !Functions::isAjax()){
-            //on écris les debug
-            $list_debug = '<div id="debug_list">';
-            foreach ($GLOBALS['debugItems'] as $value) {
-                $list_debug .= $value;
-            }
-            $list_debug .= '</div>';
-            return $list_debug;
+    public static function getExecutionTime($short = false){
+        $total = number_format(microtime(true)-TIME_START,3);
+        if(intval($total)>0){
+            if(!$short)
+                return "$total seconde".($total>1? "s" : "");
+            else
+                return $total.'s'; 
         }
-    }
-
-    public static function getExecutionTime($start){
-        $total = number_format(microtime(true)-$start,3);
-        if(intval($total)>0)
-            return "$total seconde".($total>1? "s" : "");
         else{
             $decimal = substr($total, strpos($total, '.')+1);
-            return "$decimal milliseconde".($decimal>1? "s" : "");
+            if(!$short)
+                return "$decimal milliseconde".($decimal>1? "s" : "");
+            else
+                return $decimal.'ms';
         }
     }
 
@@ -175,5 +173,32 @@ Class Functions extends SgdbManager{
         else{
             return false;
         }
+    }
+
+    /**
+     * Check if data is base64 encoded
+     * @param  [type]  $data [description]
+     * @return boolean       [description]
+     */
+    public static function isBase64Encoded($data)    {
+        if (base64_encode(base64_decode($data)) === $data) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    /**
+     * Formatte des grands nombres
+     * @source : http://www.metal3d.org/ticket/2009/02/18/php-les-grands-nombres-et-la-notation-scientifique;
+     * @param  [type] $num          [description]
+     * @param  string $floatsep     [description]
+     * @param  string $thouthandsep [description]
+     * @return [type]               [description]
+     */
+    public static function formatNumber($num, $floatsep=",", $thouthandsep=""){
+        $float = null;
+        if((int)$num != (float)$num ) $float = 2;
+        return number_format($num,$float,$floatsep,$thouthandsep);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 @session_start();
 $start=microtime(true);
-
+define('TIME_START',microtime(true));
 
 require ROOT.'/config.php';
 if(DEBUG){
@@ -20,12 +20,16 @@ function autoload($name) {
         return false;
 } 
 
+
 spl_autoload_register("autoload");
+
 
 if(!is_file(DB_NAME) && basename($_SERVER['SCRIPT_FILENAME']) != "install.php"){
     header("location: install.php");
     die();
 }
+
+$debugObject = new Debug();
 
 $config = new Configuration();
 
@@ -41,10 +45,7 @@ $myUser = $user->isConnect();
 
 $_ = array_merge($_GET, $_POST);
 
-$GLOBALS['debugItems'] = array();
 $GLOBALS['menuItems'] = array();
-
-global $myUser,$config,$_;
 
 if(Functions::isAjax()){
     require ROOT."/modeles/ajax.php";    

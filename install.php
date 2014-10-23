@@ -7,8 +7,6 @@ $start=microtime(true);
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
-$GLOBALS['debugItems'] = array();
-
 require ROOT.'/config.php';
 
 
@@ -176,6 +174,6 @@ $smarty->assign("taskList", $taskList);
 $smarty->assign("erreurs", $erreurs);
 $smarty->assign("notices", $notices);
 $smarty->assign("template_infos", $template_infos);
-$smarty->assign('executionTime',Functions::getExecutionTime($start));
+$smarty->assign('executionTime',Functions::getExecutionTime());
 $smarty->assign('debugList',Functions::getDebugList());
 $smarty->display(ROOT."/vues/install.tpl");

@@ -1,13 +1,14 @@
 <?php
 
 /*
- @nom: Gpio
+ @nom: RaspberryPi
  @auteur: Thib3113 (thib3113@gmail.com)
  @description:  Classe de gestion du raspberry pi
  */
 
 class RaspberryPi extends SgdbManager{
 
+    public static $version;
     const GPIO_DEFAULT_PATH = '/usr/local/bin/gpio';
 
     // version du raspberry par revision
@@ -28,7 +29,7 @@ class RaspberryPi extends SgdbManager{
                           "0010" => "B+1.0",
     );
 
-    private static $TablePins=array(
+    private static $tablePins=array(
                     //Physical =>  (wiringPin, nameOfPin)
                     1  =>   array(  null    ,   "3,3V"      ),
                     2  =>   array(  null    ,   "5V"        ),
@@ -73,7 +74,7 @@ class RaspberryPi extends SgdbManager{
     );
 
     //pins soudable à coté des GPIO raspberry pi B rev 2
-    private static $OptionalPins=array(
+    private static $optionalPins=array(
                     1    =>  array(  null    ,   "5V"        ),
                     2    =>  array(  null    ,   "3,3V"      ),
                     3    =>  array(  17      ,   "GPIO 8"    ),
@@ -95,6 +96,16 @@ class RaspberryPi extends SgdbManager{
 
     );
 
+
+    function __construct(){
+      self::setVersion();
+    }
+
+    public static function setVersion(){
+      if(empty(self::$version))
+        self::$version = self::getRaspVersion();
+    }
+
     private static function exec($cmd){
         // var_dump($cmd);
         return exec($cmd);
@@ -104,16 +115,16 @@ class RaspberryPi extends SgdbManager{
         return self::exec(self::GPIO_DEFAULT_PATH.' mode '.$pin.' '.$mode);
     }
     public static function write($pin,$value = 0,$automode = false){
-        if($automode) self::mode_($pin,'out');
+        if($automode) self::mode($pin,'out');
         return self::exec(self::GPIO_DEFAULT_PATH.' write '.$pin.' '.$value);
     }
     public static function read($pin,$automode = false){
-        if($automode) self::mode_($pin,'in');
+        if($automode) self::mode($pin,'in');
         return self::exec(self::GPIO_DEFAULT_PATH.' read '.$pin);
     }
 
     public static function toggle($pin,$automode = false){
-        if($automode) self::mode_($pin,'out');
+        if($automode) self::mode($pin,'out');
         return self::exec(self::GPIO_DEFAULT_PATH.' toggle '.$pin);
     }
 
@@ -131,9 +142,9 @@ class RaspberryPi extends SgdbManager{
         }
 
         //on change la valeur du pin
-        self::toggle_($pin, true);
+        self::toggle($pin, true);
         //on retourne la valeur du pin
-        return self::read_($pin);
+        return self::read($pin);
     }
 
     /**
@@ -142,7 +153,7 @@ class RaspberryPi extends SgdbManager{
      * @return array contenant la table table
      */
     public static function getTablePins(){
-        return self::$TablePins;
+        return self::$tablePins;
     }
 
     /**
@@ -152,7 +163,7 @@ class RaspberryPi extends SgdbManager{
      */
     public static function getPinsFromWiringPins($wiringPins){
         //on passe tous les pins
-        foreach (self::$TablePins as $key => $infos) {
+        foreach (self::$tablePins as $key => $infos) {
             //on passe toutes les valeurs
             foreach ($infos as $value) {
                 if($value[0] == $wiringPins)
@@ -168,7 +179,7 @@ class RaspberryPi extends SgdbManager{
      * @return number : numero du pin
     */
     public static function getPinsWiringFromPins($pins){
-        return self::$TablePins[$pins][0];
+        return self::$tablePins[$pins][0];
     }
 
     /**
@@ -178,7 +189,7 @@ class RaspberryPi extends SgdbManager{
      */
     public static function getNameOfWiringPins($wiringPins){
         //on passe tous les pins
-        foreach (self::$TablePins as $infos) {
+        foreach (self::$tablePins as $infos) {
             if($infos[0] === $wiringPins){
                     return $infos[1];
             }
@@ -192,27 +203,43 @@ class RaspberryPi extends SgdbManager{
      * @return number : numero du pin
      */
     public static function getNameOfPins($pin){
-        return self::$TablePins[$pin][1];
+        return self::$tablePins[$pin][1];
     }
 
-    public static function getListPins($version){
+    public static function getListPins(){
         $tempPinsTable = array();
+        self::setVersion();
 
         //on prend le nombre de pins correspondant à la version utilisée
-        for ($i=1; $i <= self::getNumberOfPins($version); $i++) { 
-            $tempPinsTable[] = self::$TablePins[$i];
+        for ($i=1; $i <= self::getNumberOfPins(self::$version); $i++) { 
+            $tempPinsTable[] = self::$tablePins[$i];
         }
         return $tempPinsTable;
     }
     
-    public static function getListOptionalPins($version){
+    public static function getListOptionalPins(){
         $tempPinsTable = array();
+        self::setVersion();
 
         //on prend le nombre de pins correspondant à la version utilisée
-        for ($i=1; $i <= self::getNumberOfOptionalPins($version); $i++) { 
-            $tempPinsTable[] = self::$TablePins[$i];
+        for ($i=1; $i <= self::getNumberOfOptionalPins(self::$version); $i++) { 
+            $tempPinsTable[] = self::$optionalPins[$i];
         }
         return $tempPinsTable;
+    }
+
+  /**
+   * Permet de récupéré la version du raspberry
+   * @author Thibaut SEVERAC ( thibaut@thib3113.fr )
+   * @param int $pin
+   * @param binary $state
+   * @return false en cas de problème, valeur du pin dans le cas où c'est bon
+  */
+  public static function getRaspVersion(){
+      //retourne la revision du raspberry
+      $revision = exec("cat /proc/cpuinfo | grep Revision | rev  | cut -c1-4 | rev"); // on lis les infos du proc, on cherche la revision, on retourne la chaine ( les versions renvois 00XX, les overclocké renvois 100XX), on récupère les 4 derniers, on retourne la chaine
+      $version = !empty(self::$versionByRev[$revision])? self::$versionByRev[$revision] : false;
+      return $version;
     }
 
 
@@ -221,13 +248,13 @@ class RaspberryPi extends SgdbManager{
      * @param  Version $version Version du raspberry pi donnee par la fonction adequate
      * @return array          liste des wiring pin
      */
-    public static function getListWiringPin($version){
+    public static function getListWiringPin(){
         $list = array();
         $tempPinsTable = array();
 
         //on prend le nombre de pins correspondant à la version utilisée
-        for ($i=0; $i <= self::getNumberOfPins($version); $i++) { 
-            $tempPinsTable[] = self::$TablePins[$i];
+        for ($i=1; $i <= self::getNumberOfPins(); $i++) { 
+            $tempPinsTable[] = self::$tablePins[$i];
         }
         foreach ($tempPinsTable as $value) {
             if(!is_null($value[0]))
@@ -237,13 +264,13 @@ class RaspberryPi extends SgdbManager{
         return $list;
     }
 
-    public static function getListOptionalWiringPin($version){
+    public static function getListOptionalWiringPin(){
         $list = array();
         $tempPinsTable = array();
 
         //on ajoute les pins optionnels
-        for ($i=0; $i <= self::getNumberOfOptionalPins($version); $i++) { 
-            $tempPinsTable[] = self::$TablePins[$i];
+        for ($i=1; $i <= self::getNumberOfOptionalPins(); $i++) { 
+            $tempPinsTable[] = self::$optionalPins[$i];
         }
 
         foreach ($tempPinsTable as $value) {
@@ -255,26 +282,14 @@ class RaspberryPi extends SgdbManager{
         return $list;
     }
 
-    public static function getNumberOfPins($version){
-        return self::$pinsByVer[$version][0];
+    public static function getNumberOfPins(){
+        self::setVersion();
+        return self::$pinsByVer[self::$version][0];
     }
 
-    public static function getNumberOfOptionalPins($version){
-        return self::$pinsByVer[$version][1];
-    }
-
-    /**
-     * Permet de récupéré la version du raspberry
-     * @author Thibaut SEVERAC ( thibaut@thib3113.fr )
-     * @param int $pin
-     * @param binary $state
-     * @return false en cas de problème, valeur du pin dans le cas où c'est bon
-    */
-    public static function getRaspVersion(){
-        //retourne la revision du raspberry
-        $revision = exec("cat /proc/cpuinfo | grep Revision | rev  | cut -c1-4 | rev"); // on lis les infos du proc, on cherche la revision, on retourne la chaine ( les versions renvois 00XX, les overclocké renvois 100XX), on récupère les 4 derniers, on retourne la chaine
-        $version = !empty(self::$versionByRev[$revision])? self::$versionByRev[$revision] : false;
-        return $version;
+    public static function getNumberOfOptionalPins(){
+        self::setVersion();
+        return self::$pinsByVer[self::$version][1];
     }
 
     public static function getInfos($key, $details = false){
@@ -301,6 +316,11 @@ class RaspberryPi extends SgdbManager{
             return false;
           break;
       }
+    }
+
+    public static function getNetwork(){
+      exec("ipconfig", $network);
+      var_dump($network);
     }
 }
 ?>

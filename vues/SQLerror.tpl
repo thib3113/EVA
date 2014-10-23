@@ -29,7 +29,7 @@
                 <h3 class="panel-title">Erreur sql dans le fichier {$errorInfos.file} ligne {$errorInfos.line}</h3>
             </div>
             <div class="panel-body">
-            {$errorInfos.query} ({foreach from=$errorInfos.params item=params}{$params}{foreachelse}aucun paramètre{/foreach}) <br>
+            <kbd>{$errorInfos.query}</kbd> ({foreach from=$errorInfos.params item=params}{$params}{foreachelse}aucun paramètre{/foreach}) <br>
             Rendu : {$errorInfos.bound}
                 <div class="panel panel-danger">
                     <div class="panel-heading">

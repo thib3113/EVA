@@ -43,7 +43,7 @@ function notify(statut, message){
                 }
                 donneesRecu = $.parseJSON(data);
                 if(donneesRecu.status == 'success'){
-
+                    setTimeout(location.reload(), 3000);
                 }else{
                     //anything else
                 }
