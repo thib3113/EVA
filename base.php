@@ -1,6 +1,6 @@
 <?php
 @session_start();
-$start=microtime(true);
+
 define('TIME_START',microtime(true));
 
 require ROOT.'/config.php';
@@ -29,7 +29,19 @@ if(!is_file(DB_NAME) && basename($_SERVER['SCRIPT_FILENAME']) != "install.php"){
     die();
 }
 
+$system = new System();
 $debugObject = new Debug();
+
+//on inclus tout les plugins
+$pluginsFolder = ROOT.DIRECTORY_SEPARATOR.PLUGIN_DIR;
+$pluginsFolder = opendir($pluginsFolder) or die('Erreur');
+while($file = @readdir($pluginsFolder)) {
+  if(preg_match("~.plugin.~", $file)){
+    $debugObject->addDebugList(array("plugins" => $pluginsFolder.DIRECTORY_SEPARATOR.$file));
+    include $pluginsFolder.DIRECTORY_SEPARATOR.$file;
+  }
+}
+closedir($pluginsFolder);
 
 $config = new Configuration();
 
@@ -38,7 +50,6 @@ $smarty->template_dir = ROOT.'/cache/templates/';
 $smarty->compile_dir = ROOT.'/cache/templates_c/';
 $smarty->config_dir = ROOT.'/cache/configs/';
 $smarty->cache_dir = ROOT.'/cache/cache/';
-
 
 $user = new User();
 $myUser = $user->isConnect();
@@ -51,18 +62,17 @@ if(Functions::isAjax()){
     require ROOT."/modeles/ajax.php";    
     Plugin::callHook("ajax");
     die();
+}
 
+//on charge toutes les fonctions de base
+if($myUser){
+    Plugin::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));   
+    Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "sign","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));
+    Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/index.tpl'));
+    Configuration::addJs('vues/js/index.js');
 }
 else{
-    //on charge toutes les fonctions de base
-    if($myUser){
-        Plugin::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));   
-        Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "sign","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));
-        Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/index.tpl'));
-        Configuration::addJs('vues/js/index.js');
-    }
-    else{
-        Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/signin.tpl'));
-    }
-        Configuration::addJs("vues/js/jquery.noty.packaged.min.js");
+    Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/signin.tpl'));
 }
+    Configuration::addJs("vues/js/jquery.noty.packaged.min.js");
+

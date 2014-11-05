@@ -5,13 +5,8 @@
  @description:  Classe de debugguage
  */
 
-class Debug{
-    private $debugActiveItem = array( 
-                                'COOKIE'   => false ,
-                                'SESSION'   => false ,
-                                'CONNEXION' => false ,
-                                'SQL'       => false
-                                         );
+class Debug extends SgdbManager{
+    private $debugActiveItem = array('ALL' => false);
     private $debugItems = array();
     private $debugId = 0;
 
@@ -30,10 +25,41 @@ class Debug{
         }
     }
 
+    public function addCustomQuery($query){
+        $backtrace = $this->whoCallMe(1);
+        $return = self::_query($query, null, $backtrace['file'], $backtrace['line']);
+
+        if($return){
+            $return = $return->fetch();
+            if(is_array($return)){
+                $result = '<ul>';
+                foreach ($return as $key => $value) {
+                    $result .= '<li>'.$key.' = <kbd>'.$value.'</kdb></li>';
+                }
+                $result .= '</ul>';
+                $return = $result;
+            }
+        }
+        else
+            $return = "EMPTY";
+
+        $this->addDebugList(array("custom" => $return));
+    }
+
+    public function whoCallMe($number = 1){
+        $backtrace = debug_backtrace();
+
+        return $backtrace[$number];
+    }
+
     public function addBasicDebug(){
         foreach ($_COOKIE as $key => $value) {
-            if(@unserialize($value)){
-                $array_value = unserialize($value);
+            if(is_array($value) || Functions::isSerialized($value)){
+                if(Functions::isSerialized($value))
+                    $array_value = unserialize($value);
+                else
+                    $array_value = $value;
+
                 $value = '<ul>';
                 foreach ($array_value as $clef => $valeur) {
                     $value .= "<li>$clef - <kbd>$valeur</kbd></li>";
@@ -49,8 +75,12 @@ class Debug{
         }
 
         foreach ($_SESSION as $key => $value) {
-            if(@unserialize($value)){
-                $array_value = unserialize($value);
+            if(is_array($value) || Functions::isSerialized($value)){
+                if(Functions::isSerialized($value))
+                    $array_value = unserialize($value);
+                else
+                    $array_value = $value;
+
                 $value = '<ul>';
                 foreach ($array_value as $clef => $valeur) {
                     $value .= "<li>$clef - <kbd>$valeur</kbd></li>";
@@ -59,6 +89,7 @@ class Debug{
             }
             else
                 $value = "<kbd>$value</kbd>";
+
 
 
             $return = '<span class="label label-primary">'.$key.'</span> = '.$value.''; 
@@ -72,7 +103,7 @@ class Debug{
             //on écris les debug
             $listDebug = array();
             foreach ($this->debugItems as $key => $valeurs) {
-                if($this->debugActiveItem[strtoupper($key)])
+                if($this->debugActiveItem['ALL'] || $this->debugActiveItem[strtoupper($key)])
                     $listDebug[$key] = $valeurs;   
             }
             return $listDebug;
@@ -82,6 +113,8 @@ class Debug{
     public function debugId(){
         return ++$this->debugId;
     }
+
+    
 
     public function addDebugList($debugItems, $time = NULL){
         $time = (($time === NULL)? Functions::getExecutionTime(true) :((!$time)? false : $time));
@@ -95,97 +128,160 @@ class Debug{
          } 
     }
 
-    public function var_dump($var, $maxDepth = 3, $depth = 0, $numberArray = 0){
-        $opt = array(
-                        "array"     => true,
-                        "serialize" => false,
-                        "base64"    => false
-                        );
-        $return = "";
+//     private function varDumpChild($expression){
 
-        if($depth == 0)
-            $return .= '<pre><div class="var_dump">';
+//     }
 
-        $var_ = $var;
-        //si var est un tableau serializé
-        if(@unserialize($var)){
-            $opt['serialize'] = true;
-            $varTemp = unserialize($var);
-            $var_ = $var;
-            $var = $varTemp;
-        }
+//     public function var_dump($var, $key = NULL, $maxDepth = 3, $depth = 0, $parent_number = 0){
+//         $opt = array(
+//                         "serialize" => false,
+//                         "base64"    => false
+//                         );
+//         $return = "";
 
-        //si var est encoder en base64
-        if(!is_object($var) && !is_array($var) && Functions::isBase64Encoded($var)){
-            $opt['base64'] = true;
-            $varTemp = base64_decode($var);
-            $var_ = $var;
-            $var = $varTemp;
-        }
+//         if($depth == 0)
+//             $return .= '<pre><div class="var_dump">';
 
-        $return .= "<ul>";
+//         $var_ = $var;
+//         //si var est un tableau serializé
+//         if(@unserialize($var)){
+//             $opt['serialize'] = true;
+//             $varTemp = unserialize($var);
+//             $var_ = $var;
+//             $var = $varTemp;
+//         }
 
-        if(is_array($var)){
-            $return .= '<li>'.($opt['serialize']? '<span class="label label-info">serialize</span> ' : '').''.($opt['serialize']? $var_.' => ' : '').'<span class="label label-danger">Array</span> ( '.count($var).' element'.(count($var)>1? "s" : "").')';
-            foreach ($var as $key => $var) {
-                if($depth<$maxDepth)
-                    $return .= $this->var_dump($var, $maxDepth, $depth+1, $numberArray++);
-                else{
-                    try {
-                        $count = count($var, 1);
-                        $return = "<ul><li>... ( $count element".($count>1? "s": "")." more )</li></ul>";
-                    } catch (Exception $e) {
-                        $return .= "<ul><li>error found : $e</li></ul>";
-                    }
-                }
+//         //si var est encoder en base64
+//         if(!is_object($var) && !is_array($var) && Functions::isBase64Encoded($var)){
+//             $opt['base64'] = true;
+//             $varTemp = base64_decode($var);
+//             $var_ = $var;
+//             $var = $varTemp;
+//         }
 
-            }
+//         $return .= "<ul>";
+
+//         $typeof = gettype($var);
+//         switch ($typeof) {
+//             case 'boolean':
+//             case 'NULL':
+//                 $color = "#8B1796";
+//                 $var_ = ($var_)? "<b>TRUE</b>" :($var_ === NULL)? "<b>NULL</b>" : "<b>FALSE</b>";
+//             break;
+//             case 'integer':
+//             case 'double':
+//                 $color = "#FFA000";
+//                 $var = $var;
+//             break;    
+//             case 'string':
+//                 $color = "#FF0000";
+//                 if($var[0] == "`")
+//                     $var = '"'.$var.'"';
+//                 else
+//                     $var = "`$var`";
+//             break;
+//             case 'object':
+//                 $color = '#1992D3';
+
+//             break;
+//             default:
+//                 $color = "#E85DB7";
+//             break;
+//         }
+//         $return .= '<li>'.($key === NULL? "" : "$key : ").'<span class="label label-danger">('.$typeof.')</span>';
+
+//         $return .= "<!-- is_array : ".(is_array($var)? "TRUE" : "FALSE")." -->";
+//         // <span style="color:'.$color.'">'.$var_.'</span>'.($opt['base64']? ' => '.$var : '').' </li>
+//         if(is_array($var) || is_object($var)){
+//             if(is_object($var)){
+//                 $class = new ReflectionClass( $var ); 
+//                 $name = $class->getName();
+//                 $return .= " \"$name\"";
+//             }
+
+//             $numberArray = 0;
+//             foreach ($var as $key => $var) {
+//                 if($depth<$maxDepth){
+//                     $return .= "\n<!-- depth : $depth -->\n";
+//                     $return .= $this->var_dump($var, $key, $maxDepth, $depth+1, $numberArray);
+//                 }
+//                 else{
+//                     try {
+//                         $count = count($var, 1);
+//                         $return = "<ul><li>$key <span class=\"label label-danger\">(array)</span> ".($count>0? "($count element".($count>1? "s": "")." more) ..." : "(empty)")."</li></ul>";
+//                     } catch (Exception $e) {
+//                         $return .= "<ul><li>error found : $e</li></ul>";
+//                     }
+//                 }
+//             }
+//         }
+//         else
+//             $return .= ' <span style="color:'.$color.'">'.$var_.'</span>'.($opt['base64']? ' <span class="label label-info">base64 =></span> '.$var : '');
+
+//         $return .= "</li></ul>";
+
+//         if($depth == 0)
+//             $return .= '</div></pre>';
+
+//         // if(is_array($var) || is_object($var)){
+//         //     $return .= '<li>'.($opt['serialize']? '<span class="label label-info">serialize</span> ' : '').''.($opt['serialize']? $var_.' => ' : '').'<span class="label label-danger">'.gettype($var).'</span> ('.count($var).' element'.(count($var)>1? "s" : "").')';
+//         //     foreach ($var as $key => $var) {
+//         //         if($depth<$maxDepth)
+//         //             $return .= $this->var_dump($var, $maxDepth, $depth+1, $numberArray++);
+//         //         else{
+//         //             try {
+//         //                 $count = count($var, 1);
+//         //                 $return = "<ul><li>... ( $count element".($count>1? "s": "")." more )</li></ul>";
+//         //             } catch (Exception $e) {
+//         //                 $return .= "<ul><li>error found : $e</li></ul>";
+//         //             }
+//         //         }
+
+//         //     }
+//         // }
             
-            $return .= "</li>";
-        }
-        else{
-            $typeof = gettype($var);
-            switch ($typeof) {
-                case 'boolean':
-                    $color = "#8B1796";
-                    $var = ($var)? "<b>true</b>" : "<b>false</b>";
-                break;
-                case 'integer':
-                case 'double':
-                    $color = "#FFA000";
-                    $var = $var;
-                break;    
-                case 'string':
-                    $color = "#FF0000";
-                    if($var[0] == "`")
-                        $var = '"'.$var.'"';
-                    else
-                        $var = "`$var`";
-                break;
-                case 'object':
-                    $color = '#1992D3';
-                break;
-                default:
-                    $color = "#E85DB7";
-                break;
-            }
-                if($typeof != "object")
-                    $return .= '<li>'.($depth>0?'<span class="label label-default">'.$numberArray.'</span> : ' : "").' '.($opt['base64']? '<span class="label label-info">base64</span> ' : '').'<span class="label label-danger">('.$typeof.')</span> <span style="color:'.$color.'">'.$var_.'</span>'.($opt['base64']? ' => '.$var : '').' </li>';
-                else{
+//         //     $return .= "</li>";
+
+// /*
+//                         else{
+                
+//                 $class = new ReflectionClass( $var ); 
+//                 $name = $class->getName(); 
+//                 $return .= '<li><span class="label label-warning">object</span> <span style="color:'.$color.'">'.$name.'</span>';
+//                 $i = 0;
+//                 foreach ($var as $key => $value) {
+//                     if($i == 0)
+//                         $return .= ": <ul>";
+
+//                     if($depth<$maxDepth)
+//                         $return .= $this->var_dump($var, $maxDepth, $depth+1, $numberArray++);
+//                     else{
+//                         try {
+//                             $count = count($var, 1);
+//                             $return = "<ul><li>... ( $count element".($count>1? "s": "")." more )</li></ul>";
+//                         } catch (Exception $e) {
+//                             $return .= "<ul><li>error found : $e</li></ul>";
+//                         }
+//                     }
+
+//                     $return .= '<li>'.$key.' => ';
+
+//                     $return .= $this->var_dump( $value, $maxDepth, $depth+1, $numberArray);
                     
-                    $class = new ReflectionClass( $var ); 
-                    $name = $class->getName(); 
-                    $return .= '<li><span class="label label-warning">object</span> <span style="color:'.$color.'">'.$name.'</span></li>';
-                }
-        }
-        $return .= "</ul>";
 
-        if($depth == 0)
-            $return .= '</div></pre>';
+//                     $return .= '</li>';
+//                     $i++;
+//                 }
+//                 if($i>0)
+//                     $return .= '</ul>';
+//                 $return .= '</li>';*/
+//         // }
+//         // else{
 
-        return $return;
 
-    }
+//         return $return;
+
+//     }
 
 }
 ?>

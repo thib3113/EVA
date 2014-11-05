@@ -20,7 +20,7 @@ Class Configuration extends SgdbManager{
             "tpl"          => ROOT.'/vues/index.tpl',
             "title"        => PROGRAM_NAME.' '.PROGRAM_VERSION,
             "menu_items"   => "",
-            "distribution" =>RaspberryPi::getInfos("distribution"),
+            "distribution" => RaspberryPi::getInfos("distribution"),
             "version"      => RaspberryPi::getInfos("version")
             );
         

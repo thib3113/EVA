@@ -80,8 +80,9 @@ Class User extends SgdbManager{
         $_SESSION[$this->session_name] = serialize(array($this->username, $this->uid, $this->token));
 
         //et un cookie au besoin
-        if($cookie || !empty($_COOKIE[$this->cookie_name]))
+        if($cookie || !empty($_COOKIE[$this->cookie_name])){
             setcookie($this->cookie_name, serialize( array($this->username, $this->uid, $this->token) ), time()+$this->cookie_time, '/' );
+        }
 
     }
 
@@ -112,6 +113,11 @@ Class User extends SgdbManager{
             }
     }
 
+    public function disconnect(){
+        $_SESSION[$this->session_name] = NULL;
+        $_COOKIE[$this->cookie_name] = NULL;
+    }
+
     public function isConnect(){
 
         $GLOBALS['is_connect'] = false; // on initialise les globales
@@ -134,11 +140,13 @@ Class User extends SgdbManager{
             $result = SgdbManager::sgbdSelect(array('*'), array("username" => $this->username,"uid" => $this->uid), null,null,null,  __FILE__, __LINE__ );
             $result = $result->fetch();
 
+
             if(empty($result))
                 return false;
 
             //on vérifie que le token soit le bon
             if($this->token != $result["token"]){
+                //le token n'es pas bon, on le change donc pour éviter le bruteforce
                 $this->setToken();
                 $this->save("token", "uid");
                 return false;
@@ -147,7 +155,7 @@ Class User extends SgdbManager{
                 $this->fillObject($result['id']);
                 //si le token est bon on connecte
                 $this->createSession();
-                return true;
+                return $this;
             }
         }  
     }

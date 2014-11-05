@@ -53,12 +53,14 @@ Class SgdbManager{
     public static function debug($query, $params, $errorInfo, $file, $line){
         global $debugObject;
 
+        $infos = $debugObject->whoCallMe(2);
+
         if($errorInfo[0] == 0)
             $status = '<span class="label label-success">'.$errorInfo[0].'</span>';
         else
             $status = '<span class="label label-danger">'.$errorInfo[0].' ( '.$errorInfo[1].' ) : '.$errorInfo[2].'</span>';
 
-        $list = '<kbd>'.self::boundQuery(self::$db, $query, $params).'</kbd>&nbsp;'.$status.' ON '.Functions::removeRootPath($file).' LINE '.$line;
+        $list = '<kbd>'.self::boundQuery(self::$db, $query, $params).'</kbd>&nbsp;'.$status.' ON '.$infos['file'].' LINE '.$infos['line'];
         $debugObject->addDebugList(array("SQL" => $list));
     }
 
@@ -92,7 +94,7 @@ Class SgdbManager{
                     case 'string':                    
                     default:
                         $typeOfFormat = PDO::PARAM_STR;
-                        break;
+                    break;
                 }
                 
 
@@ -108,7 +110,7 @@ Class SgdbManager{
             }
         }
         else{
-            $result = self::$db->exec($query);
+            $result = self::$db->query($query);
             if($result === false){
                 self::sgdbError($query, null, self::$db->errorInfo(), $file, $line);
                 return false;
@@ -151,7 +153,7 @@ Class SgdbManager{
     }
 
     public static function sgdbError($query, $params, $error, $file, $line){
-        global $smarty;
+        global $smarty, $debugObject;
         Functions::log("Requete : ".$query." ".(empty($params)? "": "( ".implode(",", $params)." )" ).", return : ".implode(',',$error)." IN FILE ".$file." LINE ".$line, "ERROR");
         if(DEBUG)
             self::debug($query, $params, self::$db->errorInfo(), $file, $line);
@@ -161,7 +163,7 @@ Class SgdbManager{
                 $i = 1;
         }
 
-        $smarty->assign('debugList',Functions::getDebugList());
+        $smarty->assign('debugList', $debugObject->getDebugList());
         $smarty->assign("errorInfos", array(
             "query" => $query,
             "params" => (!empty($params)? implode(', ', $params) : ""),

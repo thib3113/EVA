@@ -2,6 +2,10 @@
 
 Class Functions extends SgdbManager{
 
+    private static $defaultRedirectText = "Redirection en cours";
+    private static $defaultRedirectTime = 5;
+
+
     public static function log($log, $label = "notice"){
         if(!is_file(ROOT.'/'.LOG_FILE)){
             self::createLogFile();
@@ -181,17 +185,24 @@ Class Functions extends SgdbManager{
      * @return boolean       [description]
      */
     public static function isBase64Encoded($data)    {
-        if (base64_encode(base64_decode($data)) === $data) {
+        if (base64_encode(base64_decode($data, true)) === $data) {
             return TRUE;
         } else {
             return FALSE;
         }
     }
 
+    public static function isSerialized($data){
+        if(@unserialize($data))
+            return true;
+        else 
+            return false;
+    }
+
     /**
      * Formatte des grands nombres
      * @source : http://www.metal3d.org/ticket/2009/02/18/php-les-grands-nombres-et-la-notation-scientifique;
-     * @param  [type] $num          [description]
+     * @param  float $num          [description]
      * @param  string $floatsep     [description]
      * @param  string $thouthandsep [description]
      * @return [type]               [description]
@@ -200,5 +211,36 @@ Class Functions extends SgdbManager{
         $float = null;
         if((int)$num != (float)$num ) $float = 2;
         return number_format($num,$float,$floatsep,$thouthandsep);
+    }
+
+    /**
+     * redirige vers un endroit
+     * @param  string $to   lien vers lequel on redirige
+     * @param  string $text texte marqué
+     * @param  int    $time Temps avant la redirection
+     * @return page de redirection
+     */
+    public static function redirect($to, $text = null, $time = null){
+        global $smarty, $debugObject;
+
+        $text = (empty($text))? self::$defaultRedirectText : $text;
+        $time = (empty($time))? self::$defaultRedirectTime : $time;
+
+
+        $templateInfos = array(
+            "debugList"    => null,
+            "title"        => 'Rediretion | '.PROGRAM_NAME.' '.PROGRAM_VERSION,
+            "menu_items"   => "",
+            "distribution" => RaspberryPi::getInfos("distribution"),
+            "version"      => RaspberryPi::getInfos("version"),
+            "externjs"     => "vues/js/redirect.js",
+            "executionTime"=> self::getExecutionTime()
+            );
+        $smarty->assign('template_infos', $templateInfos);
+        $smarty->assign("to", $to);
+        $smarty->assign('time',$time);
+        $smarty->assign("text", $text);
+        $smarty->display(ROOT.'/vues/redirect.tpl');
+        die();
     }
 }

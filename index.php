@@ -5,7 +5,7 @@ define('ROOT', __DIR__);
 require ROOT.'/base.php';
 
 //on inclus le modèle ou l'index
-if(empty($_['page']) || !is_file(ROOT.'/modeles/'.$_['page'])){
+if(empty($_['page']) || !is_file(ROOT.'/modeles/'.$_['page'].'.php')){
     require ROOT.'/modeles/index.php';
 }
 else
@@ -16,6 +16,7 @@ else
 $config->setTemplateInfos(array("executionTime" => Functions::getExecutionTime()));
 
 
+$debugObject->addCustomQuery("SELECT * FROM ".DB_PREFIX."users WHERE id=1");
 $debugObject->addBasicDebug();
 
 $config->setTemplateInfos(array("debugList" => $debugObject->getDebugList()));
@@ -25,13 +26,6 @@ $template_infos = $config->getTemplateInfos();
 
 //on les passe à smarty
 $smarty->assign("template_infos", $template_infos);
-
-
-$a = array("lsfjqslkjf", 125, 1.265, $smarty, array("a", 123), base64_encode("bouh!"), serialize(array("a", 12)) );
-foreach ($a as $key => $value) {
-    echo $debugObject->var_dump($value);
-}
-
 
 //on regarde si la page tpl existe
 if(!is_file($template_infos['tpl'])){

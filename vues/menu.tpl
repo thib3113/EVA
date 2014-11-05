@@ -7,7 +7,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-        <a href="index.php" class="navbar-brand">
+        <a href="index.php" class="navbar-brand" id="header_title">
           {$smarty.const.PROGRAM_NAME} <i class="fa fa-github-alt fa-2x"></i> {$smarty.const.PROGRAM_VERSION}   
         </a>
     </div>

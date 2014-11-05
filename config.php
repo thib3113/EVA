@@ -12,5 +12,7 @@
     define('LOG_FILE','log/log.txt');
 	define('PLUGIN_DIR','plugins');
 	define('DEBUG', 1);
+
+    //spécifique à smarty
     define('SMARTY_SPL_AUTOLOAD',false);
     define('SMARTY_DIR','classes/');

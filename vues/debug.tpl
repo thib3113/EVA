@@ -1,3 +1,4 @@
+{if $template_infos.debugList}
         <div class="container-fluid">
             <div class="panel panel-warning">
                 <div class="panel-heading">
@@ -21,3 +22,4 @@
                 </div>
             </div>
         </div>
+{/if}

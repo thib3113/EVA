@@ -31,7 +31,7 @@ if(!empty($_)){
                                 $GLOBALS['json_returns'] = array('status' => true, "dash_title" => "User actif");
                             break;
                             case 'active_users':
-                                $avatar = '<img src="'.$user->getAvatar().'" alt="avatar de '.$user->getName().'" class="img-circle">';
+                                $avatar = '<img src="'.$user->getAvatar().'" alt="avatar de '.$user->getName().'" class="img-thumbnail">';
                                 $content = "$avatar <br> ".$user->getName()."";
                                 $GLOBALS['json_returns'] = array("status" => true, "message" => "ok", "dash_title" => "User actif", "dash_content" => $content, "dash_width" => 4);
                             break;
