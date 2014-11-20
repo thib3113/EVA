@@ -64,12 +64,12 @@ function widget(name, id){
     }
 
     this.createWaitingWidget = function(){
-        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading">Chargement du widget</div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
+        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
     }
 
     this.createWidget = function(){
         if(!this.HTML)
-            $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading">'+this.title+'</div>\n<div class="panel-body">'+this.content+'\n</div>\n</div>\n</div>');
+            $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading"><span class="selectable_text">'+this.title+'</span></div>\n<div class="panel-body">'+this.content+'\n</div>\n</div>\n</div>');
         else
             $('#dashboard_id_'+this.id).replaceWith(this.HTML);
 

@@ -5,8 +5,11 @@ $(function () {
     dashboard = new dashboard("default", 0);
 
     $( "#dashboard" ).sortable({ 
-        items: "> .sortable",
+        items: "> .sortable ",
+        cancel: "a,button,.panel-body,.selectable_text",
+        placeholder: "ui-state-highlight",
         forcePlaceholderSize: true ,
+        containment: "parent" ,
         stop: function( event, ui ) {
             new_order = [];
             $("#dashboard > .sortable").each(function( i ){
@@ -19,7 +22,7 @@ $(function () {
             // console.log(ui);
         },
     });
-    // $( "#dashboard" ).disableSelection({ items: "> .sortable:not(p)" });
+    // $( "#dashboard" ).disableSelection({ items: "> .sortable > .panel-heading" });
 
 
 
