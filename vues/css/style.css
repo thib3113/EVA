@@ -87,10 +87,10 @@ body { padding-bottom: 70px; }
 
 .dashboard_element{
   min-height: 100px;
-  -webkit-transition:display 1s;
-   -moz-transition:display 1s;
-     -o-transition:display 1s;
-        transition:display 1s;
+/*  -webkit-transition:height 1s;
+   -moz-transition:height 1s;
+     -o-transition:height 1s;
+        transition:height 1s;*/
 }
 
 #add_dashboard .panel-body:hover{
@@ -115,7 +115,7 @@ body { padding-bottom: 70px; }
 
 .tiers_height{
   height: 30%;
-  padding:15px;
+  padding: 0 20px 20px 20px;
 }
 
 #clear_footer{
@@ -139,4 +139,9 @@ body { padding-bottom: 70px; }
   -ms-transition: height 0.001s;
   -o-transition: height 0.001s;
   transition: height 0.001s;
+}
+
+
+.loading_icon{
+  animation-timing-function: cubic-bezier(0.79,0,0.54,0.99);
 }

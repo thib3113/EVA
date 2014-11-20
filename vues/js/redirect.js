@@ -1,5 +1,4 @@
 $(function () {
-	console.log("time : "+timer);
 	loopTime = timer*10;
 	time_between_loop = 10;
 
@@ -12,9 +11,9 @@ $(function () {
 		$("#redirect_progress div").width(Math.round(last_width)+"%");
 		if(last_width < full_width){
 			setTimeout(boucle, time_between_loop);
-			document.location.href = toLink;
 		}
 		else{
+			document.location.href = toLink;
 			$("#redirect_progress").remove();
 			$("#redirect_text").append('<br><a class="btn btn-primary btn-lg" href="'+toLink+'" role="button">Cliquez ici si vous n\'êtes pas redirigé</a>');
 		}

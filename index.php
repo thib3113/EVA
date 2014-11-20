@@ -5,11 +5,11 @@ define('ROOT', __DIR__);
 require ROOT.'/base.php';
 
 //on inclus le modèle ou l'index
-if(empty($_['page']) || !is_file(ROOT.'/modeles/'.$_['page'].'.php')){
-    require ROOT.'/modeles/index.php';
+if(empty($_['page']) || !is_file(ROOT.'/plugins/base/'.$_['page'].'.php')){
+    require ROOT.'/plugins/base/index.php';
 }
 else
-    require ROOT.'/modeles/'.$_['page'].'.php';
+    require ROOT.'/plugins/base/'.$_['page'].'.php';
 
 //on ajoute le temps d'éxécution aux informations de template
 

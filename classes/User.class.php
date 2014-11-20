@@ -33,7 +33,7 @@ Class User extends SgdbManager{
     private $gravatar_default = 404; // image par défault de l'image [ 404 | mm | identicon | monsterid | wavatar ]
     private $gravatar_max_rat = 'g'; // maximum rating ( aucune idée de à quoi ça sert )
 
-    
+
     private $enable_admin = true; // active les admins
     public $is_admin = false; // l'utilisateur est il un administrateur
     public $is_connect = false; // l'utilisateur est il connecté
@@ -58,7 +58,7 @@ Class User extends SgdbManager{
         //on fait une requete du password avec le mot de passe
         $result = SgdbManager::sgbdSelect(array('*'), array("username" => $user,"pass" => $password), null,null,null,  __FILE__, __LINE__ );
         $result = $result->fetch();
-        
+
         if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant 
             return false;
         }
@@ -93,7 +93,7 @@ Class User extends SgdbManager{
 
     public function setUid(){
         $uid = rand(0,9);
-        for ($i=0; $i <= 20 ; $i++) { 
+        for ($i=0; $i <= 20 ; $i++) {
             $uid .= rand(0,9);
         }
         $this->uid = $uid;
@@ -115,6 +115,8 @@ Class User extends SgdbManager{
 
     public function disconnect(){
         $_SESSION[$this->session_name] = NULL;
+
+        setcookie($this->cookie_name, "");
         $_COOKIE[$this->cookie_name] = NULL;
     }
 
@@ -136,7 +138,7 @@ Class User extends SgdbManager{
             $this->username = $session_infos[0]; 
             $this->uid = $session_infos[1];
             $this->token = $session_infos[2];
-        
+
             $result = SgdbManager::sgbdSelect(array('*'), array("username" => $this->username,"uid" => $this->uid), null,null,null,  __FILE__, __LINE__ );
             $result = $result->fetch();
 
@@ -157,7 +159,7 @@ Class User extends SgdbManager{
                 $this->createSession();
                 return $this;
             }
-        }  
+        }
     }
 
     public function getUserInfos(){
@@ -167,8 +169,8 @@ Class User extends SgdbManager{
 
         $return = $result_query->fetch();
         $return['avatar'] = empty($return['avatar'])? $this->getGravatar($return['email']) : $config['base_url'].'/vues/img_up/profils/'.$return['avatar'];
-        return $return; 
-        
+        return $return;
+
     }
 
     public function preparePasswd($username, $pass){ //on prépare le mot de passe à un stockage en bdd
@@ -177,7 +179,7 @@ Class User extends SgdbManager{
         $pass_temp = $username.$hashKey.$pass;
         if(DB_HASH)
             $pass_temp = hash(DB_HASH, $pass_temp);
-
+        // var_dump($pass_temp);
         return $pass_temp;
     }
 

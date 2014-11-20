@@ -1,5 +1,11 @@
 {if $template_infos.debugList}
-        <div class="container-fluid">
+        <style>
+        #debug_container{
+            clear: both;
+            word-wrap: break-word;
+        }
+        </style>
+        <div id="debug_container" class="container-fluid">
             <div class="panel panel-warning">
                 <div class="panel-heading">
                     <h3 class="panel-title">Debug</h3>

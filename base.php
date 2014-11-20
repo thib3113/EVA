@@ -59,7 +59,7 @@ $_ = array_merge($_GET, $_POST);
 $GLOBALS['menuItems'] = array();
 
 if(Functions::isAjax()){
-    require ROOT."/modeles/ajax.php";    
+    require ROOT."/plugins/base/ajax.php";    
     Plugin::callHook("ajax");
     die();
 }
@@ -69,6 +69,9 @@ if($myUser){
     Plugin::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));   
     Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "sign","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));
     Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/index.tpl'));
+    Configuration::addJs('vues/js/jquery-ui.min.js');
+    Configuration::addJs('vues/js/widget.js');
+    Configuration::addJs('vues/js/dashboard.js');
     Configuration::addJs('vues/js/index.js');
 }
 else{

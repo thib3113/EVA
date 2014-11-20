@@ -2,11 +2,10 @@
 
 function disconnect(){
     global $myUser;
-
-    // if(is_a($myUser, "User")){
-    	Functions::redirect("index.php");
-    	// $myUser->disconnect();
-    // }
+    if(is_a($myUser, "User")){
+    	Functions::redirect("index.php", "Vous allez être déconnecté !", 3);
+    	$myUser->disconnect();
+    }
     // else
 
 }
