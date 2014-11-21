@@ -7,6 +7,7 @@ function widget(name, id){
     this.HTML;
     this.name = name;
     this.ajaxConnexion;
+    this.type;
 
     this.getId = function(){
         return this.id;
@@ -68,8 +69,25 @@ function widget(name, id){
     }
 
     this.createWidget = function(){
-        if(!this.HTML)
-            $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading"><span class="selectable_text">'+this.title+'</span></div>\n<div class="panel-body">'+this.content+'\n</div>\n</div>\n</div>');
+        if(!this.HTML){
+            switch(this.type){
+                case "widget":
+                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading"><span class="selectable_text">'+this.title+'</span></div>\n<div class="panel-body">'+this.content+'\n</div>\n</div>\n</div>');
+                break;
+
+                case "waiting":
+                    $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
+                break;
+
+                case "add":
+
+                break;
+
+                case "add_button":
+
+                break;
+            }
+        }
         else
             $('#dashboard_id_'+this.id).replaceWith(this.HTML);
 
@@ -95,6 +113,7 @@ function widget(name, id){
                     parent.setContent(donneesRecu.dash_content);
                     parent.setWidth(donneesRecu.dash_width);
                     parent.setHTML(donneesRecu.HTML);
+                    parent.type = "widget";
                     parent.createWidget();
                 }
                 else

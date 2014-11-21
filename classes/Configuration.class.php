@@ -49,6 +49,7 @@ Class Configuration extends SgdbManager{
     public function getTemplateInfos(){
         self::$templateInfos['menu_items'] = self::triMenu();
         self::$templateInfos['externjs'] = self::$js_list;
+        self::$templateInfos['externcss'] = self::$css_list;
         return self::$templateInfos;
     }
 

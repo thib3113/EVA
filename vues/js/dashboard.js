@@ -4,6 +4,7 @@ function dashboard(){
     this.currentWidgetList = [];
     this.widgets = [];
     this.nextWidgetId = 0;
+    this.newOrderRequest;
 
     this.setDonneesRecu = function(DonneesRecu){
         this.DonneesRecu = DonneesRecu;
@@ -61,7 +62,9 @@ function dashboard(){
 
     this.newOrder = function(newOrder){
         parent = this;
-        $.ajax({
+        if (typeof(this.newOrderRequest) != "undefined")
+            this.newOrderRequest.abort();
+        this.newOrderRequest = $.ajax({
             url: 'index.php?page=dashboard',
             datatype: 'json',
             type: "POST",
@@ -73,9 +76,9 @@ function dashboard(){
                 }
                 donneesRecu = $.parseJSON(data);
                 if(donneesRecu.status){
-                    parent.setDonneesRecu(donneesRecu);
-                    parent.setCurrentWidgetList(donneesRecu.dashboard_list);
-                    parent.callWidgets();
+                    // parent.setDonneesRecu(donneesRecu);
+                    // parent.setCurrentWidgetList(donneesRecu.dashboard_list);
+                    // parent.callWidgets();
                 }
                 else{
                     return false;
@@ -102,6 +105,32 @@ function dashboard(){
         });
         i++;
         this.setNextWidgetId(i);
+    }
+
+    this.askNewWidget = function(){
+        parent = this;
+        $.ajax({
+            url: 'index.php?page=dashboard&dashboard=get_list',
+            datatype: 'json',
+            success: function(data){
+                if(!$.parseJSON(data)){
+                    message = 'erreur. Ressayer plus tard';
+                    notify(statut, message);
+                }
+                donneesRecu = $.parseJSON(data);
+                if(donneesRecu.status){
+                    console.log(donneesRecu);
+                }
+                else{
+                    return false;
+                }
+            },
+            error: function(data){
+                message = 'erreur. Ressayer plus tard';
+                notify(statut, message);
+            }
+
+        });
     }
 
     //execution

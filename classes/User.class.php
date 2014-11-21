@@ -39,6 +39,7 @@ Class User extends SgdbManager{
     public $is_connect = false; // l'utilisateur est il connecté
 
     private $session_name = '';
+    private $session_connect = '';
     private $cookie_name = '';
     private $cookie_time = 63072000;//2 ans
     private $default_g_id = 1;
@@ -48,6 +49,7 @@ Class User extends SgdbManager{
     function __construct(){
         $this->session_name = PROGRAM_NAME.'_auth';
         $this->cookie_name = PROGRAM_NAME.'_auth';
+        $this->session_connect = PROGRAM_NAME.'_connect';
 
         parent::__construct();
     }
@@ -78,6 +80,7 @@ Class User extends SgdbManager{
 
         //on crée la session
         $_SESSION[$this->session_name] = serialize(array($this->username, $this->uid, $this->token));
+        $_SESSION[$this->session_connect] = empty($_COOKIE['PHPSESSID'])? $_COOKIE['PHPSESSID'] : SID;
 
         //et un cookie au besoin
         if($cookie || !empty($_COOKIE[$this->cookie_name])){
@@ -130,12 +133,13 @@ Class User extends SgdbManager{
             $_SESSION[$this->session_name] = $_COOKIE[$this->cookie_name];
         }
 
+        // Bien, mais en ajax, mais pose des probleme avec les requete ajax asynchrone
         if(isset($_SESSION[$this->session_name])){ //on regarde si la session existe
             $session_infos = $_SESSION[$this->session_name]; //on renomme la session
-            $session_infos = unserialize($session_infos); //on explose la session ( celle ci est de la forme username-passwordhashé )
+            $session_infos = unserialize($session_infos);
 
             //on met les bons résultats dans les bonnes variables
-            $this->username = $session_infos[0]; 
+            $this->username = $session_infos[0];
             $this->uid = $session_infos[1];
             $this->token = $session_infos[2];
 
@@ -146,6 +150,13 @@ Class User extends SgdbManager{
             if(empty($result))
                 return false;
 
+            //permet de sauter la vérification du token . Cela permet d'avoir 2 requètes ajax asynchrone
+            if(isset($_SESSION[$this->session_connect]) && $_SESSION[$this->session_connect] == empty($_COOKIE['PHPSESSID'])? $_COOKIE['PHPSESSID'] : SID){
+                $this->fillObject($result['id']);
+                //si le token est bon on connecte
+                $this->createSession();
+                return $this;
+            }
             //on vérifie que le token soit le bon
             if($this->token != $result["token"]){
                 //le token n'es pas bon, on le change donc pour éviter le bruteforce
@@ -160,6 +171,7 @@ Class User extends SgdbManager{
                 return $this;
             }
         }
+
     }
 
     public function getUserInfos(){
@@ -217,11 +229,11 @@ Class User extends SgdbManager{
     public function getId(){
         return $this->id;
     }
-    
+
     /**
      * Sets the value of id,.
      *
-     * @param mixed $id, the id, 
+     * @param mixed $id, the id
      *
      * @return self
      */

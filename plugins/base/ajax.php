@@ -74,12 +74,17 @@ if(!empty($_)){
                     if(!empty($_['change_order'])){
                         $old_list = $user->getDashboardList();
                         $i=0;
-                        foreach ($old_list as $key => $value) {
-                            $new_list[] = array($old_list[$_['change_order'][$key]], "position" => $i);
+                        foreach ($_['change_order'] as $key => $value) {
+                            $new_list[] = array($old_list[$value], "position" => $key);
+                            // echo $value." : ".$old_list[$_['change_order'][$value]]." -> ".$_['change_order'][$value]."\n";
                             $i++;
                         }
+
                         $user->setDashboardList($new_list);
                         $user->sgbdSave();
+
+                        $GLOBALS['json_returns']['status'] = true;
+                        $GLOBALS['json_returns']['message'] = "modification réussie";
                     }
                 }
             break;
