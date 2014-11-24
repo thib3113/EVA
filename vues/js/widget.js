@@ -1,4 +1,4 @@
-function widget(name, id){
+function widget(name, id, special, new_widget){
     this.id = id;
     this.donneesRecu;
     this.title;
@@ -7,7 +7,9 @@ function widget(name, id){
     this.HTML;
     this.name = name;
     this.ajaxConnexion;
-    this.type;
+    this.resizable;
+    this.widgetType = (typeof(special) != "undefined")? special : false;
+    this.new_widget = (typeof(new_widget) != "undefined")? "&new_widget=1" : "";
 
     this.getId = function(){
         return this.id;
@@ -64,23 +66,31 @@ function widget(name, id){
             this.HTML = false;
     }
 
-    this.createWaitingWidget = function(){
-        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
-    }
+    // this.createWaitingWidget = function(){
+    //     $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
+    // }
 
-    this.createWidget = function(){
+    this.createWidget = function(type){
         if(!this.HTML){
-            switch(this.type){
+            switch(type){
                 case "widget":
-                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading"><span class="selectable_text">'+this.title+'</span></div>\n<div class="panel-body">'+this.content+'\n</div>\n</div>\n</div>');
+                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading"><span class="selectable_text">'+this.title+'</span><span class="float_right selectable_text toggle_widget" style="cursor:pointer" onclick="$(this.parentNode.parentNode.getElementsByTagName(\'div\')[1]).toggle(500);this.style.transform=(this.style.transform==\'rotate(180deg)\')?\'rotate(0deg)\':\'rotate(180deg)\';"><i class="fa fa-angle-double-down"></i></span></div>\n<div class="panel-body">'+this.content+'\n</div>\n</div>\n</div>');
                 break;
 
                 case "waiting":
-                    $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
+                    if(!$('#dashboard_id_'+this.id).length)
+                        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
+                    else
+                        $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
                 break;
 
-                case "add":
-
+                case "addNewWidget":
+                    list = '<select onchange="dashboard.addWidget(this);" class="form-control input-lg">\n\t\t<option value="">Choisissez votre nouveau widget</option>\n';
+                    for (var i = 0; i < this.donneesRecu.widget_list.length; i++) {
+                        list += '\t\t<option value="'+this.donneesRecu.widget_list[i][0]+'">'+this.donneesRecu.widget_list[i][1]+'</option>\n';
+                    };
+                    list += '\t\t</select>';
+                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+(this.id)+'" data-id="'+(this.id)+'"><div class="panel full_height panel-default"><div class="panel-heading">Ajouter un nouveau widget<span class="float_right selectable_text"  style="cursor:pointer" onclick="$(this.parentNode.parentNode.parentNode).remove();">X</span></div><div class="panel-body">\n'+list+'\n</div></div></div>');
                 break;
 
                 case "add_button":
@@ -98,7 +108,7 @@ function widget(name, id){
         donneesRecu = "";
         parent = this;
         this.ajaxConnexion = $.ajax({
-            url: 'index.php?page=dashboard&dashboard='+this.getName(),
+            url: 'index.php?page=dashboard&dashboard='+this.getName()+this.new_widget,
             datatype: 'json',
             success: function(data){
                 // La fonction à éxécuter avec les données recu
@@ -113,17 +123,47 @@ function widget(name, id){
                     parent.setContent(donneesRecu.dash_content);
                     parent.setWidth(donneesRecu.dash_width);
                     parent.setHTML(donneesRecu.HTML);
-                    parent.type = "widget";
-                    parent.createWidget();
+                    // console.log()
+                    if(!parent.widgetType)
+                            parent.createWidget("widget");
+                    else{
+                        parent.createWidget(parent.widgetType);
+                    }
                 }
                 else
-                    notify(error, donneesRecu.message);
+                    notify("error", donneesRecu.message);
                 return false;
             },
             error: function(data){
                 message = 'erreur. Ressayer plus tard';
                 notify(statut, message);
                 return false;
+            }
+
+        });
+    }
+
+    this.newWidget = function(){
+        parent = this;
+        $.ajax({
+            url: 'index.php?page=dashboard&dashboard=get_list',
+            datatype: 'json',
+            success: function(data){
+                if(!$.parseJSON(data)){
+                    message = 'erreur. Ressayer plus tard';
+                    notify(statut, message);
+                }
+                donneesRecu = $.parseJSON(data);
+                if(donneesRecu.status){
+                    console.log(donneesRecu);
+                }
+                else{
+                    return false;
+                }
+            },
+            error: function(data){
+                message = 'erreur. Ressayer plus tard';
+                notify(statut, message);
             }
 
         });
@@ -136,7 +176,7 @@ function widget(name, id){
     //execution
     // console.log("On crée l'objet d'attente");
     //on crée le widget d'attente
-    this.createWaitingWidget();
+    this.createWidget("waiting");
     // console.log("On récupère le widget");
     // on récupère les informations du widget depuis le serveur
     this.getWidget();

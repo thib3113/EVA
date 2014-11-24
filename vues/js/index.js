@@ -1,3 +1,4 @@
+dashboard;
 $(function () {
     var dashboard_list;
     var dashboard_id = 0;
@@ -22,6 +23,7 @@ $(function () {
 
     $("#add_dashboard").click(function(){
         dashboard.askNewWidget();
+        // onchange="dashboard.addWiget($(this).val());"
         // widget_list = getDashboard("get_list").widget_list;
         // console.log(widget_list);
         // $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" style="display:none;" id="dashboard_id'+dashboard_id+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading">Ajouter un nouveau widget</div>\n<div class="panel-body" id="add_widget_list">Chargement&nbsp;<i class="fa fa-refresh fa-spin"></i>\n</div>\n</div>\n</div>');
@@ -34,5 +36,6 @@ $(function () {
         // $("#add_widget_list").html(select_list);
         // $('#dashboard_id'+dashboard_id+'').show(0);
     });
+
 
 });

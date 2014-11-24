@@ -32,8 +32,12 @@ if(!empty($_)){
                     // ));
                     // $user->sgbdSave();
                     // /
-
                     if (!empty($_['dashboard'])) {
+
+                        if(!empty($_['new_widget']) && $_['new_widget'] == 1){
+                            $user->addDashboard(array($_['dashboard']));
+                            $user->sgbdSave();
+                        }
                         switch ($_['dashboard']) {
                             //getters
                             case 'get_all':

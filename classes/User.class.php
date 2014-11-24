@@ -118,8 +118,9 @@ Class User extends SgdbManager{
 
     public function disconnect(){
         $_SESSION[$this->session_name] = NULL;
+        $_SESSION[$this->session_connect] = NULL;
 
-        setcookie($this->cookie_name, "");
+        setcookie($this->cookie_name, "", time()-3600, '/' );
         $_COOKIE[$this->cookie_name] = NULL;
     }
 
@@ -276,6 +277,13 @@ Class User extends SgdbManager{
 
     public function addDashboard(array $dashboard){
         $currentDashboardList = unserialize($this->dashboard_list);
+        
+        if(!is_array($dashboard))
+            return false;
+
+        if(empty($dashboard["position"]))
+            $dashboard["position"] = count($this->dashboard_list);
+
         $currentDashboardList[] = $dashboard;
         $this->setDashboardList($currentDashboardList); 
     }

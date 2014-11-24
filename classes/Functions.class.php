@@ -234,6 +234,7 @@ Class Functions extends SgdbManager{
             "distribution" => RaspberryPi::getInfos("distribution"),
             "version"      => RaspberryPi::getInfos("version"),
             "externjs"     => "vues/js/redirect.js",
+            "externcss"    => "",
             "executionTime"=> self::getExecutionTime()
             );
         $smarty->assign('template_infos', $templateInfos);
