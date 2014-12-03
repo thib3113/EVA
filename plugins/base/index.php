@@ -4,9 +4,9 @@ function widgetDefault(){
     
 }
 
-Plugin::callHook("pre_header");
-Plugin::callHook("header");
-Plugin::callHook("pre_content");
-Plugin::callHook("content");
-Plugin::callHook("pre_footer");
-Plugin::callHook("footer");
+Plugins::callHook("pre_header");
+Plugins::callHook("header");
+Plugins::callHook("pre_content");
+Plugins::callHook("content");
+Plugins::callHook("pre_footer");
+Plugins::callHook("footer");

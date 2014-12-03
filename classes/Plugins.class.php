@@ -1,6 +1,6 @@
 <?php
 
-Class Plugin extends SgdbManager{
+Class Plugins extends SgdbManager{
     static private $hook_list = array();
     static private $menuItems;
 
@@ -17,7 +17,7 @@ Class Plugin extends SgdbManager{
             foreach (self::$hook_list[$hook] as $select_hook) {
                 call_user_func_array(key($select_hook), $select_hook[key($select_hook)]);
             }
-        }   
+        }
         else
             return false;
     }

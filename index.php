@@ -1,6 +1,7 @@
 <?php
 //on définis le root
 define('ROOT', __DIR__);
+ob_start();
 //on inclus les fichiers de base
 require ROOT.'/base.php';
 
@@ -34,4 +35,6 @@ if(!is_file($template_infos['tpl'])){
 else{
     $smarty->display($template_infos['tpl']);
 }
+
+ob_end_flush();
 ?>

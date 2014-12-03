@@ -24,7 +24,7 @@ Class User extends SgdbManager{
                                     'create_time'    => 'timestamp',
                                     'plugins_list'   => 'TEXT',
                                     'dashboard_list' => 'TEXT',
-                                    'avatar'         =>  'longstring',
+                                    'avatar'         => 'longstring',
                                     'token'         =>  'TEXT'
                                     );
 
@@ -34,6 +34,8 @@ Class User extends SgdbManager{
     private $gravatar_max_rat = 'g'; // maximum rating ( aucune idée de à quoi ça sert )
 
 
+    private $current_uid = 0; //uid courant
+    private $admin_g_id = 1;
     private $enable_admin = true; // active les admins
     public $is_admin = false; // l'utilisateur est il un administrateur
     public $is_connect = false; // l'utilisateur est il connecté
@@ -42,31 +44,46 @@ Class User extends SgdbManager{
     private $session_connect = '';
     private $cookie_name = '';
     private $cookie_time = 63072000;//2 ans
-    private $default_g_id = 1;
+    private $default_g_id = 2;
     private $col_groups = "group_id"; //nom de la colonne du groupe
     private $group_id_admin = 0; //valeur du groupe si l'utilisateur es admin
 
-    function __construct(){
+    function __construct($user = null, $password = null, $rememberMe = false, $needEncrypt = true){
         $this->session_name = PROGRAM_NAME.'_auth';
         $this->cookie_name = PROGRAM_NAME.'_auth';
         $this->session_connect = PROGRAM_NAME.'_connect';
 
+        if(empty($user) || empty($password) || empty($rememberMe) || empty($needEncrypt)){
+            return $this->isConnect();
+        }
+        else{
+            $this->connect($user, $password, $rememberMe, $needEncrypt);
+        }
         parent::__construct();
     }
 
     public function connect($user, $password, $rememberMe = false, $needEncrypt = true){
-        $password = ($needEncrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant 
+        $password = ($needEncrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant
 
         //on fait une requete du password avec le mot de passe
-        $result = SgdbManager::sgbdSelect(array('*'), array("username" => $user,"pass" => $password), null,null,null,  __FILE__, __LINE__ );
+        $result = SgdbManager::sgbdSelect(array('*'), array("username" => $user,"pass" => $password), null,null,null, null,  __FILE__, __LINE__ );
         $result = $result->fetch();
 
-        if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant 
+        if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant
             return false;
         }
         else{
             $this->fillObject($result['id']);
             $this->createSession($rememberMe);
+            return $this;
+        }
+    }
+
+
+    public function is_admin(){
+        if($this->group_id == $this->admin_g_id){
+            $this->is_admin = true;
+            $GLOBALS['is_admin'] = true;
             return true;
         }
     }
@@ -77,10 +94,15 @@ Class User extends SgdbManager{
         $this->setToken();
         $this->save("token");
 
+        //on génère les variables d'informations
+        $GLOBALS['is_connect'] = true;
+        $this->is_connect = true;
+        $this->is_admin();
+
 
         //on crée la session
         $_SESSION[$this->session_name] = serialize(array($this->username, $this->uid, $this->token));
-        $_SESSION[$this->session_connect] = empty($_COOKIE['PHPSESSID'])? $_COOKIE['PHPSESSID'] : SID;
+        $_SESSION[$this->session_connect] = !empty($_COOKIE['PHPSESSID'])? $_COOKIE['PHPSESSID'] : SID;
 
         //et un cookie au besoin
         if($cookie || !empty($_COOKIE[$this->cookie_name])){
@@ -107,7 +129,7 @@ Class User extends SgdbManager{
         if(!is_numeric($id))
             return false;
 
-            $result = self::sgbdSelect( array_keys($this->object_fields) , array("id" => $id), null, null, null, __FILE__, __LINE__);
+            $result = self::sgbdSelect( array_keys($this->object_fields) , array("id" => $id), null, null, null, null, __FILE__, __LINE__);
             $result = $result->fetch();
             $i = 0;
             foreach($this->object_fields as $field=>$type){
@@ -125,10 +147,6 @@ Class User extends SgdbManager{
     }
 
     public function isConnect(){
-
-        $GLOBALS['is_connect'] = false; // on initialise les globales
-        $GLOBALS['is_admin'] = false; // on initialise les globales
-
         if(!empty($_COOKIE[$this->cookie_name])){ //si le cookie existe
             //on crée la session correspondante ( qui fonctionnera, ou pas )
             $_SESSION[$this->session_name] = $_COOKIE[$this->cookie_name];
@@ -144,7 +162,7 @@ Class User extends SgdbManager{
             $this->uid = $session_infos[1];
             $this->token = $session_infos[2];
 
-            $result = SgdbManager::sgbdSelect(array('*'), array("username" => $this->username,"uid" => $this->uid), null,null,null,  __FILE__, __LINE__ );
+            $result = SgdbManager::sgbdSelect(array('*'), array("username" => $this->username,"uid" => $this->uid), null, null, null, null,  __FILE__, __LINE__ );
             $result = $result->fetch();
 
 
@@ -160,9 +178,15 @@ Class User extends SgdbManager{
             }
             //on vérifie que le token soit le bon
             if($this->token != $result["token"]){
+                var_dump($result["token"]);
+                var_dump($this->token);
                 //le token n'es pas bon, on le change donc pour éviter le bruteforce
                 $this->setToken();
                 $this->save("token", "uid");
+
+                //on efface le cookie et la session
+                $this->disconnect();
+
                 return false;
             }
             else{
@@ -178,7 +202,7 @@ Class User extends SgdbManager{
     public function getUserInfos(){
         $id = $this->id;
         //création de la query
-        $result_query = SgdbManager::sgbdSelect(array('*'), array("id" => $id), null,null,null,  __FILE__, __LINE__ );
+        $result_query = SgdbManager::sgbdSelect(array('*'), array("id" => $id), null, null,null,null,  __FILE__, __LINE__ );
 
         $return = $result_query->fetch();
         $return['avatar'] = empty($return['avatar'])? $this->getGravatar($return['email']) : $config['base_url'].'/vues/img_up/profils/'.$return['avatar'];

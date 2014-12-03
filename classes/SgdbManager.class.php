@@ -60,7 +60,7 @@ Class SgdbManager{
         else
             $status = '<span class="label label-danger">'.$errorInfo[0].' ( '.$errorInfo[1].' ) : '.$errorInfo[2].'</span>';
 
-        $list = '<kbd>'.self::boundQuery(self::$db, $query, $params).'</kbd>&nbsp;'.$status.' ON '.$infos['file'].' LINE '.$infos['line'];
+        $list = '<kbd>'.self::boundQuery(self::$db, $query, $params).'</kbd>&nbsp;'.$status.' ON '.((!empty($file) && !empty($line))? $file.' LINE '.$line : $infos['file'].' LINE '.$infos['line']);
         $debugObject->addDebugList(array("SQL" => $list));
     }
 
@@ -69,36 +69,38 @@ Class SgdbManager{
             if(!is_array($params))
                 $params = array($params);
 
-
+            //on prépare la requete
             $request = self::$db->prepare($query);
 
-            $paramsTemp = array();
-            $i = 1;
-            foreach ($params as $param) {
-
-                switch (gettype($param)) {
-                    case 'boolean':
-                        $typeOfFormat = PDO::PARAM_BOOL;
-                    break;
-                    case 'integer':
-                        $typeOfFormat = PDO::PARAM_INT;
-                    break;
-                    case 'array':
-                        $param = serialize($param);
-                        $typeOfFormat = PDO::PARAM_STR;
-                    break;
-                    case 'null':
-                        $typeOfFormat = PDO::PARAM_NULL;
-                    break;
-                    break;
-                    case 'string':                    
-                    default:
-                        $typeOfFormat = PDO::PARAM_STR;
-                    break;
+                //si la requete n'as pas pu être préparé, on s'arrete là
+                if($request){
+                    $paramsTemp = array();
+                    $i = 1;
+                    //on choisis le bon type de protection en fonction du type de paramètre
+                    foreach ($params as $param) {
+                        switch (gettype($param)) {
+                            case 'boolean':
+                                $typeOfFormat = PDO::PARAM_BOOL;
+                            break;
+                            case 'integer':
+                                $typeOfFormat = PDO::PARAM_INT;
+                            break;
+                            case 'array':
+                                $param = serialize($param);
+                                $typeOfFormat = PDO::PARAM_STR;
+                            break;
+                            case 'null':
+                                $typeOfFormat = PDO::PARAM_NULL;
+                            break;
+                            break;
+                            case 'string':
+                            default:
+                                $typeOfFormat = PDO::PARAM_STR;
+                            break;
+                        }
+                        //on protège
+                        $request->bindValue($i++, $param, $typeOfFormat);
                 }
-                
-
-                $request->bindValue($i++, $param, $typeOfFormat);
             }
 
             if(!$request){
@@ -119,13 +121,13 @@ Class SgdbManager{
                 $return = $result;
         }
 
-        self::debug($query, $params, self::$db->errorInfo(), $file, $line);  
+        self::debug($query, $params, self::$db->errorInfo(), $file, $line);
 
         //return peux valoir 0 si aucune ligne n'est affectée
         if($return instanceof PDO)
             if($return->errorCode() !== "00000")
                 self::sgdbError($query, $params, self::$db->errorInfo(), $file, $line);
-            
+
         return $return;
     }
 
@@ -262,13 +264,13 @@ Class SgdbManager{
 
     }
 
-    public function sgbdSelect(array $cols = null, array $where =null, array $order =null, array $group_by =null, array $limit =null, $file=NULL, $line=NULL){
+    public function sgbdSelect(array $cols = null, array $where =null, $table = null, array $order =null, array $group_by =null, array $limit =null, $file=NULL, $line=NULL){
+        //préparation du debug
         $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
         $debug = $debug[0];
-        
-        $cols = (!empty($cols))? implode(", ", $cols) : '*';
-        $table = DB_PREFIX.$this->TABLE_NAME;
 
+        $cols = (!empty($cols))? implode(", ", $cols) : '*';
+        $table = (empty($table))? DB_PREFIX.$this->TABLE_NAME : DB_PREFIX.$table;
         $params = array();
         $where_temp = null;
         if(!empty($where)){
@@ -290,8 +292,8 @@ Class SgdbManager{
         $query = "SELECT $cols FROM ".$table.$where_temp.$order.$group_by.$limit;
         $return = self::_query($query, $params, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
         return $return;
-        
-    } 
+
+    }
 
     public  function existTable($table = false, $autocreate = false){
         if(strtoupper(DB_TYPE) == "SQLITE")

@@ -139,6 +139,10 @@ function dashboard(){
         console.log(this.nextWidgetId+1);
     }
 
+    this.createWaitingWidget = function(id){
+                        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><div class="outline"><div class="circle"></div></div></div></div></div>');
+    }
+
     //execution
     // console.log("récupération de la liste des wigets de cet utilisateur");
     this.getCurrentWidget();

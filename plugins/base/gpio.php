@@ -4,11 +4,11 @@ function gpioIndex(){
     
 }
 
-Plugin::addHook("gpio", "gpioIndex");
+Plugins::addHook("gpio", "gpioIndex");
 
-Plugin::callHook("pre_header");
-Plugin::callHook("header");
-Plugin::callHook("pre_gpio");
-Plugin::callHook("gpio");
-Plugin::callHook("pre_footer");
-Plugin::callHook("footer");
+Plugins::callHook("pre_header");
+Plugins::callHook("header");
+Plugins::callHook("pre_gpio");
+Plugins::callHook("gpio");
+Plugins::callHook("pre_footer");
+Plugins::callHook("footer");

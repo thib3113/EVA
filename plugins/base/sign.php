@@ -10,7 +10,7 @@ function disconnect(){
 
 }
 
-Plugin::addHook("signout", "disconnect");
+Plugins::addHook("signout", "disconnect");
 
-Plugin::callHook("pre_signout");
-Plugin::callHook("signout");
+Plugins::callHook("pre_signout");
+Plugins::callHook("signout");

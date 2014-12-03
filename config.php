@@ -7,6 +7,7 @@
 	define('PROGRAM_FORUM','http://evaproject.net/forum'); //no end slash
     define('DB_TYPE','SQLITE');//SQLITE ou MYSQL
     define('DB_PREFIX','EVA_');
+    define('SYSTEM_USER', 'eva');
     define('DB_NAME',ROOT.'/db/.database.db');
 	define('DB_HASH','sha512');
     define('LOG_FILE','log/log.txt');

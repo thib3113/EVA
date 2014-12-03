@@ -244,4 +244,22 @@ Class Functions extends SgdbManager{
         $smarty->display(ROOT.'/vues/redirect.tpl');
         die();
     }
+
+    public static function fatal_error($text, $file = null, $line = null){
+        global $smarty, $debugObject;
+
+        $infos = $debugObject->whoCallMe(2);
+        $line = !empty($line)? $line : $infos['line'];
+        $file = !empty($file)? $file : $infos['file'];
+
+        $smarty->assign('debugList', $debugObject->getDebugList());
+        $smarty->assign("errorInfos", array(
+            "body" => $text,
+            "file" => $file,
+            "line" => $line,
+            )
+        );
+        $smarty->display(ROOT.'/vues/fatal_error.tpl');
+        die();
+    }
 }

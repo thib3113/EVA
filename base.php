@@ -7,12 +7,18 @@ if(!is_file(DB_NAME) && basename($_SERVER['SCRIPT_FILENAME']) != "install.php"){
     die();
 }
 
-$system = new System();
+$smarty = new Smarty();
+$smarty->template_dir = ROOT.'/cache/templates/';
+$smarty->compile_dir = ROOT.'/cache/templates_c/';
+$smarty->config_dir = ROOT.'/cache/configs/';
+$smarty->cache_dir = ROOT.'/cache/cache/';
+
 $debugObject = new Debug();
+$system = new System();
 
 //on inclus tout les plugins
 $pluginsFolder = ROOT.DIRECTORY_SEPARATOR.PLUGIN_DIR;
-$pluginsFolder = opendir($pluginsFolder) or die('Erreur');
+$pluginsFolder = opendir($pluginsFolder) or Functions::fatal_error('Impossible d\'ouvrir le dossier des plugins');
 while($file = @readdir($pluginsFolder)) {
   if(preg_match("~.plugin.~", $file)){
     $debugObject->addDebugList(array("plugins" => $pluginsFolder.DIRECTORY_SEPARATOR.$file));
@@ -23,29 +29,24 @@ closedir($pluginsFolder);
 
 $config = new Configuration();
 
-$smarty = new Smarty(); 
-$smarty->template_dir = ROOT.'/cache/templates/';
-$smarty->compile_dir = ROOT.'/cache/templates_c/';
-$smarty->config_dir = ROOT.'/cache/configs/';
-$smarty->cache_dir = ROOT.'/cache/cache/';
 
-$user = new User();
-$myUser = $user->isConnect();
+$myUser = new User;
+
 
 $_ = array_merge($_GET, $_POST);
 
 $GLOBALS['menuItems'] = array();
 
 if(Functions::isAjax()){
-    require ROOT."/plugins/base/ajax.php";    
-    Plugin::callHook("ajax");
+    require ROOT."/plugins/base/ajax.php";
+    Plugins::callHook("ajax");
     die();
 }
 
 //on charge toutes les fonctions de base
-if($myUser){
-    Plugin::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));   
-    Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "sign","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));
+if($myUser->is_connect){
+    Plugins::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));
+    Plugins::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "sign","times", count($GLOBALS['menuItems'])+1, array("sign" => "out")));
     Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/index.tpl'));
     Configuration::addJs('vues/js/jquery-ui.min.js');
     Configuration::addJs('vues/js/widget.js');

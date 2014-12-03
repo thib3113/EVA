@@ -66,10 +66,6 @@ function widget(name, id, special, new_widget){
             this.HTML = false;
     }
 
-    // this.createWaitingWidget = function(){
-    //     $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
-    // }
-
     this.createWidget = function(type){
         if(!this.HTML){
             switch(type){
@@ -78,10 +74,11 @@ function widget(name, id, special, new_widget){
                 break;
 
                 case "waiting":
+                    code_loader = '<div class="outline"><div class="circle"></div></div>';
                     if(!$('#dashboard_id_'+this.id).length)
-                        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
+                        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
                     else
-                        $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center"><i class="fa fa-circle-o-notch fa-spin fa-4x loading_icon"></i></div></div></div>');
+                        $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
                 break;
 
                 case "addNewWidget":
@@ -124,10 +121,15 @@ function widget(name, id, special, new_widget){
                     parent.setWidth(donneesRecu.dash_width);
                     parent.setHTML(donneesRecu.HTML);
                     // console.log()
-                    if(!parent.widgetType)
-                            parent.createWidget("widget");
+                    if(typeof(donneesRecu.executeFunction) == "undefined" || donneesRecu.executeFunction.length == 0){
+                        if(!parent.widgetType)
+                                parent.createWidget("widget");
+                        else{
+                            parent.createWidget(parent.widgetType);
+                        }
+                    }
                     else{
-                        parent.createWidget(parent.widgetType);
+                        window[donneesRecu.executeFunction](donneesRecu.arguments);
                     }
                 }
                 else
@@ -155,7 +157,7 @@ function widget(name, id, special, new_widget){
                 }
                 donneesRecu = $.parseJSON(data);
                 if(donneesRecu.status){
-                    console.log(donneesRecu);
+
                 }
                 else{
                     return false;

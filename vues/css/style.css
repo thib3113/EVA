@@ -186,3 +186,28 @@ body { padding-bottom: 70px; }
     -o-transition:-o-transform 0.5s ;
     transition:transform 0.5s ;
 }
+
+/* loading by http://codepen.io/jovanChe/pen/IzHuo */
+.loader_content .panel-body{
+    min-height: 60px;
+}
+
+.loader_content .outline {
+    width:70px; height:70px;
+    margin:55px auto;
+}
+.loader_content .circle {
+    width:70px; height:70px;
+    border-radius:50%;
+    border-top: 4px solid rgba(0, 0, 0, 0.2);
+    border-right: 4px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+    border-left: 4px solid #000;
+    -webkit-animation: circle 2s infinite linear;
+    animation: circle 2s infinite linear;
+}
+
+@-webkit-keyframes circle { 
+    100% { -webkit-transform: rotate(360deg); } }
+@keyframes circle { 
+    100% { transform: rotate(360deg); transform:rotate(360deg); } }
