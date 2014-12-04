@@ -6,9 +6,11 @@ $(function () {
 	width_per_loop = full_width / (timer*100);
 	last_width = 0;
 
+	console.log(timer);
 	function boucle(){
 		last_width = last_width + width_per_loop;
-		$("#redirect_progress div").width(Math.round(last_width)+"%");
+		$("#redirect_progress div").width(last_width+"%");
+		$("#redirect_progress div .sr-only").html(Math.round(last_width)+"%");
 		if(last_width < full_width){
 			setTimeout(boucle, time_between_loop);
 		}

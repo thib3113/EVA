@@ -1,6 +1,6 @@
 function notify(statut, message){
-        statut = typeof statut !== 'undefined' ? statut : "error";
-        message = typeof message !== 'undefined' ? message : 'erreur inconnue';
+        statut = typeof statut === 'string' ? statut : statut ? "success" : "error";
+        message = typeof message === 'string' ? message : 'erreur inconnue';
         //choix du layout    
         if($(document).width() > 768)
             choiceLayout = 'bottomLeft';
@@ -18,7 +18,7 @@ function notify(statut, message){
         });
     }
 
-    var last_notif = 0;     
+    var last_notif = 0;
     $("form#form_sign_in").submit(function(e) {
             message = 'Une erreur inconnue c\'est produite';
             statut = "error";
@@ -31,7 +31,7 @@ function notify(statut, message){
                 last_notif.close();
 
             $.ajax({
-            url: 'index.php?page=signin',        /* Il s'agit de l'url ou seront traitÃ¯Â¿Â½s les donnÃ¯Â¿Â½es */
+            url: 'index.php?page=sign',        /* Il s'agit de l'url ou seront traitÃ¯Â¿Â½s les donnÃ¯Â¿Â½es */
             type: 'POST',            /* Il s'agit de la mÃ¯Â¿Â½thode employÃ¯Â¿Â½e */
             data : {user : user, pass : pass, remember_me : remember_me},
             datatype: 'json',
@@ -42,7 +42,7 @@ function notify(statut, message){
                     last_notif = notify(statut, message);
                 }
                 donneesRecu = $.parseJSON(data);
-                if(donneesRecu.status == 'success'){
+                if(donneesRecu.status == true){
                     setTimeout(location.reload(), 3000);
                 }else{
                     //anything else

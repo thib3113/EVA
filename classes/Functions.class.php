@@ -221,23 +221,21 @@ Class Functions extends SgdbManager{
      * @return page de redirection
      */
     public static function redirect($to, $text = null, $time = null){
-        global $smarty, $debugObject;
+        global $smarty, $debugObject, $config, $myUser;
+
+        if($time === 0){
+            header("location: $to");
+            die("redirect 0s");
+        }
 
         $text = (empty($text))? self::$defaultRedirectText : $text;
         $time = (empty($time))? self::$defaultRedirectTime : $time;
 
 
-        $templateInfos = array(
-            "debugList"    => null,
-            "title"        => 'Rediretion | '.PROGRAM_NAME.' '.PROGRAM_VERSION,
-            "menu_items"   => "",
-            "distribution" => RaspberryPi::getInfos("distribution"),
-            "version"      => RaspberryPi::getInfos("version"),
-            "externjs"     => "vues/js/redirect.js",
-            "externcss"    => "",
-            "executionTime"=> self::getExecutionTime()
-            );
-        $smarty->assign('template_infos', $templateInfos);
+        Configuration::addJs("vues/js/redirect.js");
+
+        $config->setTemplateInfos(array("debugList" => $debugObject->getDebugList()));
+        $smarty->assign('template_infos', $config->getTemplateInfos());
         $smarty->assign("to", $to);
         $smarty->assign('time',$time);
         $smarty->assign("text", $text);
@@ -262,4 +260,5 @@ Class Functions extends SgdbManager{
         $smarty->display(ROOT.'/vues/fatal_error.tpl');
         die();
     }
+
 }

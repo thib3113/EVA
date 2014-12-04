@@ -54,7 +54,7 @@ Class User extends SgdbManager{
         $this->session_connect = PROGRAM_NAME.'_connect';
 
         if(empty($user) || empty($password) || empty($rememberMe) || empty($needEncrypt)){
-            return $this->isConnect();
+            $this->isConnect();
         }
         else{
             $this->connect($user, $password, $rememberMe, $needEncrypt);
@@ -178,8 +178,6 @@ Class User extends SgdbManager{
             }
             //on vérifie que le token soit le bon
             if($this->token != $result["token"]){
-                var_dump($result["token"]);
-                var_dump($this->token);
                 //le token n'es pas bon, on le change donc pour éviter le bruteforce
                 $this->setToken();
                 $this->save("token", "uid");
@@ -301,7 +299,7 @@ Class User extends SgdbManager{
 
     public function addDashboard(array $dashboard){
         $currentDashboardList = unserialize($this->dashboard_list);
-        
+
         if(!is_array($dashboard))
             return false;
 
@@ -309,7 +307,7 @@ Class User extends SgdbManager{
             $dashboard["position"] = count($this->dashboard_list);
 
         $currentDashboardList[] = $dashboard;
-        $this->setDashboardList($currentDashboardList); 
+        $this->setDashboardList($currentDashboardList);
     }
 
     public function getPluginsList(){

@@ -12,7 +12,12 @@ Class Configuration extends SgdbManager{
     private static $templateInfos = array();
     private static $menu_items = array();
     private static $dashboard_list = array();
-    private static $js_list = array();
+    private static $js_list = array(
+        "start_head" => array(),
+        "end_head" => array(),
+        "start_body" => array(),
+        "end_body" => array(),
+    );
     private static $css_list = array();
     private static $DashboardWidgetList = array();
 
@@ -24,7 +29,7 @@ Class Configuration extends SgdbManager{
             "distribution" => RaspberryPi::getInfos("distribution"),
             "version"      => RaspberryPi::getInfos("version")
             );
-        
+
         parent::__construct();
     }
 
@@ -43,7 +48,7 @@ Class Configuration extends SgdbManager{
     }
 
     public function getConfig(){
-        
+
     }
 
     public function getTemplateInfos(){
@@ -82,9 +87,9 @@ Class Configuration extends SgdbManager{
 
         self::$menu_items[] = array(
                                                     "name" => $name,
-                                                    "link" => $link, 
-                                                    "icon" => $icon, 
-                                                    "position" => $position, 
+                                                    "link" => $link,
+                                                    "icon" => $icon,
+                                                    "position" => $position,
                                                     "params" => $params,
                                                     "active" => $active,
                                                     "custom_item" => (!empty($params['custom_item']) )? $name : ""
@@ -96,9 +101,9 @@ Class Configuration extends SgdbManager{
     static public function addSubMenuItem($id, $name, $slug, $icon, $position = null, $params = null){
         self::$menu_items[$id]['sub_menu'][] = array(
                                                     "name" => $name,
-                                                    "slug" => $slug, 
-                                                    "icon" => $icon, 
-                                                    "position" => $position, 
+                                                    "slug" => $slug,
+                                                    "icon" => $icon,
+                                                    "position" => $position,
                                                     "params" => $params
                                                     );
     }
@@ -108,12 +113,19 @@ Class Configuration extends SgdbManager{
     }
 
     public static function triMenu(){
-        uasort (self::$menu_items , function($a,$b){return $a['position']>$b['position']?1:-1;});
+        uasort (self::$menu_items , function($a,$b){
+        if($a["position"]<0)
+            $a["position"] = count(self::$menu_items)+$a["position"];
+        if($b["position"]<0)
+            $b["position"] = count(self::$menu_items)+$b["position"];
+
+         return $a['position']>$b['position']?1:-1;
+     });
         return self::$menu_items;
     }
 
-    public static function addJS($url){
-        self::$js_list[] = $url;
+    public static function addJS($url, $position = "end_body"){
+        self::$js_list[$position][] = $url;
     }
 
     public static function addCSS($url){

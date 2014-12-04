@@ -5,12 +5,28 @@ ob_start();
 //on inclus les fichiers de base
 require ROOT.'/base.php';
 
-//on inclus le modèle ou l'index
-if(empty($_['page']) || !is_file(ROOT.'/plugins/base/'.$_['page'].'.php')){
-    require ROOT.'/plugins/base/index.php';
+$custom_function = "";
+if(Functions::isAjax())
+    $custom_function = "json_";
+
+if($myUser->is_connect){
+    //on inclus le modèle ou l'index
+    if(empty($_['page']) || !function_exists("affich_$custom_function".$_['page'])){
+        $func_name = 'affich_'.$custom_function.'index';
+        $func_name();
+    }
+    else{
+        $func_name = "affich_$custom_function".$_['page'];
+        $func_name();
+    }
 }
 else
-    require ROOT.'/plugins/base/'.$_['page'].'.php';
+    affich_sign("in");
+
+if(Functions::isAjax()){
+    echo json_encode($ajaxResponse->get_response());
+    die();
+}
 
 //on ajoute le temps d'éxécution aux informations de template
 

@@ -90,12 +90,21 @@ body { padding-bottom: 70px; }
 }
 
 .dashboard_element{
-    min-height: 100px;
+    /*désactiver car réapparait au drag*/
+    /*min-height: 100px; */
 /*  -webkit-transition:height 1s;
     -moz-transition:height 1s;
      -o-transition:height 1s;
      transition:height 1s;*/
  }
+
+.dashboard_element{
+    margin-bottom: 20px;
+}
+
+.dashboard_element .panel{
+    margin-bottom: 0;
+}
 
 #add_dashboard .panel-body:hover{
     background-color: #CCCCCC;

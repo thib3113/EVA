@@ -105,13 +105,13 @@ function widget(name, id, special, new_widget){
         donneesRecu = "";
         parent = this;
         this.ajaxConnexion = $.ajax({
-            url: 'index.php?page=dashboard&dashboard='+this.getName()+this.new_widget,
+            url: 'index.php?dashboard='+this.getName()+this.new_widget,
             datatype: 'json',
             success: function(data){
                 // La fonction à éxécuter avec les données recu
                 if(!$.parseJSON(data)){ //si le json reçu n'est pas réelement du json
                     message = 'erreur. Ressayer plus tard';
-                    notify(statut, message);
+                    notify(false, message);
                 }
                 donneesRecu = $.parseJSON(data);
                 if(donneesRecu.status){
@@ -133,12 +133,12 @@ function widget(name, id, special, new_widget){
                     }
                 }
                 else
-                    notify("error", donneesRecu.message);
+                    notify(false, donneesRecu.message);
                 return false;
             },
             error: function(data){
                 message = 'erreur. Ressayer plus tard';
-                notify(statut, message);
+                notify(false, message);
                 return false;
             }
 
@@ -148,7 +148,7 @@ function widget(name, id, special, new_widget){
     this.newWidget = function(){
         parent = this;
         $.ajax({
-            url: 'index.php?page=dashboard&dashboard=get_list',
+            url: 'index.php?dashboard=get_list',
             datatype: 'json',
             success: function(data){
                 if(!$.parseJSON(data)){

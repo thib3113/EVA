@@ -2,8 +2,6 @@
 
 Options -Indexes 
 
-
-
 # compress text, html, javascript, css, xml:
 
 AddOutputFilterByType DEFLATE text/plain

@@ -7,7 +7,7 @@
             <div class="navbar-header">
                 <p class="navbar-brand logo visible-*-*">
                     <a href="index.php">
-                        {$smarty.const.PROGRAM_NAME} <i class="fa fa-github-alt fa-2x"></i> {$smarty.const.PROGRAM_VERSION}   
+                        {$smarty.const.PROGRAM_NAME} <i class="fa fa-github-alt fa-2x"></i> {$smarty.const.PROGRAM_VERSION}
                     </a>
                 </p>
             </div>
@@ -21,12 +21,12 @@
             <p id="redirect_text">{$text}
             <noscript><br>
                 Vous serez redirigé dans {$time} seconde{if $time>1}s{/if} <br>
-                <a href="{$to}">Cliquez ici si votre navigateur ne vous redirige pas</a>
             </noscript>
             </p>
             <script type="text/javascript">
             document.write('\t\t\t<div id="redirect_progress" class="progress">\n\t\t\t\t\n<div class="progress-bar progress-bar-striped active no-transition" role="progressbar"style="">\n\t\t\t\t\t<span class="sr-only">0% Complete</span>\n\t\t\t\t</div>\n\t\t\t</div>');
             </script>
+            <a href="{$to}">Cliquez ici si votre navigateur ne vous redirige pas ou si vous ne voulez pas attendre</a>
         </div>
     </div>
 </div>

@@ -36,7 +36,7 @@ function dashboard(){
     this.getCurrentWidget = function(){
         parent = this;
         $.ajax({
-            url: 'index.php?page=dashboard&dashboard=get_all',
+            url: 'index.php?dashboard=get_all',
             datatype: 'json',
             success: function(data){
                 if(!$.parseJSON(data)){
@@ -103,10 +103,6 @@ function dashboard(){
         i = this.getNextWidgetId();
         this.order[i] = i;
         parent_dashboard = this;
-        console.log(this);
-        console.log(i<parent_dashboard.currentWidgetList.length);
-        console.log(typeof(parent_dashboard.currentWidgetList));
-        console.log(i);
         //sert à attendre le retour de la requete
         $.when(this.widgets[i] = new widget(this.currentWidgetList[i], i))
         .done(function(){
