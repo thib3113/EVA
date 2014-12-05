@@ -16,7 +16,6 @@ Class User extends SgdbManager{
     protected $TABLE_NAME = "users";
     protected $object_fields= array(
                                     'id'             => 'key',
-                                    'uid'            => 'int',
                                     'username'       => 'string',
                                     'pass'           => 'string',
                                     'group_id'       => 'int',
@@ -25,7 +24,6 @@ Class User extends SgdbManager{
                                     'plugins_list'   => 'TEXT',
                                     'dashboard_list' => 'TEXT',
                                     'avatar'         => 'longstring',
-                                    'token'         =>  'TEXT'
                                     );
 
     //gravatar
@@ -34,6 +32,7 @@ Class User extends SgdbManager{
     private $gravatar_max_rat = 'g'; // maximum rating ( aucune idée de à quoi ça sert )
 
 
+    private $uid_table_name = "uid";
     private $current_uid = 0; //uid courant
     private $admin_g_id = 1;
     private $enable_admin = true; // active les admins
@@ -69,10 +68,14 @@ Class User extends SgdbManager{
         $result = SgdbManager::sgbdSelect(array('*'), array("username" => $user,"pass" => $password), null,null,null, null,  __FILE__, __LINE__ );
         $result = $result->fetch();
 
+
         if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant
             return false;
         }
         else{
+            $this->id = $result['id'];
+            $this->set_uid_infos();
+
             $this->fillObject($result['id']);
             $this->createSession($rememberMe);
             return $this;
@@ -92,7 +95,8 @@ Class User extends SgdbManager{
 
         //on génère un nouveau token
         $this->setToken();
-        $this->save("token");
+        $this->_query("UPDATE ".DB_PREFIX.$this->uid_table_name." SET token=? WHERE uid=?", array($this->current_token, $this->current_uid), __FILE__, __LINE__);
+        // $this->save("token");
 
         //on génère les variables d'informations
         $GLOBALS['is_connect'] = true;
@@ -101,27 +105,63 @@ Class User extends SgdbManager{
 
 
         //on crée la session
-        $_SESSION[$this->session_name] = serialize(array($this->username, $this->uid, $this->token));
+        $_SESSION[$this->session_name] = serialize(array($this->username, $this->uid, $this->current_token));
         $_SESSION[$this->session_connect] = !empty($_COOKIE['PHPSESSID'])? $_COOKIE['PHPSESSID'] : SID;
 
         //et un cookie au besoin
         if($cookie || !empty($_COOKIE[$this->cookie_name])){
-            setcookie($this->cookie_name, serialize( array($this->username, $this->uid, $this->token) ), time()+$this->cookie_time, '/' );
+            setcookie($this->cookie_name, serialize( array($this->username, $this->uid, $this->current_token) ), time()+$this->cookie_time, '/' );
         }
+
+        $this->saveIp();
 
     }
 
     public function setToken(){
-        $this->token = Functions::randomStr(rand(100, 127));
+        $this->current_token = Functions::randomStr(rand(100, 127));
+        $this->_query("UPDATE ".DB_PREFIX.$this->uid_table_name." SET token=?, time=?  WHERE uid=?", array($this->current_token, time(), $this->current_uid), __FILE__, __LINE__);
+
         return true;
     }
-
-    public function setUid(){
+    public function generateUid(){
         $uid = rand(0,9);
+
         for ($i=0; $i <= 20 ; $i++) {
             $uid .= rand(0,9);
         }
-        $this->uid = $uid;
+
+        $this->current_uid = $uid;
+    }
+
+    public function saveIp(){
+        if(!in_array($_SERVER['REMOTE_ADDR'], $this->current_ip_list)){
+            $this->current_ip_list[] = $_SERVER['REMOTE_ADDR'];
+            $this->_query("UPDATE ".DB_PREFIX.$this->uid_table_name." SET ips=? WHERE uid=?", array(serialize($this->current_ip_list), $this->current_uid), __FILE__, __LINE__);
+        }
+
+    }
+
+    public function set_uid_infos(){
+        if(!empty($this->current_uid)){
+            $result = SgdbManager::sgbdSelect(array('*'), array("uid" => $this->current_uid), "uid", null, null, null,  __FILE__, __LINE__ );
+            $result = $result->fetch();
+        }
+        else{
+            $result = SgdbManager::sgbdSelect(array('*'), array("browser_infos" => $_SERVER['HTTP_USER_AGENT']), "uid", null, null, null,  __FILE__, __LINE__ );
+            $result = $result->fetch();
+            if(!$result){
+                $this->generateUid();
+                $result['uid'] = $this->current_uid;
+                $result['token'] = "";
+                $result['ips'] = serialize(array($_SERVER['REMOTE_ADDR']));
+                $this->_query("INSERT INTO ".DB_PREFIX.$this->uid_table_name." (uid, browser_infos, ips, id, time) VALUES (?, ?, ?, ?, ?)", array($this->current_uid, $_SERVER['HTTP_USER_AGENT'], $result['ips'], $this->id, time() ), __FILE__, __LINE__);
+            }
+        }
+        $this->current_ip = $_SERVER['REMOTE_ADDR'];
+        $this->current_ip_list = unserialize($result['ips']);
+        $this->current_user_agent = $_SERVER['HTTP_USER_AGENT'];
+        $this->current_uid = $result['uid'];
+        $this->current_token = $result['token'];
         return true;
     }
 
@@ -159,28 +199,34 @@ Class User extends SgdbManager{
 
             //on met les bons résultats dans les bonnes variables
             $this->username = $session_infos[0];
-            $this->uid = $session_infos[1];
-            $this->token = $session_infos[2];
+            $this->current_uid = $session_infos[1];
+            $this->current_token = $session_infos[2];
 
-            $result = SgdbManager::sgbdSelect(array('*'), array("username" => $this->username,"uid" => $this->uid), null, null, null, null,  __FILE__, __LINE__ );
+            $result = SgdbManager::sgbdSelect(array('*'), array("username" => $this->username), null, null, null, null,  __FILE__, __LINE__ );
             $result = $result->fetch();
+
 
 
             if(empty($result))
                 return false;
 
+
+            $this->id = $result['id'];
+            $this->set_uid_infos();
+
             //permet de sauter la vérification du token . Cela permet d'avoir 2 requètes ajax asynchrone
             if(isset($_SESSION[$this->session_connect]) && $_SESSION[$this->session_connect] == empty($_COOKIE['PHPSESSID'])? $_COOKIE['PHPSESSID'] : SID){
+
                 $this->fillObject($result['id']);
                 //si le token est bon on connecte
                 $this->createSession();
                 return $this;
             }
+
             //on vérifie que le token soit le bon
-            if($this->token != $result["token"]){
+            if($this->current_token != $this->current_token){
                 //le token n'es pas bon, on le change donc pour éviter le bruteforce
                 $this->setToken();
-                $this->save("token", "uid");
 
                 //on efface le cookie et la session
                 $this->disconnect();
@@ -260,7 +306,7 @@ Class User extends SgdbManager{
      *
      * @return self
      */
-    public function setId($id){
+    private function setId($id){
         $this->id = $id;
     }
     public function setusername($username){

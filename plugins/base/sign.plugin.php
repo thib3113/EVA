@@ -36,8 +36,6 @@ function disconnect(){
     global $myUser;
     if(is_a($myUser, "User")){
         $myUser->disconnect();
-        echo "disconnect()";
-        // die("aaaaa");
         Functions::redirect("index.php", "Vous allez être déconnecté !", 5);
     }
     // else

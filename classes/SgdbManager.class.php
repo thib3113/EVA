@@ -195,15 +195,15 @@ Class SgdbManager{
         return self::existTable();
 	}
 
-    public function sgbdDrop($file = NULL, $line = NULL){
-        //debug
-        $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
-        $debug = $debug[0];
+    // public function sgbdDrop($file = NULL, $line = NULL){
+    //     //debug
+    //     $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
+    //     $debug = $debug[0];
 
-        $query = 'DROP TABLE `'.DB_PREFIX.$this->TABLE_NAME.'`;';
+    //     $query = 'DROP TABLE `'.DB_PREFIX.$this->TABLE_NAME.'`;';
         
-        $this->_query($query, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
-    }
+    //     $this->_query($query, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
+    // }
 
     public function save($input, $optionnalParams=NULL, $file = NULL, $line = NULL){
         $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
