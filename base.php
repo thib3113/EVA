@@ -15,6 +15,7 @@ $smarty->cache_dir = ROOT.'/cache/cache/';
 
 $debugObject = new Debug();
 $system = new System();
+$RaspberryPi = new RaspberryPi();
 $config = new Configuration();
 $myUser = new User;
 $ajaxResponse = new Ajax();

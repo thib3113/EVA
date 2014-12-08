@@ -90,6 +90,10 @@ function widget(name, id, special, new_widget){
                     $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+(this.id)+'" data-id="'+(this.id)+'"><div class="panel full_height panel-default"><div class="panel-heading">Ajouter un nouveau widget<span class="float_right selectable_text"  style="cursor:pointer" onclick="$(this.parentNode.parentNode.parentNode).remove();">X</span></div><div class="panel-body">\n'+list+'\n</div></div></div>');
                 break;
 
+                case "error":
+                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="selectable_text">Erreur lors du chargement du widget</span></div><div class="panel-body text-center"><i style="color: rgb(183, 10, 10);" class="fa fa-exclamation-triangle fa-5x"></i><br>'+this.message+'</div></div></div>');
+                break;
+
                 case "add_button":
 
                 break;
@@ -110,8 +114,8 @@ function widget(name, id, special, new_widget){
             success: function(data){
                 // La fonction à éxécuter avec les données recu
                 if(!$.parseJSON(data)){ //si le json reçu n'est pas réelement du json
-                    message = 'erreur. Ressayer plus tard';
-                    notify(false, message);
+                    parent.message = "Une erreur s'est produite lors du chargement du widget";
+                    parent.createWidget("error");
                 }
                 donneesRecu = $.parseJSON(data);
                 if(donneesRecu.status){
@@ -132,13 +136,15 @@ function widget(name, id, special, new_widget){
                         window[donneesRecu.executeFunction](donneesRecu.arguments);
                     }
                 }
-                else
-                    notify(false, donneesRecu.message);
+                else{
+                    parent.message = "Une erreur s'est produite lors du chargement du widget";
+                    parent.createWidget("error");
+                }
                 return false;
             },
             error: function(data){
-                message = 'erreur. Ressayer plus tard';
-                notify(false, message);
+                    parent.message = "Une erreur s'est produite lors du chargement du widget";
+                    parent.createWidget("error");
                 return false;
             }
 

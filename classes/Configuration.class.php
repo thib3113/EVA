@@ -22,12 +22,13 @@ Class Configuration extends SgdbManager{
     private static $DashboardWidgetList = array();
 
     function __construct(){
+        global $RaspberryPi;
         self::$templateInfos = array(
             "tpl"          => ROOT.'/vues/index.tpl',
             "title"        => PROGRAM_NAME.' '.PROGRAM_VERSION,
             "menu_items"   => "",
-            "distribution" => RaspberryPi::getInfos("distribution"),
-            "version"      => RaspberryPi::getInfos("version")
+            "distribution" => $RaspberryPi->getInfos("distribution"),
+            "version"      => $RaspberryPi->getInfos("version")
             );
 
         parent::__construct();

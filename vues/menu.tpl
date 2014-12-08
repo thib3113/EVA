@@ -1,13 +1,13 @@
 <nav class="navbar navbar-default" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
+  <div class="container-fluid">
+    <div class="navbar-header" style="padding: 0px 30px;">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-        <a href="index.php" class="navbar-brand" id="header_title">
+        <a href="index.php" class="navbar-brand" style="padding: 5px;" id="header_title">
           {$smarty.const.PROGRAM_NAME} <i class="fa fa-github-alt fa-2x"></i> {$smarty.const.PROGRAM_VERSION}   
         </a>
     </div>

@@ -62,7 +62,7 @@ function affich_json_index(){
                 break;
                 case 'actual_users':
                     $avatar = '<img src="'.$myUser->getAvatar().'" alt="avatar de '.$myUser->getName().'" class="img-thumbnail">';
-                    $content = "$avatar <br> ".$myUser->getName()."";
+                    $content = "$avatar ".$myUser->getName()."";
                     $ajaxResponse->set_response(array("status" => true, "message" => "ok", "dash_title" => "User actif", "dash_content" => $content, "dash_width" => 4));
                 break;
                 case 'lorem':
