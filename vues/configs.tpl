@@ -13,28 +13,81 @@
         width: 50%;
     }
 </style>
-    <div id="tab_accueil">
-        <form role="form">
-            <table class="table table-striped">
-                <tr>
-                    <td>Votre Raspberry Pi</td>
-                    <td>{$yourRaspberryPi}</td>
-                </tr>
-                <tr>
-                    <td>Votre version</td>
-                    <td>{$smarty.const.PROGRAM_NAME} {$smarty.const.PROGRAM_VERSION}</td>
-                </tr>
-                <tr>
-                    <td>Votre serveur web</td>
-                    <td>{$server_software}</td>
-                </tr>
-                <tr>
-                  <td>Version de php</td>
-                  <td>{$phpversion}</td>
-                </tr>
-            </table>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
+  <div id="current_tab">
+    
+      <div id="tab_accueil">
+          <form role="form">
+              <table class="table table-striped">
+                  <tr>
+                      <td>Votre Raspberry Pi</td>
+                      <td>{$yourRaspberryPi}</td>
+                  </tr>
+                  <tr>
+                      <td>Votre version</td>
+                      <td>{$smarty.const.PROGRAM_NAME} {$smarty.const.PROGRAM_VERSION}</td>
+                  </tr>
+                  <tr>
+                      <td>Votre serveur web</td>
+                      <td>{$server_software}</td>
+                  </tr>
+                  <tr>
+                    <td>Version de php</td>
+                    <td>{$phpversion}</td>
+                  </tr>
+              </table>
+          </form>
+      </div>
+      <div id="tab_profil">
+          <form role="form">
+              <table class="table table-striped">
+                  <tr>
+                      <td>Pseudo</td>
+                      <td><input type="text" value="{$myUser.username}"></td>
+                  </tr>
+                  <tr>
+                      <td>Email</td>
+                      <td><input type="email" value="{$myUser.email}"></td>
+                  </tr>
+                  <tr>
+                    <td>Mot de passe</td>
+                    <td><input type="password"></td>
+                  </tr>
+                  <tr>
+                    <td>Confirmation du mot de passe</td>
+                    <td><input type="password"></td>
+                  </tr>
+              </table>
+              <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+      </div>
+      <div id="tab_plugins">
+        <div class="panel panel-danger">
+          <div class="panel-heading">
+              <h3 class="panel-title">Le serveur de plugin ne semble pas disponible</h3>
+          </div>
+          <div class="panel-body">
+            Une erreur de connexion au market viens de se produire, merci de réessayer ultérieurement.
+            -- Fonctionnalitée non active en alpha --
+          </div>
+        </div>
+      </div>
+      <div id="tab_mise_a_jour">
+          {if !$erreur_maj}
+          {else}
+        <div class="panel panel-danger">
+          <div class="panel-heading">
+              <h3 class="panel-title">Les erreurs suivantes sont apparus</h3>
+          </div>
+          <div class="panel-body">
+            <ul>
+            {foreach from=$erreur_maj item=erreur}
+              <li>{$erreur}</li>
+            {/foreach}
+            </ul>
+          </div>
+        </div>
+          {/if}
+      </div>
+  </div>
 </div>
 {include "{$smarty.const.ROOT}/vues/footer.tpl"}

@@ -8,25 +8,16 @@
         <span class="icon-bar"></span>
       </button>
         <a href="index.php" class="navbar-brand" style="padding: 5px;" id="header_title">
-          {$smarty.const.PROGRAM_NAME} <i class="fa fa-github-alt fa-2x"></i> {$smarty.const.PROGRAM_VERSION}   
+          {$smarty.const.PROGRAM_NAME} <i class="fa fa-github-alt fa-2x"></i> {$smarty.const.PROGRAM_VERSION}
         </a>
     </div>
     <div class="collapse navbar-collapse navbar-inner" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav nav-center">
 {foreach from=$template_infos.menu_items item=menu_item}
-{if {$menu_item.sub_menu} ne ""}
-            <li {if {$menu_item.active}==1}class="active"{/if}>
-                {if {$menu_item.custom_item} ne ""}
-                {$menu_item.custom_item}
-                {else}
-                <a href="{$menu_item.link}"><i class="fa fa-{$menu_item.icon}"></i> {$menu_item.name}</a>
-                {/if}
-            </li>
-{else}
+{if isset($menu_item.sub_menu) && $menu_item.sub_menu ne ""}
             <li class="dropdown">
               <a href="{$menu_item.link}" class="dropdown-toggle" data-toggle="dropdown">{$menu_item.name}<span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
-
 {foreach from=$menu_item.sub_menu item=sub_item}
 {if {$sub_item.divider}}
                 <li class="divider"></li>
@@ -35,6 +26,14 @@
 {/if}
 {/foreach}
               </ul>
+            </li>
+{else}
+            <li {if {$menu_item.active}==1}class="active"{/if}>
+                {if {$menu_item.custom_item} ne ""}
+                {$menu_item.custom_item}
+                {else}
+                <a href="{$menu_item.link}"><i class="fa fa-{$menu_item.icon}"></i> {$menu_item.name}</a>
+                {/if}
             </li>
 {/if}
 {/foreach}

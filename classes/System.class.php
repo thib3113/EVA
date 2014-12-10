@@ -25,6 +25,7 @@ class System {
         //on cherche la distrib courante
         $this->setDistrib($this->getCurrentDistrib());
 
+        $this->setUserSystemFolder($this->getUserSystemFolder());
         //on regarde si l'utilisateur systeme est installé
     }
 
@@ -32,6 +33,14 @@ class System {
         $processUser = posix_getpwuid(posix_geteuid());
         return $processUser['name'];
 
+    }
+
+    public function getUserSystemFolder(){
+        return $this->shell(' cat /etc/passwd | grep '.SYSTEM_USER.' | cut -d : -f6', true);
+    }
+
+    public function setUserSystemFolder($userSystemFolder){
+        $this->userSystemFolder = $userSystemFolder;
     }
 
     public function shell($str, $system_user = false){
@@ -47,7 +56,6 @@ class System {
         //Pour rajouter une distrib, il faut l'ajouter dans la liste, puis l'ajouter dans le switch en dessous
         $getCurrentDistribByVersion = array(
             "Raspbian",
-
             );
 
         foreach ($getCurrentDistribByVersion as $value) {
