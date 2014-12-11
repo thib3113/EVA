@@ -306,7 +306,7 @@ class RaspberryPi extends SgdbManager{
           return $this->exec("uname -r");
         break;
         case 'wiringpi':
-          return $this->exec($this->GPIO_DEFAULT_PATH.' -v | grep "gpio version" | cut -c15-');
+          return $this->exec(self::GPIO_DEFAULT_PATH.' -v | grep "gpio version" | cut -c15-');
           break;
         case 'git':
           return $this->exec("git --version");

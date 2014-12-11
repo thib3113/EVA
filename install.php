@@ -21,6 +21,7 @@ function autoload($name) {
 spl_autoload_register("autoload");
 
 
+$RaspberryPi = new RaspberryPi();
 $_ = array_merge($_GET, $_POST);
 
 //on regarde si la db existe déjà, pour empécher l'installaion dans ce cas
@@ -74,8 +75,8 @@ function check($value){
 
 $GLOBALS['error'] = 0;
 $all_is_not_good_message = "";
-$distribution = RaspberryPi::getInfos("distribution");
-$version = RaspberryPi::getInfos("version");
+$distribution = $RaspberryPi->getInfos("distribution");
+$version = $RaspberryPi->getInfos("version");
 
 //on test les erreurs
 if(!is_writable(dirname(DB_NAME))){
@@ -85,10 +86,10 @@ if(!is_writable(dirname(DB_NAME))){
 if(!is_writable(ROOT.'/'.PLUGIN_DIR))
     $erreurs[] = createError('le dossier '.PLUGIN_DIR.' n\'est pas disponible en écriture', array("Rendre le dossier inscriptible par tout le monde <kbd>sudo chmod -R 777 ".PLUGIN_DIR."/</kbd>" ));
 
-if(!RaspberryPi::getInfos('wiringpi'))
+if(!$RaspberryPi->getInfos('wiringpi'))
     $erreurs[] = createError("WiringPi ne semble pas être installer sur votre RaspberryPi", 'Suivre les étapes d\'installation : <a href="http://wiringpi.com/download-and-install/">http://wiringpi.com/download-and-install/</a>');
 
-if(!RaspberryPi::getInfos('git'))
+if(!$RaspberryPi->getInfos('git'))
     $erreurs[] = createError("Git ne semble pas être installer sur votre RaspberryPi", 'Installer git <kdb>sudo apt-get install git</kdb>');
 
 
@@ -164,8 +165,8 @@ if(!empty($_['launch_install'])){
 $template_infos = array(
             "title"        => 'Installation - '.PROGRAM_NAME.' '.PROGRAM_VERSION,
             "externjs"     => '',
-            "distribution" => RaspberryPi::getInfos("distribution"),
-            "version"      => RaspberryPi::getInfos("version")
+            "distribution" => $RaspberryPi->getInfos("distribution"),
+            "version"      => $RaspberryPi->getInfos("version")
             );
 $smarty->assign("all_is_good", !$GLOBALS['error']);
 $smarty->assign("all_is_not_good_message", $all_is_not_good_message);

@@ -1,6 +1,6 @@
 #! /bin/bash
 ver_eva=0.4
-ver_install=1.0.2
+ver_install=1.0.3
 
 
 url_git="https://github.com/thib3113/EVA.git"
@@ -224,8 +224,9 @@ then
     affich action "Installation de PHP & SQLite "
     install php5
     install php5-cgi
-    install php5-sqlite
     install sqlite
+    install php5-sqlite
+    install php5-curl
     /etc/init.d/lighttpd force-reload >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
         affich point
     affich ok
