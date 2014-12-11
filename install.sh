@@ -1,4 +1,6 @@
 #! /bin/bash
+ver=1.0
+
 
 url_git="https://github.com/thib3113/EVA.git"
 log_folder="/var/log/eva"
@@ -118,7 +120,7 @@ echo -e "${RED}( : '~'.~.'~' : )${WHITE}    |  _| _    \ \ / /   / ___ \   "
 echo -e "${RED} ~ .~ (   ) ~. ~ ${WHITE}   _| |__/ |    \ ' /  _/ /   \ \_ "
 echo -e "${RED}  (  : '~' :  )  ${WHITE}  |________|     \_/  |____| |____|"
 echo -e "${RED}   '~ .~~~. ~'   ${WHITE}                                   "
-echo -e "${RED}       '~'       ${WHITE}                                   "
+echo -e "${RED}       '~'       ${WHITE}                              $ver "
 echo -e "Lien github : ${GREEN}https://github.com/thib3113/EVA${WHITE}"
 echo -e "Lien du site : ${GREEN}http://evaproject.net/${WHITE}"
 echo -e "En cas de problème, merci de joindre vos deux fichiers présent dans le dossier log avec votre problème"
@@ -136,6 +138,7 @@ else
     mkdir -p $log_folder
         affich -no-log point
     date >> "$log_folder/$log_file"
+    echo $ver >> "$log_folder/$log_file"
         affich -no-log point
     affich -no-log ok
 fi
@@ -243,7 +246,7 @@ then
 fi
 
 affich action "Clonage de Eva "
-git clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+# git clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
 affich point
 chmod -R 775 /var/www/EVA
 affich point
