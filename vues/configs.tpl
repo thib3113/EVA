@@ -73,6 +73,7 @@
       </div>
       <div id="tab_mise_a_jour">
           {if !$erreur_maj}
+          
           {else}
         <div class="panel panel-danger">
           <div class="panel-heading">

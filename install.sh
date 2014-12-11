@@ -1,6 +1,6 @@
 #! /bin/bash
 
-url_git=""
+url_git="https://github.com/thib3113/EVA.git"
 log_folder="/var/log/eva"
 log_file="install.log"
 log_error_file="error.install.log"
@@ -78,22 +78,27 @@ check_install(){
     # echo "sudo dpkg --get-selections | grep \"$soft\" | grep -v deinstall"
     if [ $(sudo dpkg --get-selections | grep "$soft" | grep -v deinstall | wc -l) -gt 0 ]
     then
-        echo "installation fail " >> "$log_folder/$log_file"
+        return 0
+    else
+        echo -ne "installation fail, nombre d'application trouvé : " >> "$log_folder/$log_file"
+        sudo dpkg --get-selections | grep "$soft" | grep -v deinstall | wc -l >> "$log_folder/$log_file"
         echo "commande sudo dpkg --get-selections | grep \"$soft\" | grep -v deinstall" >> "$log_folder/$log_file"
         sudo dpkg --get-selections | grep "$soft" | grep -v deinstall >> "$log_folder/$log_file"
         return 1
-    else
-        return 0
     fi
 }
 
 install(){
+    echo "apt-get install -y $1" >> "$log_folder/$log_file"
     apt-get install -y $1 >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
-    if ! check_install $1;
+
+    check_install $1
+    if [ $? -eq 1 ];
     then
         affich error
+    else
+        affich point
     fi
-
 }
 
 if [ "$UID" -ne 0 ]
@@ -158,7 +163,7 @@ fi
 affich action "Mise à jour de la liste des paquets "
     affich point
     affich point
-sudo apt-get update >> "$log_folder/$log_file" 2>> $log_error_file
+sudo apt-get update >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
     affich point
 affich ok
 
@@ -171,7 +176,6 @@ then
     affich already
 else
     install git
-        affich point
         affich point
         affich point
     affich ok
@@ -212,22 +216,17 @@ fi
 if [ -z $webserver ]
 then
     affich action "Installation de lighttpd "
-    if install lighttpd ; then affich error ;fi
-        affich point
+    if ! install lighttpd ; then affich error ;fi
         affich point
         affich point
     affich ok
 
     affich action "Installation de PHP & SQLite "
-    if install php5 ; then affich error ;fi
-        affich point
-    if install php5-cgi ; then affich error ;fi
-        affich point
-    if install php5-sqlite ; then affich error ;fi
-        affich point
-    if install sqlite ; then affich error ;fi
-        affich point
-    /etc/init.d/lighttpd force-reload >> "$log_folder/$log_file" 2>> $log_error_file
+    install php5
+    install php5-cgi
+    install php5-sqlite
+    install sqlite
+    /etc/init.d/lighttpd force-reload >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
         affich point
     affich ok
 
@@ -243,4 +242,24 @@ then
     affich ok
 fi
 
+affich action "Clonage de Eva "
+git clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+affich point
+chmod -R 775 /var/www/EVA
+affich point
+affich point
+affich ok
 
+affich action "Création d'un utilisateur eva "
+affich point
+useradd --home /home/eva --groups web,eva eva >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+affich point
+sudo -u eva cat /var/log/eva/install.log >> "$log_folder/$log_file" 2>>"$log_folder/$log_file"
+affich point
+
+if [ ! $? -eq 1 ]
+then
+    affich ok
+else
+    affich error
+fi
