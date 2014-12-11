@@ -1,5 +1,6 @@
 #! /bin/bash
-ver=1.0
+ver_eva=0.4
+ver_install=1.0.1
 
 
 url_git="https://github.com/thib3113/EVA.git"
@@ -82,10 +83,6 @@ check_install(){
     then
         return 0
     else
-        echo -ne "installation fail, nombre d'application trouvé : " >> "$log_folder/$log_file"
-        sudo dpkg --get-selections | grep "$soft" | grep -v deinstall | wc -l >> "$log_folder/$log_file"
-        echo "commande sudo dpkg --get-selections | grep \"$soft\" | grep -v deinstall" >> "$log_folder/$log_file"
-        sudo dpkg --get-selections | grep "$soft" | grep -v deinstall >> "$log_folder/$log_file"
         return 1
     fi
 }
@@ -120,7 +117,7 @@ echo -e "${RED}( : '~'.~.'~' : )${WHITE}    |  _| _    \ \ / /   / ___ \   "
 echo -e "${RED} ~ .~ (   ) ~. ~ ${WHITE}   _| |__/ |    \ ' /  _/ /   \ \_ "
 echo -e "${RED}  (  : '~' :  )  ${WHITE}  |________|     \_/  |____| |____|"
 echo -e "${RED}   '~ .~~~. ~'   ${WHITE}                                   "
-echo -e "${RED}       '~'       ${WHITE}                              $ver "
+echo -e "${RED}       '~'       ${WHITE}  EVA $ver_eva - Installeur $ver_install "
 echo -e "Lien github : ${GREEN}https://github.com/thib3113/EVA${WHITE}"
 echo -e "Lien du site : ${GREEN}http://evaproject.net/${WHITE}"
 echo -e "En cas de problème, merci de joindre vos deux fichiers présent dans le dossier log avec votre problème"
@@ -246,7 +243,10 @@ then
 fi
 
 affich action "Clonage de Eva "
-# git clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+if [ -z $1 ] || [ $1 != "-fake-clone" ]
+then
+    git clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+fi
 affich point
 chmod -R 775 /var/www/EVA
 affich point
