@@ -145,9 +145,10 @@ Class Functions extends SgdbManager{
     }
 
     public static function myVersionIsSupport(){
+        global $RaspberryPi;
         $supported_versions = self::getSupportedVersion();
-        $distribution = RaspberryPi::getInfos("distribution");
-        $version = RaspberryPi::getInfos("version");
+        $distribution = $RaspberryPi->getInfos("distribution");
+        $version = $RaspberryPi->getInfos("version");
 
         foreach ($supported_versions as $version_support) {
             if(strtolower($version_support[0]) == strtolower($distribution))

@@ -1,24 +1,7 @@
 <?php
 define('ROOT', __DIR__);
 
-session_start();
-$start=microtime(true);
-
-ini_set('display_errors', 'On');
-error_reporting(E_ALL);
-
-require ROOT.'/config.php';
-
-
-function autoload($name) {  
-    if (file_exists(ROOT.'/classes/'.$name.".class.php")) { 
-        require_once(ROOT.'/classes/'.$name.".class.php"); 
-    } 
-    else
-        return false;
-} 
-
-spl_autoload_register("autoload");
+require_once ROOT.DIRECTORY_SEPARATOR."root.php";
 
 
 $RaspberryPi = new RaspberryPi();
@@ -36,6 +19,7 @@ $smarty->template_dir = ROOT.'/cache/templates/';
 $smarty->compile_dir = ROOT.'/cache/templates_c/';
 $smarty->config_dir = ROOT.'/cache/configs/';
 $smarty->cache_dir = ROOT.'/cache/cache/';
+$debugObject = new Debug();
 
 $taskList = array();
 $erreurs = array();
@@ -107,8 +91,8 @@ else{
     }
 }
 
-if(!Functions::isApache()){
-    $notices = createError("Il semble que vous n'utilisez pas un serveur apache, le dossier db est donc visible si vous décidez de le rendre accéssible de l'extérieur !", array('Renseigner vous sur notre forum sur des solutions alternatives ( <a href="'.PROGRAM_FORUM.'">'.PROGRAM_FORUM.'</a> )'));
+if(file_get_contents('http://'.$_SERVER['SERVER_NAME'].dirname($_SERVER['REQUEST_URI']).'/db/.htaccess')){
+    $notices = createError("Il semble que la base de donnée soit accessible depuis internet !", array('Renseignez vous sur notre forum sur des solutions possibles ( <a href="'.PROGRAM_FORUM.'">'.PROGRAM_FORUM.'</a> )'));
 }
 
 
@@ -162,11 +146,21 @@ if(!empty($_['launch_install'])){
     }
 
 }
+
 $template_infos = array(
             "title"        => 'Installation - '.PROGRAM_NAME.' '.PROGRAM_VERSION,
-            "externjs"     => '',
+            "externjs"     => array( "end_body" => array(
+                "//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js",
+                "https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js",
+                "vues/js/jquery.noty.packaged.min.js",
+                "vues/js/libs.js",
+                "vues/js/debug.js",
+             )),
+            "externcss"    => '',
             "distribution" => $RaspberryPi->getInfos("distribution"),
-            "version"      => $RaspberryPi->getInfos("version")
+            "version"      => $RaspberryPi->getInfos("version"),
+            'debugList'    => $debugObject->getDebugList(),
+            "executionTime" => Functions::getExecutionTime(),
             );
 $smarty->assign("all_is_good", !$GLOBALS['error']);
 $smarty->assign("all_is_not_good_message", $all_is_not_good_message);
@@ -175,6 +169,4 @@ $smarty->assign("taskList", $taskList);
 $smarty->assign("erreurs", $erreurs);
 $smarty->assign("notices", $notices);
 $smarty->assign("template_infos", $template_infos);
-$smarty->assign('executionTime',Functions::getExecutionTime());
-$smarty->assign('debugList',Functions::getDebugList());
 $smarty->display(ROOT."/vues/install.tpl");
