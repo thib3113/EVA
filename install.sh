@@ -1,6 +1,6 @@
 #! /bin/bash
 ver_eva=0.4
-ver_install=1.0.1
+ver_install=1.0.2
 
 
 url_git="https://github.com/thib3113/EVA.git"
