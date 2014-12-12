@@ -91,7 +91,7 @@ else{
     }
 }
 
-if(file_get_contents('http://'.$_SERVER['SERVER_NAME'].dirname($_SERVER['REQUEST_URI']).'/db/.htaccess')){
+if(@file_get_contents('http://'.$_SERVER['SERVER_NAME'].dirname($_SERVER['REQUEST_URI']).'/db/.htaccess')){
     $notices = createError("Il semble que la base de donnée soit accessible depuis internet !", array('Renseignez vous sur notre forum sur des solutions possibles ( <a href="'.PROGRAM_FORUM.'">'.PROGRAM_FORUM.'</a> )'));
 }
 
