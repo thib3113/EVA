@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-ver_install=1.0.4
+ver_install=1.0.5
 url_git="https://github.com/thib3113/EVA.git"
 
 default_branch="dev"
