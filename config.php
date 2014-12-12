@@ -2,7 +2,7 @@
 
 	define('PROGRAM_NAME','EVA');
 	define('PROGRAM_AUTHOR','Thibaut SEVERAC');
-    define('PROGRAM_VERSION','0.4');
+    define('PROGRAM_VERSION','0.4.4');
     define('PROGRAM_WEBSITE','http://evaproject.net'); //no end slash
 	define('PROGRAM_FORUM','http://evaproject.net/forum'); //no end slash
     define('DB_TYPE','SQLITE');
