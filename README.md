@@ -11,5 +11,5 @@ E.V.A est un assistant éléctronique qui gère les GPIO du raspberry pi, contro
 
 E.V.A est en alpha, pour tester : lancer la commande
 ```shell
-wget https://raw.githubusercontent.com/thib3113/EVA/dev/install.sh -O install.sh && chmod +x install.sh && ./install.sh
+sudo wget https://raw.githubusercontent.com/thib3113/EVA/master/install.sh -O install.sh && sudo chmod +x install.sh && sudo ./install.sh
 ```
