@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-ver_install=1.0.5
+ver_install=1.0.6
 url_git="https://github.com/thib3113/EVA.git"
 
 default_branch="dev"
@@ -147,13 +147,13 @@ GRN=$GREEN
 
 echo -e "${GRN}   .~~.   .~~.   ${WHITE}                                   "
 echo -e "${GRN}  '. \ ' ' / .'  ${WHITE}                                   "
-echo -e "${RED}   .~ .~~~..~.   ${WHITE}   ________  ____   ____    _      "
+echo -e "${RED}   .~ .~~~..~.   ${WHITE}   ________  ____   ____    _$ver_eva"
 echo -e "${RED}  : .~.'~'.~. :  ${WHITE}  |_   __  ||_  _| |_  _|  / \     "
 echo -e "${RED} ~ (   ) (   ) ~ ${WHITE}    | |_ \_|  \ \   / /   / _ \    "
 echo -e "${RED}( : '~'.~.'~' : )${WHITE}    |  _| _    \ \ / /   / ___ \   "
 echo -e "${RED} ~ .~ (   ) ~. ~ ${WHITE}   _| |__/ |    \ ' /  _/ /   \ \_ "
 echo -e "${RED}  (  : '~' :  )  ${WHITE}  |________|     \_/  |____| |____|"
-echo -e "${RED}   '~ .~~~. ~'   ${WHITE}                          $ver_eva"
+echo -e "${RED}   '~ .~~~. ~'   ${WHITE}                                   "
 echo -e "${RED}       '~'       ${WHITE}  branch $branche - Installeur $ver_install "
 echo -e "Lien github : ${GREEN}https://github.com/thib3113/EVA${WHITE}"
 echo -e "Lien du site : ${GREEN}http://evaproject.net/${WHITE}"
@@ -284,6 +284,11 @@ affich action "Clonage de Eva "
 if [ -z $dev_mod ] || [ $dev_mod -ne 1 ]
 then
     git -b $branche clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+else
+    if [ ! -d $log_folder ]
+    then
+        mkdir -p /var/www/EVA
+    fi
 fi
 affich point
 chmod -R 775 /var/www/EVA
