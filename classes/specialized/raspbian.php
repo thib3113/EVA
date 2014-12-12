@@ -29,6 +29,4 @@ $specialized_list = array(
     "network-receivedTransmittedDropped" => "~dropped:([0-9]+)~",
     "network-receivedTransmittedOverruns" => "~overruns:([0-9]+)~",
     "network-receivedTransmittedBytes" => "~^\s*RX\s*bytes:([0-9]*)\s*\(([0-9]*\.*[0-9]* [a-zA-z]*)\)\s*TX\s*bytes:([0-9]*)\s*\(([0-9]*\.*[0-9]*\s*[a-zA-z]*)\)~",
-
-
 );
