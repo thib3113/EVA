@@ -1,9 +1,9 @@
 #! /bin/bash
-ver_eva=0.4
-ver_install=1.0.3
-
-
+#
+ver_install=1.0.4
 url_git="https://github.com/thib3113/EVA.git"
+
+default_branch="dev"
 log_folder="/var/log/eva"
 log_file="install.log"
 log_error_file="error.install.log"
@@ -13,6 +13,36 @@ WHITE="\\033[0;39m"
 RED="\\033[1;31m"
 BLUE='\e[0;34m'
 PURPLE='\e[0;35m'
+
+#on traite les arguments
+while getopts "db:" opt; do
+  case $opt in
+    d)
+      dev_mod=1
+      echo -e "${PURPLE}Mode developpeur activé${WHITE}"
+      ;;
+    b)
+      branche=$(echo $OPTARG | cut -c2-)
+      ;;
+    :)
+      echo "L'option -$OPTARG requière un argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ -z $branche ]
+then
+    branche=${default_branch}
+fi
+
+case $branche in
+    master);;
+    dev);;
+    *)
+        branche=${default_branch}
+      ;;
+  esac
 
 affich(){
     format=""
@@ -104,6 +134,13 @@ if [ "$UID" -ne 0 ]
 then
     echo -e "Le script doit être lancé en sudo [${RED}ERREUR${WHITE}]"
     exit 0
+fi
+
+
+ver_eva=$(curl -s https://raw.githubusercontent.com/thib3113/EVA/${branche}/config.php | grep PROGRAM_VERSION | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
+
+if [ -z $ver_eva ] ; then
+   echo -ne "Impossible de récupéré la version de EVA " ;affich error
 fi
 
 GRN=$GREEN
@@ -244,9 +281,9 @@ then
 fi
 
 affich action "Clonage de Eva "
-if [ -z $1 ] || [ $1 != "-fake-clone" ]
+if [ -z $dev_mod ] || [ $dev_mod -ne 1 ]
 then
-    git clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+    git -b $branche clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
 fi
 affich point
 chmod -R 775 /var/www/EVA
