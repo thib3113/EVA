@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-ver_install=1.0.6
+ver_install=1.0.7
 url_git="https://github.com/thib3113/EVA.git"
 
 default_branch="dev"
@@ -285,7 +285,7 @@ if [ -z $dev_mod ] || [ $dev_mod -ne 1 ]
 then
     git -b $branche clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
 else
-    if [ ! -d $log_folder ]
+    if [ ! -d /var/www/EVA ]
     then
         mkdir -p /var/www/EVA
     fi
