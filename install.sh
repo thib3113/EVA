@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-ver_install=1.0.7
+ver_install=1.0.8
 url_git="https://github.com/thib3113/EVA.git"
 
 default_branch="dev"
@@ -157,7 +157,7 @@ echo -e "${RED}   '~ .~~~. ~'   ${WHITE}                                   "
 echo -e "${RED}       '~'       ${WHITE}  branch $branche - Installeur $ver_install "
 echo -e "Lien github : ${GREEN}https://github.com/thib3113/EVA${WHITE}"
 echo -e "Lien du site : ${GREEN}http://evaproject.net/${WHITE}"
-echo -e "En cas de problème, merci de joindre vos deux fichiers présent dans le dossier log avec votre problème"
+echo -e "En cas de problème, merci de joindre les fichiers présent dans le dossier ${log_folder} avec votre problème"
 echo -e "${GREEN}Crée par SEVERAC Thibaut - étudiant - ${PURPLE}http://cv.thib3113.fr${WHITE}\n"
 
 affich action "Création d'un dossier pour les logs "
@@ -283,18 +283,22 @@ then
     affich ok
 fi
 
+affich action "Création d'un dossier pour EVA"
+affich point
+if [ ! -d /var/www/EVA ]
+then
+        mkdir -p /var/www/EVA
+        affich ok
+    else
+        affich already
+fi
+
 affich action "Clonage de Eva "
+affich point
 if [ -z $dev_mod ] || [ $dev_mod -ne 1 ]
 then
     git -b $branche clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
-else
-    if [ ! -d /var/www/EVA ]
-    then
-        echo "création du dossier /var/www/EVA réussie"  >> "$log_folder/$log_file"
-        mkdir -p /var/www/EVA
-    fi
 fi
-affich point
 chmod -R 775 /var/www/EVA
 affich point
 affich point
