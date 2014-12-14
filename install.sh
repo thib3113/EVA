@@ -189,6 +189,7 @@ then
 else
         affich point
     mkdir -p /var/www
+    echo -ne "création de /var/www réussie " >> "$log_folder/$log_file"
     echo -ne "création réussie "
         affich point
     cd /var/www
@@ -244,9 +245,11 @@ fi
 if [ ! -z $webserver ]
 then
     echo -ne "${webserver} est déjà installé ! "
+    echo -ne "${webserver} est déjà installé ! " >> "$log_folder/$log_file"
     affich already
 else
     echo -ne "Aucun serveur web installé ! "
+    echo -ne "Aucun serveur web installé ! " >> "$log_folder/$log_file"
     affich ok
 fi
 
@@ -287,6 +290,7 @@ then
 else
     if [ ! -d /var/www/EVA ]
     then
+        echo "création du dossier /var/www/EVA réussie"  >> "$log_folder/$log_file"
         mkdir -p /var/www/EVA
     fi
 fi
