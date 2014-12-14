@@ -15,6 +15,7 @@ BLUE='\e[0;34m'
 PURPLE='\e[0;35m'
 
 #on traite les arguments
+dev_mod=0
 while getopts "db:" opt; do
   case $opt in
     d)
@@ -295,9 +296,12 @@ fi
 
 affich action "Clonage de Eva "
 affich point
-if [ -z $dev_mod ] || [ $dev_mod -ne 1 ]
+if [ $dev_mod -ne 1 ]
 then
     git -b $branche clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+else
+    echo "Pas de clone en dev"
+    echo "Pas de clone en dev" >> "$log_folder/$log_file"
 fi
 chmod -R 775 /var/www/EVA
 affich point
