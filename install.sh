@@ -298,6 +298,7 @@ affich action "Clonage de Eva "
 affich point
 if [ $dev_mod -ne 1 ]
 then
+    echo "git -b $branche clone $url_git /var/www/EVA" >> "$log_folder/$log_file"
     git -b $branche clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
 else
     echo "Pas de clone en dev"
