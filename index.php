@@ -11,9 +11,12 @@ if(Functions::isAjax())
 
 if($myUser->is_connect){
     //on inclus le modèle ou l'index
-    if(empty($_['page']) || !function_exists("affich_$custom_function".$_['page'])){
+    if(empty($_['page'])){
         $func_name = 'affich_'.$custom_function.'index';
         $func_name();
+    }
+    elseif (!function_exists("affich_$custom_function".$_['page'])) {
+        Functions::fatal_error("aucun template n'as était donné pour l'affichage");
     }
     else{
         $func_name = "affich_$custom_function".$_['page'];
@@ -28,13 +31,12 @@ if(Functions::isAjax()){
     die();
 }
 
-//on ajoute le temps d'éxécution aux informations de template
-
-$config->setTemplateInfos(array("executionTime" => Functions::getExecutionTime()));
-
-
 $debugObject->addCustomQuery("SELECT * FROM ".DB_PREFIX."users WHERE id=1");
 $debugObject->addBasicDebug();
+
+
+//on ajoute le temps d'éxécution aux informations de template
+$config->setTemplateInfos(array("executionTime" => Functions::getExecutionTime()));
 
 $config->setTemplateInfos(array("debugList" => $debugObject->getDebugList()));
 
@@ -53,4 +55,6 @@ else{
 }
 
 ob_end_flush();
+Functions::logExecutionTime(Functions::getExecutionTime(false, true));
+
 ?>

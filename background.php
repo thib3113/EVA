@@ -10,10 +10,9 @@ require ROOT.'/base.php';
 
 while(true){
     $numberOfPins = count(RaspberryPi::getListWiringPin()) + count(RaspberryPi::getListOptionalWiringPin());
-    for ($i=0; $i < $numberOfPins; $i++) { 
+    for ($i=0; $i < $numberOfPins; $i++) {
         echo "pin $i : ".RaspberryPi::read($i)."\n";
     }
-    
     usleep(10);
 }
 ?>

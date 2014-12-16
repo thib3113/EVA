@@ -96,7 +96,6 @@ Class User extends SgdbManager{
         //on génère un nouveau token
         $this->setToken();
         $this->_query("UPDATE ".DB_PREFIX.$this->uid_table_name." SET token=? WHERE uid=?", array($this->current_token, $this->current_uid), __FILE__, __LINE__);
-        // $this->save("token");
 
         //on génère les variables d'informations
         $GLOBALS['is_connect'] = true;
@@ -105,12 +104,12 @@ Class User extends SgdbManager{
 
 
         //on crée la session
-        $_SESSION[$this->session_name] = serialize(array($this->username, $this->uid, $this->current_token));
+        $_SESSION[$this->session_name] = serialize(array($this->username, $this->current_uid, $this->current_token));
         $_SESSION[$this->session_connect] = !empty($_COOKIE['PHPSESSID'])? $_COOKIE['PHPSESSID'] : SID;
 
         //et un cookie au besoin
         if($cookie || !empty($_COOKIE[$this->cookie_name])){
-            setcookie($this->cookie_name, serialize( array($this->username, $this->uid, $this->current_token) ), time()+$this->cookie_time, '/' );
+            setcookie($this->cookie_name, $_SESSION[$this->session_name], time()+$this->cookie_time, '/' );
         }
 
         $this->saveIp();

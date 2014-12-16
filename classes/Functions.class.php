@@ -77,8 +77,11 @@ Class Functions extends SgdbManager{
         return $is_ajax;
     }
 
-    public static function getExecutionTime($short = false){
-        $total = number_format(microtime(true)-TIME_START,3);
+    public static function getExecutionTime($short = false, $force_ms = false){
+        $total_time = microtime(true)-TIME_START;
+        if($force_ms)
+            return $total_time;
+        $total = number_format($total_time,3);
         if(intval($total)>0){
             if(!$short)
                 return "$total seconde".($total>1? "s" : "");
@@ -110,7 +113,7 @@ Class Functions extends SgdbManager{
     public static function checkConnectivity($url = "http://www.google.com"){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,100); 
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,100);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         $result = curl_exec($ch);
@@ -122,7 +125,6 @@ Class Functions extends SgdbManager{
     }
 
     public static function getSupportedVersion(){
-        
         $url = PROGRAM_WEBSITE."/json.php?get=supported_distribution"; //ne pas mettre http
 
         //on vérifie la connexion avec le site
@@ -262,4 +264,9 @@ Class Functions extends SgdbManager{
         die();
     }
 
+    public static function logExecutionTime($time){
+        global $system, $_;
+        //on le lance en shell pour que ce ne soit pas php qui prenne du temps
+        $system->shell('echo "'.time().':'.(!empty($_['page'])?$_['page']:"index").':'.escapeshellarg($time).'" >> '.ROOT.'/log/executionTime.txt');
+    }
 }

@@ -1,12 +1,13 @@
 #! /bin/bash
 #
-ver_install=1.0.8
+ver_install=1.0.9
 url_git="https://github.com/thib3113/EVA.git"
 
 default_branch="dev"
 log_folder="/var/log/eva"
 log_file="install.log"
 log_error_file="error.install.log"
+install_folder="/var/www/EVA"
 
 GREEN="\\033[1;32m"
 WHITE="\\033[0;39m"
@@ -67,21 +68,21 @@ affich(){
             echo -ne "${PURPLE}- ${text}${WHITE}"
             if [ ! -z $no_log ]
             then
-                echo -ne "${PURPLE}- ${text}${WHITE}" >> "$log_folder/$log_file"
+                log "${PURPLE}- ${text}${WHITE}"
             fi
         ;;
         "ok")
             echo -e "[${GREEN}FAIT${WHITE}]"
             if [ ! -z $no_log ]
             then
-                echo -e "[${GREEN}FAIT${WHITE}]" >> "$log_folder/$log_file"
+                log  "[${GREEN}FAIT${WHITE}]"
             fi
         ;;
         "error")
             echo -e "[${RED}ERREUR${WHITE}]"
             if [ ! -z $no_log ]
             then
-                echo -e "[${RED}ERREUR${WHITE}]" >> "$log_folder/$log_file"
+                log  "[${RED}ERREUR${WHITE}]"
             fi
             exit 1
         ;;
@@ -89,14 +90,14 @@ affich(){
             echo -e "[${BLUE}DEJA FAIT${WHITE}]"
             if [ ! -z $no_log ]
             then
-                echo -e "[${BLUE}DEJA FAIT${WHITE}]" >> "$log_folder/$log_file"
+                log  "[${BLUE}DEJA FAIT${WHITE}]"
             fi
         ;;
         "point")
             echo -ne ". "
             if [ ! -z $no_log ]
             then
-                echo -ne ". " >> "$log_folder/$log_file"
+               log ". "
             fi
         ;;
     esac
@@ -109,7 +110,8 @@ check_install(){
     else
         soft=$1
     fi
-    # echo "sudo dpkg --get-selections | grep \"$soft\" | grep -v deinstall"
+
+    log "sudo dpkg --get-selections | grep \"$soft\" | grep -v deinstall"
     if [ $(sudo dpkg --get-selections | grep "$soft" | grep -v deinstall | wc -l) -gt 0 ]
     then
         return 0
@@ -119,7 +121,7 @@ check_install(){
 }
 
 install(){
-    echo "apt-get install -y $1" >> "$log_folder/$log_file"
+    log "apt-get install -y $1"
     apt-get install -y $1 >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
 
     check_install $1
@@ -130,6 +132,22 @@ install(){
         affich point
     fi
 }
+
+check_gpio(){
+    log "gpio -v"
+
+    if [ $(gpio -v | wc -l) -gt 0 ]
+    then
+        return 0
+    else
+        return 1
+    fi
+}
+
+log(){
+    echo -e "$(date '+%d/%m/%Y %T') : $1" >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+}
+
 
 if [ "$UID" -ne 0 ]
 then
@@ -161,23 +179,26 @@ echo -e "Lien du site : ${GREEN}http://evaproject.net/${WHITE}"
 echo -e "En cas de problème, merci de joindre les fichiers présent dans le dossier ${log_folder} avec votre problème"
 echo -e "${GREEN}Crée par SEVERAC Thibaut - étudiant - ${PURPLE}http://cv.thib3113.fr${WHITE}\n"
 
-affich action "Création d'un dossier pour les logs "
+affich -no-log action "Création d'un dossier pour les logs "
 if [ -d $log_folder ]
 then
         affich -no-log point
         affich -no-log point
         affich -no-log point
-    affich already
+    affich -no-log already
 else
         affich -no-log point
     mkdir -p $log_folder
         affich -no-log point
-    date >> "$log_folder/$log_file"
-    echo $ver >> "$log_folder/$log_file"
         affich -no-log point
     affich -no-log ok
 fi
 
+echo -e "Installation EVA \n date : $(date '+%d/%m/%Y %T') \n version eva : $ver_eva \n version installeur $ver_install" >> "$log_folder/$log_file"
+if [ $dev_mod -eq 1 ]
+then
+    echo -e "${PURPLE}Mode developpeur activé${WHITE}" >> "$log_folder/$log_file"
+fi
 
 affich action "Déplacement dans /var/www "
 if [ -d /var/www ]
@@ -190,9 +211,10 @@ then
 else
         affich point
     mkdir -p /var/www
-    echo -ne "création de /var/www réussie " >> "$log_folder/$log_file"
+    log "création de /var/www réussie "
     echo -ne "création réussie "
         affich point
+    log "cd /var/www"
     cd /var/www
         affich point
     affich ok
@@ -202,6 +224,7 @@ fi
 affich action "Mise à jour de la liste des paquets "
     affich point
     affich point
+log "sudo apt-get update"
 sudo apt-get update >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
     affich point
 affich ok
@@ -246,11 +269,11 @@ fi
 if [ ! -z $webserver ]
 then
     echo -ne "${webserver} est déjà installé ! "
-    echo -ne "${webserver} est déjà installé ! " >> "$log_folder/$log_file"
+    log "${webserver} est déjà installé ! "
     affich already
 else
     echo -ne "Aucun serveur web installé ! "
-    echo -ne "Aucun serveur web installé ! " >> "$log_folder/$log_file"
+    log "Aucun serveur web installé ! "
     affich ok
 fi
 
@@ -284,32 +307,80 @@ then
     affich ok
 fi
 
+affich action "Installation de wiringPi "
+affich point
+if check_gpio ;
+then
+    affich point
+    affich point
+    affich already
+else
+    log "git clone --verbose git://git.drogon.net/wiringPi ~/wiringPi"
+    git clone --verbose git://git.drogon.net/wiringPi ~/wiringPi >> "$log_folder/$log_file"
+        affich point
+    log "~/wiringPi/build"
+    cd ~/wiringPi
+    ./build >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+        affich point
+    cd -
+        affich point
+
+
+    if check_gpio ;
+    then
+        affich ok
+    else
+        affich error
+    fi
+fi
+
 affich action "Création d'un dossier pour EVA"
 affich point
-if [ ! -d /var/www/EVA ]
+if [ ! -d $install_folder ]
 then
-        mkdir -p /var/www/EVA
+        mkdir -p $install_folder
         affich ok
     else
         affich already
+fi
+
+if [ $(ls -a $install_folder | sed -e "/\.$/d" | wc -l 2>> "$log_folder/$log_error_file" ) -ne 0 ] && [ $dev_mod -ne 1 ]
+then
+    echo -e "la suite va supprimer le contenu du dossier $install_folder, voulez vous continuer [O/n] :"
+    read REP
+
+    case $REP in
+                 O|o)
+                    log "rm -Rf $install_folder/*"
+                    rm -Rf $install_folder
+                    echo "Contenu du dossier $install_folder éffacé" >> "$log_folder/$log_file"
+                ;;
+                 N|n|*)
+                       log "vous avez répondu "$REP" installation avortée"
+                       echo -e " Eva ne sera pas installé "
+                       exit 1
+                 ;;
+    esac
 fi
 
 affich action "Clonage de Eva "
 affich point
 if [ $dev_mod -ne 1 ]
 then
-    echo "git -b $branche clone $url_git /var/www/EVA" >> "$log_folder/$log_file"
-    git -b $branche clone $url_git /var/www/EVA >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+    log "git clone --verbose $url_git --branch $branche --single-branch $install_folder"
+    git clone --verbose $url_git --branch $branche --single-branch $install_folder >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
 else
-    echo "Pas de clone en dev"
+    log "Pas de clone en dev"
     echo "Pas de clone en dev" >> "$log_folder/$log_file"
 fi
-chmod -R 775 /var/www/EVA
+chmod -R 775 $install_folder
 affich point
 affich point
 affich ok
 
 affich action "Création d'un utilisateur eva "
+affich point
+groupadd web
 affich point
 useradd --home /home/eva --groups web,eva eva >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
 affich point

@@ -4,11 +4,11 @@ function affich_index(){
     global $myUser;
 
     if($myUser->is_connect){
-        Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/index.tpl'));
+        Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/index/index.tpl'));
         Configuration::addJs('vues/js/jquery-ui.min.js');
-        Configuration::addJs('vues/js/widget.js');
-        Configuration::addJs('vues/js/dashboard.js');
-        Configuration::addJs('vues/js/index.js');
+        Configuration::addJs('plugins/base/vues/index/js/widget.js');
+        Configuration::addJs('plugins/base/vues/index/js/dashboard.js');
+        Configuration::addJs('plugins/base/vues/index/js/index.js');
 
         //affichage
         Plugins::callHook("pre_header");
