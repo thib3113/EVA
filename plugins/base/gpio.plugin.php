@@ -10,9 +10,19 @@ if($myUser->is_connect){
 }
 
 function affich_gpio(){
-    global $RaspberryPi;
+    global $RaspberryPi, $smarty;
 
-    var_dump($RaspberryPi->getTablePins());
+    $pins = array();
+
+    //on ajoute les etats
+    foreach ($RaspberryPi->getTablePins() as $key => $value) {
+        $pins[$key] = $value;
+        if($value['type'] == 'GPIO')
+            $pins[$key]["state"] = $RaspberryPi->read($value['wiringPin']);
+    }
+    // var_dump($pins);
+    $smarty->assign('pins', $pins);
+
     Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/gpio/gpio.tpl'));
     Plugins::callHook("pre_header");
     Plugins::callHook("header");

@@ -99,6 +99,21 @@ class RaspberryPi extends SgdbManager{
 
     function __construct(){
       $this->setVersion();
+      $this->nameTable();
+    }
+
+    private function nameTable(){
+      foreach ($this->tablePins as $key => $value) {
+        $this->tablePins[$key]["wiringPin"] = $value[0];
+        $this->tablePins[$key]["nameOfPin"] = $value[1];
+        $this->tablePins[$key]["type"] = $value[2];
+      }
+
+      foreach ($this->optionalPins as $key => $value) {
+        $this->optionalPins[$key]["wiringPin"] = $value[0];
+        $this->optionalPins[$key]["nameOfPin"] = $value[1];
+        $this->optionalPins[$key]["type"] = $value[2];
+      }
     }
 
     public function setVersion(){
@@ -107,25 +122,25 @@ class RaspberryPi extends SgdbManager{
     }
 
     private function exec($cmd){
-        // var_dump($cmd);
+        // echo $cmd;
         return exec($cmd);
     }
 
     public function mode($pin,$mode = 'out'){
-        return $this->exec($this->GPIO_DEFAULT_PATH.' mode '.$pin.' '.$mode);
+        return $this->exec(self::GPIO_DEFAULT_PATH.' mode '.$pin.' '.$mode);
     }
     public function write($pin,$value = 0,$automode = false){
         if($automode) $this->mode($pin,'out');
-        return $this->exec($this->GPIO_DEFAULT_PATH.' write '.$pin.' '.$value);
+        return $this->exec(self::GPIO_DEFAULT_PATH.' write '.$pin.' '.$value);
     }
     public function read($pin,$automode = false){
         if($automode) $this->mode($pin,'in');
-        return $this->exec($this->GPIO_DEFAULT_PATH.' read '.$pin);
+        return $this->exec(self::GPIO_DEFAULT_PATH.' read '.$pin);
     }
 
     public function toggle($pin,$automode = false){
         if($automode) $this->mode($pin,'out');
-        return $this->exec($this->GPIO_DEFAULT_PATH.' toggle '.$pin);
+        return $this->exec(self::GPIO_DEFAULT_PATH.' toggle '.$pin);
     }
 
 
