@@ -1,6 +1,6 @@
 <?php
 
-Class Plugins extends SgdbManager{
+Class Plugin extends SgdbManager{
     static private $hook_list = array();
     static private $menuItems;
 

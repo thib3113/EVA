@@ -13,14 +13,22 @@ if($myUser->is_connect){
     //on inclus le modèle ou l'index
     if(empty($_['page'])){
         $func_name = 'affich_'.$custom_function.'index';
-        $func_name();
+        if(function_exists($func_name)){
+            $func_name();
+        }
+        else
+            Functions::fatal_error("impossible d'appeler la fonction $func_name");
     }
     elseif (!function_exists("affich_$custom_function".$_['page'])) {
         Functions::fatal_error("aucun template n'as était donné pour l'affichage");
     }
     else{
         $func_name = "affich_$custom_function".$_['page'];
-        $func_name();
+        if(function_exists($func_name)){
+            $func_name();
+        }
+        else
+            Functions::fatal_error("impossible d'appeler la fonction $func_name");
     }
 }
 else

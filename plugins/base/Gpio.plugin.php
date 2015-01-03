@@ -6,7 +6,7 @@
  */
 
 if($myUser->is_connect){
-    Plugins::addHook("header", "Configuration::addMenuItem", array("GPIO", "gpio","dot-circle-o", 1));
+    Plugin::addHook("header", "Configuration::addMenuItem", array("GPIO", "gpio","dot-circle-o", 1));
 }
 
 function affich_gpio(){
@@ -23,13 +23,22 @@ function affich_gpio(){
     // var_dump($pins);
     $smarty->assign('pins', $pins);
 
+    //test des led 
+    $led = new LED(array(array(0 , true), array(1 , false)));
+    $led1 = new LED(array(array(0 , false), array(1 , true)));
+
+    $led->power(true);
+    sleep(1);
+    $led->power(false);
+    $led1->power(true);
+
     Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/gpio/gpio.tpl'));
-    Plugins::callHook("pre_header");
-    Plugins::callHook("header");
-    Plugins::callHook("pre_gpio");
-    Plugins::callHook("gpio");
-    Plugins::callHook("pre_footer");
-    Plugins::callHook("footer");
+    Plugin::callHook("pre_header");
+    Plugin::callHook("header");
+    Plugin::callHook("pre_gpio");
+    Plugin::callHook("gpio");
+    Plugin::callHook("pre_footer");
+    Plugin::callHook("footer");
 }
 
 function affich_json_gpio(){

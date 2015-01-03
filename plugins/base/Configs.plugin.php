@@ -4,9 +4,9 @@ if($myUser->is_connect){
         global $smarty, $RaspberryPi, $system, $myUser;
 
         Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/configs/configs.tpl'));
-        Plugins::callHook("pre_header");
-        Plugins::callHook("header");
-        Plugins::callHook("pre_content");
+        Plugin::callHook("pre_header");
+        Plugin::callHook("header");
+        Plugin::callHook("pre_content");
 
         Configuration::addJs('vues/js/jquery-ui.min.js');
         Configuration::addJs("plugins/base/vues/configs/js/config.js");
@@ -51,13 +51,13 @@ if($myUser->is_connect){
 
 
 
-        Plugins::callHook("content");
-        Plugins::callHook("pre_footer");
-        Plugins::callHook("footer");
+        Plugin::callHook("content");
+        Plugin::callHook("pre_footer");
+        Plugin::callHook("footer");
 
     }
 
-    Plugins::addHook("header", "Configuration::addMenuItem", array("Configuration", "configs","cogs", -2));
+    Plugin::addHook("header", "Configuration::addMenuItem", array("Configuration", "configs","cogs", -2));
 }
 
 function affich_json_configs(){

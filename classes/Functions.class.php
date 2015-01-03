@@ -249,7 +249,7 @@ Class Functions extends SgdbManager{
     public static function fatal_error($text, $file = null, $line = null){
         global $smarty, $debugObject;
 
-        $infos = $debugObject->whoCallMe(2);
+        $infos = $debugObject->whoCallMe(1);
         $line = !empty($line)? $line : $infos['line'];
         $file = !empty($file)? $file : $infos['file'];
 
@@ -262,6 +262,37 @@ Class Functions extends SgdbManager{
         );
         $smarty->display(ROOT.'/vues/fatal_error.tpl');
         die();
+    }
+
+    public static function list_plugins($dir){
+        global  $debugObject;
+        
+        $liste_link = array();
+        //on liste les dossiers du dossier parent des plugins
+        $pluginsFolder = opendir($dir) or Functions::fatal_error('Impossible d\'ouvrir le dossier des plugins');
+        while($file = @readdir($pluginsFolder)) {
+            //si ils ne correspondent pas aux actions linux
+            if($file != "." && $file != ".."){
+                $link = $dir.DIRECTORY_SEPARATOR.$file;
+                //et que c'est bien un dossier
+                if(is_dir($link)){
+                    $liste_link = array_merge($liste_link, self::list_plugins($link));
+                }
+                else{
+                    if(preg_match("~([A-Z][a-zA-Z_]+)\\.plugin\\.php~", $file, $match)){
+                        if(!empty($match[1])){
+                            if(!class_exists($match[1])){
+                                $debugObject->addDebugList(array("plugins" => substr($link, strlen(ROOT)+1) ));
+                                $liste_link[] = $link;
+                                // $plugins->addPlugin(new $match[1]());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        closedir($pluginsFolder);
+        return $liste_link;
     }
 
     public static function logExecutionTime($time){

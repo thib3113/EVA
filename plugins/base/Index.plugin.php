@@ -11,12 +11,12 @@ function affich_index(){
         Configuration::addJs('plugins/base/vues/index/js/index.js');
 
         //affichage
-        Plugins::callHook("pre_header");
-        Plugins::callHook("header");
-        Plugins::callHook("pre_content");
-        Plugins::callHook("content");
-        Plugins::callHook("pre_footer");
-        Plugins::callHook("footer");
+        Plugin::callHook("pre_header");
+        Plugin::callHook("header");
+        Plugin::callHook("pre_content");
+        Plugin::callHook("content");
+        Plugin::callHook("pre_footer");
+        Plugin::callHook("footer");
     }
 }
 
@@ -97,4 +97,4 @@ function affich_json_index(){
 }
 
 if($myUser->is_connect)
-    Plugins::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));
+    Plugin::addHook("header", "Configuration::addMenuItem", array("Accueil", "index","home", 0));
