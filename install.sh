@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-ver_install=1.0.9
+ver_install=1.0.10
 url_git="https://github.com/thib3113/EVA.git"
 
 default_branch="dev"
@@ -382,10 +382,11 @@ affich action "Création d'un utilisateur eva "
 affich point
 groupadd web
 affich point
-useradd --home /home/eva --groups web,eva eva >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+useradd --home /home/eva --groups web,eva,spi eva >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
 affich point
 sudo -u eva cat /var/log/eva/install.log >> "$log_folder/$log_file" 2>>"$log_folder/$log_file"
 affich point
+
 
 if [ ! $? -eq 1 ]
 then

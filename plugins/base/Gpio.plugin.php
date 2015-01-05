@@ -24,13 +24,18 @@ function affich_gpio(){
     $smarty->assign('pins', $pins);
 
     //test des led 
-    $led = new LED(array(array(0 , true), array(1 , false)));
-    $led1 = new LED(array(array(0 , false), array(1 , true)));
+    // $led = new LED(array(array(0 , true), array(1 , false)));
+    // $led1 = new LED(array(array(0 , false), array(1 , true)));
 
-    $led->power(true);
-    sleep(1);
-    $led->power(false);
-    $led1->power(true);
+    // $led->power(true);
+    // sleep(1);
+    // $led->power(false);
+    // $led1->power(true);
+    // 
+    // test des 7 segments
+    // $sevenseg = new SevenSegment(array(), "max7219");
+
+    // $sevenseg->affich("je taime");
 
     Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/gpio/gpio.tpl'));
     Plugin::callHook("pre_header");
