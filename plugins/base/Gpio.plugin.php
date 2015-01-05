@@ -35,7 +35,7 @@ function affich_gpio(){
     // test des 7 segments
     // $sevenseg = new SevenSegment(array(), "max7219");
 
-    // $sevenseg->affich("je taime");
+    // $sevenseg->affich("je tame");
 
     Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/gpio/gpio.tpl'));
     Plugin::callHook("pre_header");
