@@ -264,6 +264,20 @@ Class Functions extends SgdbManager{
         die();
     }
 
+    public static function list_plugins_active($dir){
+        global $myUser;
+
+        $liste_plugins =self::list_plugins($dir);
+        $list_plugins_active = $myUser->getPluginsList();
+        $return_list = array();
+
+        foreach ($liste_plugins as $key => $plugins) {
+            if(in_array($key, $list_plugins_active) || preg_match("~".DIRECTORY_SEPARATOR."base".DIRECTORY_SEPARATOR."~", substr($plugins, strlen(__DIR__))))
+                $return_list[$key] = $plugins;
+        }
+        return $return_list;
+    }
+
     public static function list_plugins($dir){
         global  $debugObject;
         
@@ -279,11 +293,11 @@ Class Functions extends SgdbManager{
                     $liste_link = array_merge($liste_link, self::list_plugins($link));
                 }
                 else{
-                    if(preg_match("~([A-Z][a-zA-Z_]+)\\.plugin\\.php~", $file, $match)){
+                    if(preg_match("~([A-Z][a-zA-Z_0-9]+)\\.plugin\\.php~", $file, $match)){
                         if(!empty($match[1])){
                             if(!class_exists($match[1])){
                                 $debugObject->addDebugList(array("plugins" => substr($link, strlen(ROOT)+1) ));
-                                $liste_link[] = $link;
+                                $liste_link[$match[1]] = $link;
                                 // $plugins->addPlugin(new $match[1]());
                             }
                         }
@@ -295,6 +309,17 @@ Class Functions extends SgdbManager{
         return $liste_link;
     }
 
+    public static function secureUnserialize($linear){
+        if(!self::isSerialized($linear))
+            return array();
+        else
+            return unserialize($linear);
+    }
+    /**
+     * [logExecutionTime description]
+     * @param  [type] $time [description]
+     * @return [type]       [description]
+     */
     public static function logExecutionTime($time){
         global $system, $_;
         //on le lance en shell pour que ce ne soit pas php qui prenne du temps

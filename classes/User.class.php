@@ -356,7 +356,7 @@ Class User extends SgdbManager{
     }
 
     public function getPluginsList(){
-        return unserialize($this->plugins_list);
+        return Functions::secureUnserialize($this->plugins_list);
     }
 
     public function getDashboardList(){

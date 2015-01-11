@@ -35,7 +35,12 @@ function affich_gpio(){
     // test des 7 segments
     // $sevenseg = new SevenSegment(array(), "max7219");
 
-    // $sevenseg->affich("thib3113");
+    // for ($i=0; $i < 20; $i++) {
+    //         $sevenseg->affich($i);
+    //     sleep(1);
+    // }
+
+    // $sevenseg->affich("hello");
 
     Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/gpio/gpio.tpl'));
     Plugin::callHook("pre_header");

@@ -24,9 +24,10 @@ $plugins = new Plugin();
 
 //on liste les dossiers du dossier parent des plugins
 $pluginsFolder_link = ROOT.DIRECTORY_SEPARATOR.PLUGIN_DIR;
-$list_plugins = Functions::list_plugins($pluginsFolder_link);
+$list_plugins = Functions::list_plugins_active($pluginsFolder_link);
 
-foreach ($list_plugins as $plugins) {
+foreach ($list_plugins as $key => $plugins) {
+    // var_dump("$key : $plugins");
     include $plugins;
 }
 
