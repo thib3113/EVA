@@ -14,31 +14,28 @@
     }
 </style>
   <div id="current_tab">
-    
-      <div id="tab_accueil">
-          <form role="form">
-              <table class="table table-striped">
-                  <tr>
-                      <td>Votre Raspberry Pi</td>
-                      <td>{$yourRaspberryPi}</td>
-                  </tr>
-                  <tr>
-                      <td>Votre version</td>
-                      <td>{$smarty.const.PROGRAM_NAME} {$smarty.const.PROGRAM_VERSION}</td>
-                  </tr>
-                  <tr>
-                      <td>Votre serveur web</td>
-                      <td>{$server_software}</td>
-                  </tr>
-                  <tr>
-                    <td>Version de php</td>
-                    <td>{$phpversion}</td>
-                  </tr>
-              </table>
-          </form>
+      <div style="display:none;" id="tab_accueil">
+        <table class="table table-striped">
+            <tr>
+                <td>Votre Raspberry Pi</td>
+                <td>{$yourRaspberryPi}</td>
+            </tr>
+            <tr>
+                <td>Votre version</td>
+                <td>{$smarty.const.PROGRAM_NAME} {$smarty.const.PROGRAM_VERSION}</td>
+            </tr>
+            <tr>
+                <td>Votre serveur web</td>
+                <td>{$server_software}</td>
+            </tr>
+            <tr>
+              <td>Version de php</td>
+              <td>{$phpversion}</td>
+            </tr>
+        </table>
       </div>
-      <div id="tab_profil">
-          <form role="form">
+      <div style="display:none;" id="tab_profil">
+          <form role="form" method="POST" action="?page=configs#profil">
               <table class="table table-striped">
                   <tr>
                       <td>Pseudo</td>
@@ -60,7 +57,7 @@
               <button type="submit" class="btn btn-primary">Submit</button>
           </form>
       </div>
-      <div id="tab_plugins">
+      <div style="display:none;" id="tab_plugins">
         <div class="panel panel-danger">
           <div class="panel-heading">
               <h3 class="panel-title">Le serveur de plugin ne semble pas disponible</h3>
@@ -71,7 +68,7 @@
           </div>
         </div>
       </div>
-      <div id="tab_mise_a_jour">
+      <div style="display:none;" id="tab_mise_a_jour">
           {if !$erreur_maj}
           
           {else}

@@ -19,30 +19,17 @@ $RaspberryPi = new RaspberryPi();
 $config = new Configuration();
 $myUser = new User;
 $ajaxResponse = new Ajax();
+$plugins = new Plugin();
+// $plugins = new Plugins();
 
 //on liste les dossiers du dossier parent des plugins
 $pluginsFolder_link = ROOT.DIRECTORY_SEPARATOR.PLUGIN_DIR;
-$pluginsFolder = opendir($pluginsFolder_link) or Functions::fatal_error('Impossible d\'ouvrir le dossier des plugins');
-while($folder = @readdir($pluginsFolder)) {
-    //si ils ne correspondent pas aux actions linux
-    if($folder != "." && $folder != ".."){
-        $link = $pluginsFolder_link.DIRECTORY_SEPARATOR.$folder;
-        //et que c'est bien un dossier
-        if(is_dir($link)){
-            //on liste les fichier du dossier en cours
-            $folder = opendir($link) or Functions::fatal_error('Impossible d\'ouvrir le dossier plugin : '.$link);
-            while($file = @readdir($folder)) {
-              if(preg_match("~.plugin.~", $file)){
-                $debugObject->addDebugList(array("plugins" => substr($link.DIRECTORY_SEPARATOR.$file, strlen(ROOT)+1) ));
-                include $link.DIRECTORY_SEPARATOR.$file;
-              }
-            }
-            closedir($folder);
-        }
-    }
-}
-closedir($pluginsFolder);
+$list_plugins = Functions::list_plugins_active($pluginsFolder_link);
 
+foreach ($list_plugins as $key => $plugins) {
+    // var_dump("$key : $plugins");
+    include $plugins;
+}
 
 
 $_ = array_merge($_GET, $_POST);

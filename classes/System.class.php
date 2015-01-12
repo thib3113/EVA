@@ -46,7 +46,7 @@ class System {
     public function shell($str, $system_user = false){
         exec(($system_user? "sudo -u ".SYSTEM_USER." " : "").$str, $return, $status);
         if(count($return) < 2 && $status == 0)
-            $return = $return[0];
+            $return = !empty($return[0])? $return[0] : "";
         else
             $this->last_status = $status;
         return $return;

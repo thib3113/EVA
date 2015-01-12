@@ -3,13 +3,13 @@ if($myUser->is_connect){
     function affich_configs(){
         global $smarty, $RaspberryPi, $system, $myUser;
 
-        Configuration::setTemplateInfos(array("tpl" => ROOT.'/vues/configs.tpl'));
-        Plugins::callHook("pre_header");
-        Plugins::callHook("header");
-        Plugins::callHook("pre_content");
+        Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/configs/configs.tpl'));
+        Plugin::callHook("pre_header");
+        Plugin::callHook("header");
+        Plugin::callHook("pre_content");
 
         Configuration::addJs('vues/js/jquery-ui.min.js');
-        Configuration::addJs("vues/js/config.js");
+        Configuration::addJs("plugins/base/vues/configs/js/config.js");
 
         //accueil
         $nb_wiring_pi = count($RaspberryPi->getListWiringPin());
@@ -51,13 +51,13 @@ if($myUser->is_connect){
 
 
 
-        Plugins::callHook("content");
-        Plugins::callHook("pre_footer");
-        Plugins::callHook("footer");
+        Plugin::callHook("content");
+        Plugin::callHook("pre_footer");
+        Plugin::callHook("footer");
 
     }
 
-    Plugins::addHook("header", "Configuration::addMenuItem", array("Configuration", "configs","cogs", 0));
+    Plugin::addHook("header", "Configuration::addMenuItem", array("Configuration", "configs","cogs", -2));
 }
 
 function affich_json_configs(){
@@ -73,8 +73,4 @@ function affich_json_configs(){
                 break;
         }
     }
-}
-
-function rewritte_config_file(){
-
 }

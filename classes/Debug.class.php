@@ -52,6 +52,24 @@ class Debug extends SgdbManager{
         return $backtrace[$number];
     }
 
+    private function echoArray($array, $depth = 0, $maxDepth = 3){
+        $return ="";
+        if(!is_array($array))
+            $return .= "$array";
+        else{
+            foreach ($array as $key => $value) {
+                if(!is_array($value))
+                    $return .="<li>$key - <kbd>$value</kbd></li>\n";
+                else{
+                    $return .="<li>$key - <ul>";
+                    $return .= $this->echoArray($value, $depth+1, $maxDepth);
+                    $return .="</lu></li>";
+                }
+            }
+        }
+        return $return;
+    }
+
     public function addBasicDebug(){
         foreach ($_COOKIE as $key => $value) {
             if(is_array($value) || Functions::isSerialized($value)){
@@ -61,9 +79,7 @@ class Debug extends SgdbManager{
                     $array_value = $value;
 
                 $value = '<ul>';
-                foreach ($array_value as $clef => $valeur) {
-                    $value .= "<li>$clef - <kbd>$valeur</kbd></li>";
-                }
+                $value .= $this->echoArray($array_value);
                 $value .= '</ul>';
             }
             else
@@ -82,9 +98,7 @@ class Debug extends SgdbManager{
                     $array_value = $value;
 
                 $value = '<ul>';
-                foreach ($array_value as $clef => $valeur) {
-                    $value .= "<li>$clef - <kbd>$valeur</kbd></li>";
-                }
+                $value .= $this->echoArray($array_value);
                 $value .= '</ul>';
             }
             else

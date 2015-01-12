@@ -77,8 +77,11 @@ Class Functions extends SgdbManager{
         return $is_ajax;
     }
 
-    public static function getExecutionTime($short = false){
-        $total = number_format(microtime(true)-TIME_START,3);
+    public static function getExecutionTime($short = false, $force_ms = false){
+        $total_time = microtime(true)-TIME_START;
+        if($force_ms)
+            return $total_time;
+        $total = number_format($total_time,3);
         if(intval($total)>0){
             if(!$short)
                 return "$total seconde".($total>1? "s" : "");
@@ -110,7 +113,7 @@ Class Functions extends SgdbManager{
     public static function checkConnectivity($url = "http://www.google.com"){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,100); 
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,100);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         $result = curl_exec($ch);
@@ -122,8 +125,7 @@ Class Functions extends SgdbManager{
     }
 
     public static function getSupportedVersion(){
-        
-        $url = PROGRAM_WEBSITE."/json.php?get=supported_distribution"; //ne pas mettre http
+        $url = DISTANT_API."?get=supported_distribution"; //ne pas mettre http
 
         //on vérifie la connexion avec le site
         if(!self::checkConnectivity($url))
@@ -247,7 +249,7 @@ Class Functions extends SgdbManager{
     public static function fatal_error($text, $file = null, $line = null){
         global $smarty, $debugObject;
 
-        $infos = $debugObject->whoCallMe(2);
+        $infos = $debugObject->whoCallMe(1);
         $line = !empty($line)? $line : $infos['line'];
         $file = !empty($file)? $file : $infos['file'];
 
@@ -262,4 +264,65 @@ Class Functions extends SgdbManager{
         die();
     }
 
+    public static function list_plugins_active($dir){
+        global $myUser;
+
+        $liste_plugins =self::list_plugins($dir);
+        $list_plugins_active = $myUser->getPluginsList();
+        $return_list = array();
+
+        foreach ($liste_plugins as $key => $plugins) {
+            if(in_array($key, $list_plugins_active) || preg_match("~".DIRECTORY_SEPARATOR."base".DIRECTORY_SEPARATOR."~", substr($plugins, strlen(__DIR__))))
+                $return_list[$key] = $plugins;
+        }
+        return $return_list;
+    }
+
+    public static function list_plugins($dir){
+        global  $debugObject;
+        
+        $liste_link = array();
+        //on liste les dossiers du dossier parent des plugins
+        $pluginsFolder = opendir($dir) or Functions::fatal_error('Impossible d\'ouvrir le dossier des plugins');
+        while($file = @readdir($pluginsFolder)) {
+            //si ils ne correspondent pas aux actions linux
+            if($file != "." && $file != ".."){
+                $link = $dir.DIRECTORY_SEPARATOR.$file;
+                //et que c'est bien un dossier
+                if(is_dir($link)){
+                    $liste_link = array_merge($liste_link, self::list_plugins($link));
+                }
+                else{
+                    if(preg_match("~([A-Z][a-zA-Z_0-9]+)\\.plugin\\.php~", $file, $match)){
+                        if(!empty($match[1])){
+                            if(!class_exists($match[1])){
+                                $debugObject->addDebugList(array("plugins" => substr($link, strlen(ROOT)+1) ));
+                                $liste_link[$match[1]] = $link;
+                                // $plugins->addPlugin(new $match[1]());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        closedir($pluginsFolder);
+        return $liste_link;
+    }
+
+    public static function secureUnserialize($linear){
+        if(!self::isSerialized($linear))
+            return array();
+        else
+            return unserialize($linear);
+    }
+    /**
+     * [logExecutionTime description]
+     * @param  [type] $time [description]
+     * @return [type]       [description]
+     */
+    public static function logExecutionTime($time){
+        global $system, $_;
+        //on le lance en shell pour que ce ne soit pas php qui prenne du temps
+        $system->shell('echo "'.time().':'.(!empty($_['page'])?$_['page']:"index").':'.escapeshellarg($time).'" >> '.ROOT.'/log/executionTime.txt');
+    }
 }
