@@ -156,7 +156,7 @@ then
 fi
 
 
-ver_eva=$(curl -s https://raw.githubusercontent.com/thib3113/EVA/${branche}/config.php | grep PROGRAM_VERSION | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
+ver_eva=$(curl -s https://raw.githubusercontent.com/thib3113/EVA/${branche}/static.php | grep PROGRAM_VERSION | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
 
 if [ -z $ver_eva ] ; then
    echo -ne "Impossible de récupéré la version de EVA " ;affich error

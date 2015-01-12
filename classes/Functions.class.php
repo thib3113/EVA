@@ -125,7 +125,7 @@ Class Functions extends SgdbManager{
     }
 
     public static function getSupportedVersion(){
-        $url = PROGRAM_WEBSITE."/json.php?get=supported_distribution"; //ne pas mettre http
+        $url = DISTANT_API."?get=supported_distribution"; //ne pas mettre http
 
         //on vérifie la connexion avec le site
         if(!self::checkConnectivity($url))
