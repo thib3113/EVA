@@ -13,16 +13,17 @@ function affich_gpio(){
     global $RaspberryPi, $smarty;
 
     $pins = array();
-
+    $array_list_wiring_pin = $RaspberryPi->getListWiringPin();
     //on ajoute les etats
     foreach ($RaspberryPi->getTablePins() as $key => $value) {
         $pins[$key] = $value;
-        if($value['type'] == 'GPIO')
+        if(!is_null($value['wiringPin']))
             $pins[$key]["state"] = $RaspberryPi->read($value['wiringPin']);
     }
     // var_dump($pins);
     $smarty->assign('pins', $pins);
 
+    // var_dump($RaspberryPi->getListWiringPin());
     //test des led 
     // $led = new LED(array(array(0 , true), array(1 , false)));
     // $led1 = new LED(array(array(0 , false), array(1 , true)));
@@ -43,6 +44,7 @@ function affich_gpio(){
     // $sevenseg->affich("hello");
 
     Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/gpio/gpio.tpl'));
+    Configuration::addJs('plugins/base/vues/gpio/js/gpio.js');
     Plugin::callHook("pre_header");
     Plugin::callHook("header");
     Plugin::callHook("pre_gpio");

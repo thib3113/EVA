@@ -74,7 +74,10 @@ function widget(name, id, special, new_widget){
                 break;
 
                 case "waiting":
-                    code_loader = '<div class="outline"><div class="circle"></div></div>';
+                    // code_loader = '<div class="outline"><div class="circle"></div></div>';
+                    // code_loader = '<svg class="loader" width="20px" height="20px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle></svg>';
+                    code_loader = '<div class="loader"><svg class="circular"><circle class="path" cx="30" cy="30" r="20" fill="none" stroke-width="5" stroke-miterlimit="10"/></svg></div>';
+
                     if(!$('#dashboard_id_'+this.id).length)
                         $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
                     else

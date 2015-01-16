@@ -27,7 +27,6 @@ $pluginsFolder_link = ROOT.DIRECTORY_SEPARATOR.PLUGIN_DIR;
 $list_plugins = Functions::list_plugins_active($pluginsFolder_link);
 
 foreach ($list_plugins as $key => $plugins) {
-    // var_dump("$key : $plugins");
     include $plugins;
 }
 

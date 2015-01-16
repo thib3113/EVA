@@ -243,6 +243,15 @@ class RaspberryPi extends SgdbManager{
         return $tempPinsTable;
     }
 
+    public function getAllState(){
+        $pins = array();
+        foreach ($this->getTablePins() as $key => $value) {
+            if(!is_null($value['wiringPin']))
+                $pins[] = array("id" => $key, "state" => $this->read($value['wiringPin']));
+        }
+        return $pins;
+    }
+
   /**
    * Permet de récupéré la version du raspberry
    * @author Thibaut SEVERAC ( thibaut@thib3113.fr )
@@ -254,7 +263,7 @@ class RaspberryPi extends SgdbManager{
       $this->setRevision($revision);
       $version = !empty($this->versionByRev[$revision])? $this->versionByRev[$revision] : false;
       return $version;
-    }
+  }
 
 
     /**

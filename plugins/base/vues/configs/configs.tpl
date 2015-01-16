@@ -58,15 +58,22 @@
           </form>
       </div>
       <div style="display:none;" id="tab_plugins">
-        <div class="panel panel-danger">
-          <div class="panel-heading">
-              <h3 class="panel-title">Le serveur de plugin ne semble pas disponible</h3>
-          </div>
-          <div class="panel-body">
-            Une erreur de connexion au market viens de se produire, merci de réessayer ultérieurement.
-            -- Fonctionnalitée non active en alpha --
-          </div>
-        </div>
+
+              <div class="input-group" style="min-height:40px;">
+                <span class="input-group-addon">
+                  <span id="market_search_loading">
+                    <span class="load hide">
+                      <svg class="loader" width="20px" height="20px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                         <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+                      </svg>
+                    </span>
+                    <span class="no_load">
+                      <i class="fa fa-search" style="transition: font-size 0.3s"></i>
+                    </span>
+                  </span>
+                </span>
+                <input type="text" class="form-control" placeholder="Recherche" aria-describedby="market_search_loading" style="min-height: 40px;">
+              </div>
       </div>
       <div style="display:none;" id="tab_mise_a_jour">
           {if !$erreur_maj}
