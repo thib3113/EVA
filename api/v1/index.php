@@ -38,6 +38,45 @@ if(!empty($_GET['get'])){
     echo json_encode($return);
     
 }
+elseif(!empty($_GET['set'])){
+
+    switch ($_GET['set']) {
+        case "GPIO_STATE":
+            if((empty($_GET["GPIO"]) && intval($_GET["GPIO"]) !== 0) || (empty($_GET["GPIO_STATE"]) && intval($_GET["GPIO_STATE"]) !== 0) ){
+                $return = array(
+                "status" => false,
+                "message" => "parametre manquant",
+                "error_code" => 400,
+                );
+            }
+            elseif(!is_int((int)$_GET["GPIO_STATE"]) || !is_int((int)$_GET["GPIO"])){
+
+                $return = array(
+                "status" => false,
+                "message" => "parametre incorrects",
+                "error_code" => 405,
+                );
+            }
+            else{
+                $RaspberryPi->write($_GET["GPIO"], $_GET["GPIO_STATE"], true);
+
+                $return = array(
+                "status" => true,
+                "message" => "success",
+                "error_code" => 200,
+                "wiringpin" => $_GET["GPIO"],
+                "state" => $RaspberryPi->read($_GET["GPIO"]),
+                );
+                
+            }
+        break;
+        default:
+            # code...
+            break;
+    }
+    echo json_encode($return);
+    
+}
 else{
     $return["message"] = "parametre incorrects";
     $return["error_code"] = 400;

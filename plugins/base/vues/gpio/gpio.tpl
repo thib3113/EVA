@@ -6,11 +6,11 @@
         text-align: center;
     }
     .gpio_left{
-        text-align:right;
+        text-align:center;
     }
 
     .gpio_right{
-        text-align:left;
+        text-align:center;
     }
     .POWER{
       color: #fff;
@@ -282,6 +282,16 @@
       color: #7029CA;
       background-color: #fff;
     }
+@media (max-width: 1200px) {
+  .SPI, .I2C, .UART {
+     background-image:      -webkit-linear-gradient(bottom left, rgba(235, 147, 22, 0.75) 25%, transparent 25%, transparent 50%, rgba(235, 147, 22, 0.75) 50%, rgba(235, 147, 22, 0.75) 75%, transparent 75%, transparent);
+     background-image:      -o-linear-gradient(bottom left, rgba(235, 147, 22, 0.75) 25%, transparent 25%, transparent 50%, rgba(235, 147, 22, 0.75) 50%, rgba(235, 147, 22, 0.75) 75%, transparent 75%, transparent);
+     background-image:      linear-gradient(to top right, rgba(235, 147, 22, 0.75) 25%, transparent 25%, transparent 50%, rgba(235, 147, 22, 0.75) 50%, rgba(235, 147, 22, 0.75) 75%, transparent 75%, transparent);
+  
+     -webkit-background-size: 40px 40px;
+          background-size: 40px 40px;
+  }
+}
 </style>
 <div class="container-fluid" style="margin-bottom: 10px;">
   <div class="panel panel-default legend">
@@ -302,21 +312,21 @@
 {if $key%2!=0}
             <div class="row">
                 <div class="gpio_left">
-                    <div class="col-md-2 col-xs-2 col-xs-offset-0">
+                    <div class="col-md-2 col-xs-2 col-sm-2 col-xs-offset-0">
                             <p>
 {if $pin.wiringPin !== null}
-                        <button type="button" data-wiringpin="{$pin.wiringPin}" class="btn btn-{if $pin.state}success{else}warning{/if}">{if $pin.state}on{else}off{/if}</button>
+                        <button type="button" data-state="{$pin.state}" data-wiringpin="{$pin.wiringPin}" class="change_state btn btn-{if $pin.state}success{else}warning{/if}">{if $pin.state}on{else}off{/if}</button>
 {/if}
                             </p>
                     </div>
-                    <div class="col-md-1 col-xs-1">
+                    <div class="col-md-1 hidden-xs col-sm-1">
                         <p>
 {$key}
                         </p>
                     </div>
-                    <div class="col-md-2 col-xs-2">
+                    <div class="col-md-2 col-xs-4 col-sm-3">
                         <p>
-                            <button disabled type="button" class="btn {$pin.type}">{$pin.nameOfPin}</button>{if $pin.wiringPin !== null && $pin.type != "GPIO"}<span class="hidden-sm hidden-xs"> / <button disabled type="button" class="btn GPIO">GPIO {$pin.wiringPin}</button></span>{/if}
+                            <button disabled type="button" class="btn {$pin.type}">{$pin.nameOfPin}</button>{if $pin.wiringPin !== null && $pin.type != "GPIO"}<span class="hidden-sm hidden-xs hidden-md "> / <button disabled type="button" class="btn GPIO">GPIO {$pin.wiringPin}</button></span>{/if}
                         </p>
                     </div>
                     <div class="col-md-1 hidden-sm hidden-xs">
@@ -329,20 +339,20 @@
                         <i class="fa fa-dot-circle-o"></i>
                     </div>
 
-                    <div class="col-md-2 col-xs-2">
+                    <div class="col-md-2 col-xs-4 col-sm-3">
                         <p>
-                            <button disabled type="button" class="btn {$pin.type}">{$pin.nameOfPin}</button>{if $pin.wiringPin !== null && $pin.type != "GPIO"}<span class="hidden-sm hidden-xs"> / <button disabled type="button" class="btn GPIO">GPIO {$pin.wiringPin}</button></span>{/if}
+                            <button disabled type="button" class="btn {$pin.type}">{$pin.nameOfPin}</button>{if $pin.wiringPin !== null && $pin.type != "GPIO"}<span class="hidden-sm hidden-xs hidden-md"> / <button disabled type="button" class="btn GPIO">GPIO {$pin.wiringPin}</button></span>{/if}
                         </p>
                     </div>
-                    <div class="col-md-1 col-xs-1">
+                    <div class="col-md-1 col-sm-1 hidden-xs">
                         <p>
 {$key}
                         </p>
                     </div>
-                    <div class="col-md-2 col-xs-2">
+                    <div class="col-md-2 col-xs-2 col-sm-2">
                         <p>
 {if $pin.wiringPin !== null}
-                        <button type="button" data-wiringpin="{$pin.wiringPin}" class="btn btn-{if $pin.state}success{else}warning{/if}">{if $pin.state}on{else}off{/if}</button>
+                        <button type="button" data-state="{$pin.state}" data-wiringpin="{$pin.wiringPin}" class="change_state btn btn-{if $pin.state}success{else}warning{/if}">{if $pin.state}on{else}off{/if}</button>
 {/if}
                         </p>
                     </div>

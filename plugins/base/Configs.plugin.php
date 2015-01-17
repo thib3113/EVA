@@ -16,7 +16,7 @@ if($myUser->is_connect){
 
         $yourRaspberryPi = "Type : ".$RaspberryPi->getRaspVersion()." <br>
         Révision : ".$RaspberryPi->getInfos("revision").'<br>
-        Nombre de pins : '.$RaspberryPi->getNumberOfPins().' et '.$RaspberryPi->getNumberOfOptionalPins().' pins optionnels <br>
+        Nombre de pins : '.$RaspberryPi->getNumberOfPins().' et '.$RaspberryPi->getNumberOfOptionalPins().' pins optionnels <i title="non activable actuellement" class="fa fa-question-circle"></i> <br>
         dont '.$nb_wiring_pi.' pin'.($nb_wiring_pi>1? 's' : '').' controllable'.($nb_wiring_pi>1? 's' : '').' <br>
          <a href="http://fr.wikipedia.org/wiki/OS" title="Operating System">OS</a> : '.$RaspberryPi->getInfos('distribution', true).' '.$RaspberryPi->getInfos('version');
         $smarty->assign('yourRaspberryPi', $yourRaspberryPi);
