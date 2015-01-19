@@ -9,7 +9,7 @@ $_ = array_merge($_GET, $_POST);
 
 //on regarde si la db existe déjà, pour empécher l'installaion dans ce cas
 if(is_file(DB_NAME)){
-    //pour le debug, on supprime le fichier de db à chaque
+    //pour le debug, on supprime le fichier de db à chaque fois
     // unlink(DB_NAME);
     die('<meta charset="utf-8">le fichier de base de donnée existe déjà <a href="index.php">Retour à l\'accueil</a>');
 }
@@ -129,7 +129,7 @@ if(!empty($_['launch_install'])){
     if(empty($erreurs)){
         $config = new Configuration();
         $taskList[] = "création de la base ... ".check($config->sgbdCreate());
-        $taskList[] = "Ajout des infos ... ".check( $config->addConfig("base_url", 'http://'.$_SERVER['SERVER_NAME']) );
+        $taskList[] = "Ajout des infos ... ".check( $config->addConfig("base_url", "http".(!empty($_SERVER["HTTPS"])? "s" : "")."://".$_SERVER["SERVER_NAME"].dirname($_SERVER["PHP_SELF"])) );
 
         $taskList[] = "Vérification de la création de la database ... ".check(filesize(DB_NAME) >1);
 

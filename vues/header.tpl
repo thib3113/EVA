@@ -21,6 +21,10 @@
     {foreach from=$template_infos.externcss item=style}
     <link rel="stylesheet" href="{$style}">
     {/foreach}
+    <script>
+    base_url = "{$template_infos.configs.base_url}";
+    program_version  = "{$smarty.const.PROGRAM_VERSION}";
+    </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>

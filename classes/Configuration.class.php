@@ -20,6 +20,7 @@ Class Configuration extends SgdbManager{
     );
     private static $css_list = array();
     private static $DashboardWidgetList = array();
+    private static $configs;
 
     function __construct(){
         global $RaspberryPi;
@@ -28,10 +29,10 @@ Class Configuration extends SgdbManager{
             "title"        => PROGRAM_NAME.' '.PROGRAM_VERSION,
             "menu_items"   => "",
             "distribution" => $RaspberryPi->getInfos("distribution"),
-            "version"      => $RaspberryPi->getInfos("version")
+            "version"      => $RaspberryPi->getInfos("version"),
             );
-
         parent::__construct();
+        self::fetch_config();
     }
 
     public function setKey($key){
@@ -41,21 +42,32 @@ Class Configuration extends SgdbManager{
     public function addConfig($key, $value){
         $this->key=$key;
         $this->value=$value;
-        return $this->sgbdSave();
+        $return = $this->sgbdSave();
+        self::fetch_config();
+        return $return;
     }
 
     public function getValue($key){
         return $this->value;
     }
 
-    public function getConfig(){
+    private function fetch_config(){
+        $query = self::sgbdSelect();
+        while($config = $query->fetch()){
+            $return[$config["key"]] = $config["value"];
+        }
+        self::$configs = $return;
+    }
 
+    public function getConfigs(){
+        return self::$configs;
     }
 
     public function getTemplateInfos(){
         self::$templateInfos['menu_items'] = self::triMenu();
         self::$templateInfos['externjs'] = self::$js_list;
         self::$templateInfos['externcss'] = self::$css_list;
+        self::$templateInfos['configs'] = self::getConfigs();
         return self::$templateInfos;
     }
 

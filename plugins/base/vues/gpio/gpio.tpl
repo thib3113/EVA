@@ -306,7 +306,8 @@
           <div class="col-md-2"><button disabled class="btn GPIO">Pin GPIO</button></div>
       </div>
     </div>
-    <div class="panel-footer">Pour une correspondance des Pins, tenez votre raspberry pi avec les Pin en haut à droite<br><i class="fa fa-exclamation-triangle"></i>Si le pin n'est pas relié à un + ou un -, il oscillera</div></div>
+    <div class="panel-footer">Pour une correspondance des Pins, tenez votre raspberry pi avec les Pin en haut à droite<br><i class="fa fa-exclamation-triangle"></i>Si le pin n'est pas relié à un + ou un -, il oscillera
+    </div>
   </div>
 {foreach from=$pins key=key item=pin}
 {if $key%2!=0}

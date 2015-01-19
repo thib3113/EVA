@@ -1,7 +1,7 @@
 {* SMARTY TEMPLATE *}
 {include "{$smarty.const.ROOT}/vues/header.tpl"}
 {include "{$smarty.const.ROOT}/vues/menu.tpl"}
-<div class="container-fluid full_height">
+<div class="container-fluid">
     <ul class="nav nav-tabs nav-justified">
       <li role="tabs" data-tab="accueil" class="active"><a href="javascript:void(0)">Accueil</a></li>
       <li role="tabs" data-tab="profil"><a href="javascript:void(0)">Profil</a></li>
@@ -58,22 +58,36 @@
           </form>
       </div>
       <div style="display:none;" id="tab_plugins">
-
-              <div class="input-group" style="min-height:40px;">
-                <span class="input-group-addon">
+        <div id="market_conteneur">
+          <style>
+            #load_market, .circular{
+              height:20px;
+              width:20px;
+            }
+            #addon_market{
+              min-width:45px;
+            }
+          </style>
+              <div class="input-group" style="margin-bottom: 20px;">
+                <span class="input-group-addon" id="addon_market">
+                  <div id="load_market" class="loader" style="display:none;background:inherit;">
+                    <svg class="circular">
+                      <circle class="path" cx="10" cy="10" r="8" fill="none" stroke-width="3" stroke-miterlimit="10"/>
+                    </svg>
+                  </div>
                   <span id="market_search_loading">
-                    <span class="load hide">
-                      <svg class="loader" width="20px" height="20px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-                         <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
-                      </svg>
-                    </span>
-                    <span class="no_load">
-                      <i class="fa fa-search" style="transition: font-size 0.3s"></i>
-                    </span>
+                    <i class="fa fa-search"></i>
                   </span>
                 </span>
-                <input type="text" class="form-control" placeholder="Recherche" aria-describedby="market_search_loading" style="min-height: 40px;">
+                <input type="text" class="form-control floating-label" id="market_search" placeholder="Recherche">
               </div>
+              <!-- <div style="float:left;margin-left:50%;transition:top 1.5s;" class="load"> -->
+              <!-- </div> -->
+              <div id="market_container">
+                <ul id="market_list_plugins" class="no_puce"></ul>
+                <div id="pagination_plugins"></div>
+              </div>
+        </div>
       </div>
       <div style="display:none;" id="tab_mise_a_jour">
           {if !$erreur_maj}

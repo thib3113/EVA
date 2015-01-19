@@ -70,7 +70,7 @@ function widget(name, id, special, new_widget){
         if(!this.HTML){
             switch(type){
                 case "widget":
-                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading"><span class="selectable_text">'+this.title+'</span><span class="float_right selectable_text toggle_widget" style="cursor:pointer" onclick="$(this.parentNode.parentNode.getElementsByTagName(\'div\')[1]).toggle(500);this.style.transform=(this.style.transform==\'rotate(180deg)\')?\'rotate(0deg)\':\'rotate(180deg)\';"><i class="fa fa-angle-double-down"></i></span></div>\n<div class="panel-body">'+this.content+'\n</div>\n</div>\n</div>');
+                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading"><span class="selectable_text">'+this.title+'</span><span class="float_right selectable_text toggle_widget" style="cursor:pointer" onclick="$(this.parentNode.parentNode.getElementsByTagName(\'div\')[1]).slideToggle(500);this.style.transform=(this.style.transform==\'rotate(180deg)\')?\'rotate(0deg)\':\'rotate(180deg)\';"><i class="fa fa-angle-double-down"></i></span></div>\n<div class="panel-body">'+this.content+'\n</div>\n</div>\n</div>');
                 break;
 
                 case "waiting":
