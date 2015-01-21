@@ -129,7 +129,11 @@ if(!empty($_['launch_install'])){
     if(empty($erreurs)){
         $config = new Configuration();
         $taskList[] = "création de la base ... ".check($config->sgbdCreate());
-        $taskList[] = "Ajout des infos ... ".check( $config->addConfig("base_url", "http".(!empty($_SERVER["HTTPS"])? "s" : "")."://".$_SERVER["SERVER_NAME"].dirname($_SERVER["PHP_SELF"])) );
+        $taskList[] = "Ajout des infos ... ".check( 
+            $config->addConfig("base_url", "http".(!empty($_SERVER["HTTPS"])? "s" : "")."://".$_SERVER["SERVER_NAME"].dirname($_SERVER["PHP_SELF"]))
+        &&  $config->addConfig("base_version", PROGRAM_VERSION)
+        &&  $config->addConfig("channel", "stable")
+            );
 
         $taskList[] = "Vérification de la création de la database ... ".check(filesize(DB_NAME) >1);
 

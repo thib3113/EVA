@@ -23,6 +23,9 @@ $return = array(
 if(!empty($_GET['get'])){
 
     switch ($_GET['get']) {
+        case 'test':
+             var_dump($RaspberryPi->readAll());
+            break;
         case "GPIO_STATE":
             $return = array(
             "status" => true,

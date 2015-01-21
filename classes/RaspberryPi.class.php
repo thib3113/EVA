@@ -8,7 +8,8 @@
 
 class RaspberryPi extends SgdbManager{
 
-    public $version, $revision;
+    public $version, $revision, $pins;
+    private $active_optionnal = false;
     const GPIO_DEFAULT_PATH = '/usr/local/bin/gpio';
 
     // version du raspberry par revision
@@ -99,6 +100,7 @@ class RaspberryPi extends SgdbManager{
 
     function __construct(){
       $this->setVersion();
+      $this->checkPins();
       $this->nameTable();
     }
 
@@ -121,9 +123,10 @@ class RaspberryPi extends SgdbManager{
         $this->version = $this->getRaspVersion();
     }
 
-    private function exec($cmd){
+    private function exec($cmd, $system_user = true){
+        global $system;
         // echo $cmd;
-        return exec($cmd);
+        return $system->shell($cmd, $system_user); 
     }
 
     public function mode($pin,$mode = 'out'){
@@ -141,6 +144,36 @@ class RaspberryPi extends SgdbManager{
     public function toggle($pin,$automode = false){
         if($automode) $this->mode($pin,'out');
         return $this->exec(self::GPIO_DEFAULT_PATH.' toggle '.$pin);
+    }
+
+
+    public function checkPins(){
+      //on récupère les pins
+      $this->pins = $this->tablePins;
+      if($this->active_optionnal){
+        foreach ($this->optionalPins as $key => $value) {
+          $this->pins[] = $value;
+        }
+      }
+
+      //on récupère les informations du readall
+      $read_all = $this->exec("gpio readall", true);
+      foreach ($read_all as $key => $value) {
+        //on match les lignes dans les bonnes cases
+        preg_match("~\|(?:\s*(?'LBCM'[0-9]*)\s*\|\s*(?'LwPi'[0-9]*)\s*\|\s*(?'LName'[^\|]*)\s*\|\s*(?'LMode'[^\|]*)\s*\|\s*(?'LValue'[^\|]*)\s*\|\s*(?'LPhysical'[0-9]*))\s*\|\|(?:\s*(?'Rphysical'[0-9]*)\s*\|\s*(?'RValue'[0-9]*)\s*\|\s*(?'RMode'[^\|]*)\s*\|\s*(?'RName'[^\|]*)\s*\|\s*(?'RwPi'[^\|]*)\s*\|\s*(?'RBCM'[0-9]*))\s*\|~i", $value, $matches);
+        
+        //on les met dans le tableau ( gauche du tableau, puis droite)
+        if(!empty($matches["Lphysical"]))
+          $this->pins[$matches["Lphysical"]]["value"] = trim($matches["LValue"]);
+
+        if(!empty($matches["Rphysical"]))
+          $this->pins[$matches["Rphysical"]]["value"] = trim($matches["RValue"]);
+      }
+    }
+
+    public function readAll(){
+        $this->checkPins();
+        return $this->pins;
     }
 
 
@@ -244,12 +277,13 @@ class RaspberryPi extends SgdbManager{
     }
 
     public function getAllState(){
-        $pins = array();
-        foreach ($this->getTablePins() as $key => $value) {
-            if(!is_null($value['wiringPin']))
-                $pins[] = array("id" => $key, "state" => $this->read($value['wiringPin']));
+        $pins = $this->readAll();
+        $return = array();
+        foreach ($pins as $key => $value) {
+            if(isset($value['value']) && !is_null($value['value']))
+                $return[] = array("id" => $key, "state" => $value["value"]);
         }
-        return $pins;
+        return $return;
     }
 
   /**

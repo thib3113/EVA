@@ -176,7 +176,7 @@ $("body").on("click", ".plugin_install", function(){
   };
   console.log("current_plugin : "+current_plugin);
   if(current_plugin != null)
-    alert("Le plugin id : \""+current_plugin.name+"\" ne peux pas encore être installé");
+    alert("Le plugin \""+current_plugin.name+"\" ne peux pas encore être installé");
   else
     alert("Une erreur c'est produite");
 });
