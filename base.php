@@ -42,6 +42,8 @@ Configuration::addJs("//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js
 Configuration::addJs("https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js");
 //noty
 Configuration::addJs("vues/js/jquery.noty.packaged.min.js");
+//permet de voir si quelqu'un est idle ou pas
+Configuration::addJs("vues/js/idle.min.js");
 //fonctions utiles
 Configuration::addJs("vues/js/libs.js");
 //debuguer perso

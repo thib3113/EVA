@@ -5,6 +5,33 @@ ob_start();
 //on inclus les fichiers de base
 require ROOT.'/base.php';
 
+// Fichier API
+$return = array(
+"status" => false,
+"message" => "Erreur inconnue",
+"error_code" => 500,
+);
+
+//API sans auth
+if(!empty($_GET['get'])){
+
+    switch ($_GET['get']) {
+        case "ping":
+            $return = array(
+                "status" => true,
+                "ping" => "pong",
+            );
+            echo json_encode($return);
+        break;
+        default:
+            # code...
+        break;
+    }
+    
+}
+
+
+// API avec AUTH
 if(!$myUser->is_connect){
     $return = array(
     "status" => false,
@@ -14,12 +41,6 @@ if(!$myUser->is_connect){
     die(json_encode($return));
 }
 
-// Fichier API
-$return = array(
-"status" => false,
-"message" => "Erreur inconnue",
-"error_code" => 500,
-);
 if(!empty($_GET['get'])){
 
     switch ($_GET['get']) {

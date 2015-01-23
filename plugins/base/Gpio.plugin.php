@@ -12,16 +12,8 @@ if($myUser->is_connect){
 function affich_gpio(){
     global $RaspberryPi, $smarty;
 
-    $pins = array();
-    $array_list_wiring_pin = $RaspberryPi->getListWiringPin();
-    //on ajoute les etats
-    foreach ($RaspberryPi->getTablePins() as $key => $value) {
-        $pins[$key] = $value;
-        if(!is_null($value['wiringPin']))
-            $pins[$key]["state"] = $RaspberryPi->read($value['wiringPin']);
-    }
-    // var_dump($pins);
-    $smarty->assign('pins', $pins);
+    $state = $RaspberryPi->readAll();
+    $smarty->assign('pins', $state);
 
     // var_dump($RaspberryPi->getListWiringPin());
     //test des led 

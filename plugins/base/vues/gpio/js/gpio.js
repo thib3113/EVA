@@ -1,7 +1,29 @@
+
 $(function(){
     refresh_time = 5;//s
     refresh_id = setTimeout(update_gpio, refresh_time*1000);
+    idle_noty_id = null;
 
+    //gestion de l'idl
+    $.idleTimer(60000);//1 minute
+    $(document).bind("idle.idleTimer", function(){
+        clearTimeout(refresh_id);
+        idle_noty_id = noty({
+            layout: 'top',
+            theme: 'defaultTheme', // or 'relax'
+            type: 'warning',
+            text: 'Vous êtes inactif, le raffraichissement des GPIOs ne s\'effectue plus' , // can be html or string
+            dismissQueue: false, // If you want to use queue feature set this true
+            timeout: false, // delay for closing event. Set false for sticky notifications
+            force: false, // adds notification to the beginning of queue when set to true
+        });
+    });
+
+    $(document).bind("active.idleTimer", function(){
+        refresh_id = setTimeout(update_gpio, refresh_time*1000);
+        if(idle_noty_id != "")
+            idle_noty_id.close();      
+    });
     gpio = [];
     ajaxConnexion = "";
     function update_gpio(){

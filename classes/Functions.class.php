@@ -270,7 +270,7 @@ Class Functions extends SgdbManager{
         $liste_plugins =self::list_plugins($dir);
         $list_plugins_active = $myUser->getPluginsList();
         $return_list = array();
-
+        
         foreach ($liste_plugins as $key => $plugins) {
             if(in_array($key, $list_plugins_active) || preg_match("~".DIRECTORY_SEPARATOR."base".DIRECTORY_SEPARATOR."~", substr($plugins, strlen(__DIR__))))
                 $return_list[$key] = $plugins;

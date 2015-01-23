@@ -160,14 +160,15 @@ class RaspberryPi extends SgdbManager{
       $read_all = $this->exec("gpio readall", true);
       foreach ($read_all as $key => $value) {
         //on match les lignes dans les bonnes cases
-        preg_match("~\|(?:\s*(?'LBCM'[0-9]*)\s*\|\s*(?'LwPi'[0-9]*)\s*\|\s*(?'LName'[^\|]*)\s*\|\s*(?'LMode'[^\|]*)\s*\|\s*(?'LValue'[^\|]*)\s*\|\s*(?'LPhysical'[0-9]*))\s*\|\|(?:\s*(?'Rphysical'[0-9]*)\s*\|\s*(?'RValue'[0-9]*)\s*\|\s*(?'RMode'[^\|]*)\s*\|\s*(?'RName'[^\|]*)\s*\|\s*(?'RwPi'[^\|]*)\s*\|\s*(?'RBCM'[0-9]*))\s*\|~i", $value, $matches);
+        preg_match("~\|(?:(?'LBCM'\s*[0-9]*\s*)\|(?'LwPi'\s*[0-9]*\s*)\|(?'LName'\s*[^\|]*\s*)\|(?'LMode'\s*[^\|]*\s*)\|(?'LValue'\s*[^\|]*\s*)\|(?'LPhysical'\s*[0-9]*\s*))\|\|(?:(?'Rphysical'\s*[0-9]*\s*)\|(?'RValue'\s*[0-9]*\s*)\|(?'RMode'\s*[^\|]*\s*)\|(?'RName'\s*[^\|]*\s*)\|(?'RwPi'\s*[^\|]*\s*)\|(?'RBCM'\s*[0-9]*\s*))\s*\|~i", $value, $matches);
         
         //on les met dans le tableau ( gauche du tableau, puis droite)
-        if(!empty($matches["Lphysical"]))
-          $this->pins[$matches["Lphysical"]]["value"] = trim($matches["LValue"]);
+        if(!empty($matches["LPhysical"]))
+          $this->pins[trim($matches["LPhysical"])]["value"] = trim($matches["LValue"]);
 
         if(!empty($matches["Rphysical"]))
-          $this->pins[$matches["Rphysical"]]["value"] = trim($matches["RValue"]);
+          $this->pins[trim($matches["Rphysical"])]["value"] = trim($matches["RValue"]);
+        
       }
     }
 

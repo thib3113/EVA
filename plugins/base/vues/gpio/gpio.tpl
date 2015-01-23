@@ -316,7 +316,7 @@
                     <div class="col-md-2 col-xs-2 col-sm-2 col-xs-offset-0">
                             <p>
 {if $pin.wiringPin !== null}
-                        <button type="button" data-state="{$pin.state}" data-wiringpin="{$pin.wiringPin}" class="change_state btn btn-{if $pin.state}success{else}warning{/if}">{if $pin.state}on{else}off{/if}</button>
+                        <button type="button" data-state="{$pin.value}" data-wiringpin="{$pin.wiringPin}" class="change_state btn btn-{if $pin.value}success{else}warning{/if}">{if $pin.value}on{else}off{/if}</button>
 {/if}
                             </p>
                     </div>
@@ -353,7 +353,7 @@
                     <div class="col-md-2 col-xs-2 col-sm-2">
                         <p>
 {if $pin.wiringPin !== null}
-                        <button type="button" data-state="{$pin.state}" data-wiringpin="{$pin.wiringPin}" class="change_state btn btn-{if $pin.state}success{else}warning{/if}">{if $pin.state}on{else}off{/if}</button>
+                        <button type="button" data-state="{$pin.value}" data-wiringpin="{$pin.wiringPin}" class="change_state btn btn-{if $pin.value}success{else}warning{/if}">{if $pin.value}on{else}off{/if}</button>
 {/if}
                         </p>
                     </div>
