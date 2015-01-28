@@ -58,6 +58,9 @@ $all_is_not_good_message = "";
 $distribution = $RaspberryPi->getInfos("distribution");
 $version = $RaspberryPi->getInfos("version");
 
+var_dump($distribution);
+var_dump($version);
+
 //on test les erreurs
 if(!is_writable(dirname(DB_NAME))){
     $erreurs[] = createError('le dossier '.basename(dirname(DB_NAME)).' n\'est pas disponible en écriture', array("Rendre le dossier inscriptible par tout le monde <kbd>sudo chmod -R 777 ".basename(dirname(DB_NAME))."/</kbd>") );
@@ -70,7 +73,7 @@ if(!$RaspberryPi->getInfos('wiringpi'))
     $erreurs[] = createError("WiringPi ne semble pas être installer sur votre RaspberryPi", 'Suivre les étapes d\'installation : <a href="http://wiringpi.com/download-and-install/">http://wiringpi.com/download-and-install/</a>');
 
 if(!$RaspberryPi->getInfos('git'))
-    $erreurs[] = createError("Git ne semble pas être installer sur votre RaspberryPi", 'Installer git <kdb>sudo apt-get install git</kdb>');
+    $erreurs[] = createError("Git ne semble pas être installer sur votre RaspberryPi", 'Installer git <kbd>sudo apt-get install git</kbd>');
 
 
 //on teste les erreurs non blocantes
