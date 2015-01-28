@@ -506,6 +506,7 @@ fi
 
 #on change les droits du dossier d'installation
 cmd "chmod -R 775 $install_folder"
+cmd "chmod -R 777 $install_folder/cache $install_folder/db"
 affich point
 affich point
 #on regarde si ça à marché en regardant si le dossier d'installation est vide
