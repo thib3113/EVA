@@ -125,8 +125,8 @@ Class Functions extends SgdbManager{
     }
 
     public static function getSupportedVersion(){
-        $url = DISTANT_API."?get=supported_distribution"; //ne pas mettre http
-
+        $url = DISTANT_API."?get=supported_distribution";
+        
         //on vérifie la connexion avec le site
         if(!self::checkConnectivity($url))
             return false;
@@ -153,8 +153,8 @@ Class Functions extends SgdbManager{
         $version = $RaspberryPi->getInfos("version");
 
         foreach ($supported_versions as $version_support) {
-            if(strtolower($version_support[0]) == strtolower($distribution))
-                if(strtolower($version_support[1]) == strtolower($version))
+            if(strtolower($version_support["distribution"]) == strtolower($distribution))
+                if(strtolower($version_support["version"]) == strtolower($version))
                     return true;
         }
         return false;

@@ -6,7 +6,7 @@
  @description:  Classe de gestion du raspberry pi
  */
 
-class RaspberryPi extends SgdbManager{
+class RaspberryPi extends System{
 
     public $version, $revision, $pins;
     private $active_optionnal = false;
@@ -124,9 +124,8 @@ class RaspberryPi extends SgdbManager{
     }
 
     private function exec($cmd, $system_user = true){
-        global $system;
         // echo $cmd;
-        return $system->shell($cmd, $system_user); 
+        return $this->shell($cmd, $system_user); 
     }
 
     public function mode($pin,$mode = 'out'){

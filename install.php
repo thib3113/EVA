@@ -31,9 +31,6 @@ $error_form = array(
         "email"        => 0
     );
 
-////////////////////////////////////////
-//on vérifie les droits du dossier db //
-////////////////////////////////////////
 
 function createError($error, $resolve = array()){
     global $erreurs;
@@ -56,7 +53,6 @@ function check($value){
         $GLOBALS['error'] = 1;
     return '[ '.($value? '<span style="color:green">OK</span>' : '<span style="color:red">ERREUR</span>').' ]';
 }
-
 $GLOBALS['error'] = 0;
 $all_is_not_good_message = "";
 $distribution = $RaspberryPi->getInfos("distribution");
@@ -90,7 +86,7 @@ else{
         $notices[] = createError("votre RaspberryPi n'arrive pas à communiquer avec notre site, nous ne pouvons pas voir si votre version est supportée");
     }
 }
-$html = @file_get_html('http://'.$_SERVER['SERVER_NAME'].dirname($_SERVER['REQUEST_URI']).'/db/index.html');
+$html = @file_get_contents('http://'.$_SERVER['SERVER_NAME'].dirname($_SERVER['REQUEST_URI']).'/db/index.html');
 if(!$html){
     $notices = createError("Il semble que la base de donnée soit accessible depuis internet !", array('Renseignez vous sur notre forum sur des solutions possibles ( <a href="'.PROGRAM_FORUM.'">'.PROGRAM_FORUM.'</a> )'));
 }

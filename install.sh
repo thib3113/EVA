@@ -369,6 +369,7 @@ then
     case $REP in
                  O|o)
                     cmd "rm -Rf $install_folder/*"
+                    cmd "rm -Rf $install_folder/.*"
                     log "Contenu du dossier $install_folder éffacé"
                 ;;
                  N|n|*)
