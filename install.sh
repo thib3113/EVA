@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-ver_install=1.0.10
+ver_install=1.0.13
 url_git="https://github.com/thib3113/EVA.git"
 
 default_branch="dev"
@@ -66,36 +66,36 @@ affich(){
     case $format in
         "action")
             echo -ne "${PURPLE}- ${text}${WHITE}"
-            if [ ! -z $no_log ]
+            if [[ $no_log != 1 ]]
             then
-                log "${PURPLE}- ${text}${WHITE}"
+                log "${PURPLE}- ${text}${WHITE}" status
             fi
         ;;
         "ok")
             echo -e "[${GREEN}FAIT${WHITE}]"
-            if [ ! -z $no_log ]
+            if [[ $no_log != 1 ]]
             then
-                log  "[${GREEN}FAIT${WHITE}]"
+                log  "[${GREEN}FAIT${WHITE}]" status
             fi
         ;;
         "error")
             echo -e "[${RED}ERREUR${WHITE}]"
-            if [ ! -z $no_log ]
+            if [[ $no_log != 1 ]]
             then
-                log  "[${RED}ERREUR${WHITE}]"
+                log  "[${RED}ERREUR${WHITE}]" status
             fi
             exit 1
         ;;
         "already")
             echo -e "[${BLUE}DEJA FAIT${WHITE}]"
-            if [ ! -z $no_log ]
+            if [[ $no_log != 1 ]]
             then
-                log  "[${BLUE}DEJA FAIT${WHITE}]"
+                log  "[${BLUE}DEJA FAIT${WHITE}]" status
             fi
         ;;
         "point")
             echo -ne ". "
-            if [ ! -z $no_log ]
+            if [[ $no_log != 1 ]]
             then
                log ". "
             fi
@@ -104,15 +104,11 @@ affich(){
 }
 
 check_install(){
-    if [ -z $2 ] || [ $2 != "-r"]
-    then
-        soft="${1}\s"
-    else
-        soft=$1
-    fi
 
-    log "sudo dpkg --get-selections | grep \"$soft\" | grep -v deinstall"
-    if [ $(sudo dpkg --get-selections | grep "$soft" | grep -v deinstall | wc -l) -gt 0 ]
+    soft="$1"
+
+    log "sudo dpkg --get-selections | grep \"^$soft\s\" | grep -v deinstall" cmd
+    if [ $(sudo dpkg --get-selections  | grep "^$soft\s" | grep -v deinstall  | wc -l) -gt 0 ]
     then
         return 0
     else
@@ -120,9 +116,35 @@ check_install(){
     fi
 }
 
+secure_install(){
+    i=0;
+    affich action "tentative d'installation de $1 "
+    if check_install $1
+    then
+            affich point
+            affich point
+            affich point
+        affich already
+        return
+    fi
+
+    while ! `check_install $1` && [ $i -lt 3 ]
+    do
+        cmd "apt-get install -y $1"
+            affich point
+            affich point
+        i=$(($i + 1))
+    done
+
+    if [[ $i -lt 3 ]]; then
+        affich ok
+    else
+        affich error
+    fi
+}
+
 install(){
-    log "apt-get install -y $1"
-    apt-get install -y $1 >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+    cmd "apt-get install -y $1"
 
     check_install $1
     if [ $? -eq 1 ];
@@ -133,19 +155,45 @@ install(){
     fi
 }
 
-check_gpio(){
-    log "gpio -v"
 
-    if [ $(gpio -v | wc -l) -gt 0 ]
+
+
+check_gpio(){
+    return 0
+    cmd "gpio -v"
+    if [[ "$?" != "0" ]]
     then
-        return 0
-    else
+        gpio -v 2> /dev/null > /dev/null
+        if [[ $? == 1 ]]
+            then
+            log "${RED}Votre appareil ne semble pas disposer de gpio, ou la librairie GPIO n'est pas installé${WHITE}"
+            affich error
+        fi
         return 1
+    else
+        return 0
     fi
 }
 
 log(){
-    echo -e "$(date '+%d/%m/%Y %T') : $1" >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+    if [[ ! -z $2 ]]
+        then
+        type=" ${2} : " 
+    else
+        type=""
+    fi
+
+    echo -e "$(date '+%d/%m/%Y %T') :${type} $1" >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+}
+
+cmd(){
+    if [[ -z $1 ]]
+        then
+        return 1
+    fi
+
+    log "$1" cmd
+    $1 >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file";
 }
 
 
@@ -155,11 +203,18 @@ then
     exit 0
 fi
 
+#on crée le dossier de log au besoin
+if [ ! -d $log_folder ]
+then
+    mkdir -p $log_folder
+fi
 
+secure_install curl
 ver_eva=$(curl -s https://raw.githubusercontent.com/thib3113/EVA/${branche}/static.php | grep PROGRAM_VERSION | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
 
 if [ -z $ver_eva ] ; then
-   echo -ne "Impossible de récupéré la version de EVA " ;affich error
+   echo -ne "Impossible de récupéré la version de EVA " ;
+   affich error
 fi
 
 GRN=$GREEN
@@ -179,43 +234,27 @@ echo -e "Lien du site : ${GREEN}http://evaproject.net/${WHITE}"
 echo -e "En cas de problème, merci de joindre les fichiers présent dans le dossier ${log_folder} avec votre problème"
 echo -e "${GREEN}Crée par SEVERAC Thibaut - étudiant - ${PURPLE}http://cv.thib3113.fr${WHITE}\n"
 
-affich -no-log action "Création d'un dossier pour les logs "
-if [ -d $log_folder ]
-then
-        affich -no-log point
-        affich -no-log point
-        affich -no-log point
-    affich -no-log already
-else
-        affich -no-log point
-    mkdir -p $log_folder
-        affich -no-log point
-        affich -no-log point
-    affich -no-log ok
-fi
 
 echo -e "Installation EVA \n date : $(date '+%d/%m/%Y %T') \n version eva : $ver_eva \n version installeur $ver_install" >> "$log_folder/$log_file"
 if [ $dev_mod -eq 1 ]
 then
     echo -e "${PURPLE}Mode developpeur activé${WHITE}" >> "$log_folder/$log_file"
 fi
-
 affich action "Déplacement dans /var/www "
 if [ -d /var/www ]
 then
         affich point
         affich point
-        cd /var/www
+        cmd "cd /var/www"
         affich point
     affich ok
 else
         affich point
-    mkdir -p /var/www
+    cmd "mkdir -p /var/www"
     log "création de /var/www réussie "
     echo -ne "création réussie "
         affich point
-    log "cd /var/www"
-    cd /var/www
+    cmd "cd /var/www"
         affich point
     affich ok
 fi
@@ -224,24 +263,11 @@ fi
 affich action "Mise à jour de la liste des paquets "
     affich point
     affich point
-log "sudo apt-get update"
-sudo apt-get update >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+ cmd "sudo apt-get update" 
     affich point
 affich ok
 
-affich action "Installation de GIT "
-if check_install "git";
-then
-        affich point
-        affich point
-        affich point
-    affich already
-else
-    install git
-        affich point
-        affich point
-    affich ok
-fi
+secure_install git-core
 
 affich action "Recherche d'un serveur web "
 if check_install apache2;
@@ -279,30 +305,21 @@ fi
 
 if [ -z $webserver ]
 then
-    affich action "Installation de lighttpd "
-    if ! install lighttpd ; then affich error ;fi
-        affich point
-        affich point
-    affich ok
+    secure_install lighttpd
 
-    affich action "Installation de PHP & SQLite "
-    install php5
-    install php5-cgi
-    install sqlite
-    install php5-sqlite
-    install php5-curl
-    /etc/init.d/lighttpd force-reload >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
-        affich point
-    affich ok
+    secure_install php5
+    secure_install php5-cgi
+    secure_install sqlite
+    secure_install php5-sqlite
+    secure_install php5-curl
+    cmd "/etc/init.d/lighttpd force-reload"
 
     affich action "Configuration de lighttpd "
-    sudo lighttpd-enable-mod fastcgi-php >> "$log_folder/$log_file"
+    cmd "sudo lighttpd-enable-mod fastcgi-php"
         affich point
-    sudo lighttpd-enable-mod cgi >> "$log_folder/$log_file"
+    cmd "sudo lighttpd-enable-mod cgi"
         affich point
-    echo -e '$HTTP["url"] =~ "/cgi-bin/" {\n\tcgi.assign = ( "" => "" )\n}' >> /etc/lighttpd/conf-enabled/10-cgi.conf
-        affich point
-    sudo /etc/init.d/lighttpd force-reload >> "$log_folder/$log_file"
+    cmd "sudo /etc/init.d/lighttpd force-reload"
         affich point
     affich ok
 fi
@@ -315,14 +332,13 @@ then
     affich point
     affich already
 else
-    log "git clone --verbose git://git.drogon.net/wiringPi ~/wiringPi"
-    git clone --verbose git://git.drogon.net/wiringPi ~/wiringPi >> "$log_folder/$log_file"
+    cmd "git clone --verbose git://git.drogon.net/wiringPi ~/wiringPi"
         affich point
-    log "~/wiringPi/build"
-    cd ~/wiringPi
-    ./build >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+    log "~/wiringPi/./build" cmd
+    cmd "cd ~/wiringPi"
+    cmd "./build"
         affich point
-    cd -
+    cmd "cd -"
         affich point
 
 
@@ -338,22 +354,22 @@ affich action "Création d'un dossier pour EVA"
 affich point
 if [ ! -d $install_folder ]
 then
-        mkdir -p $install_folder
+        cmd "mkdir -p $install_folder"
+        cmd "chown -R eva $install_folder"
         affich ok
     else
+        cmd "chown -R eva $install_folder"
         affich already
 fi
 
-if [ $(ls -a $install_folder | sed -e "/\.$/d" | wc -l 2>> "$log_folder/$log_error_file" ) -ne 0 ] && [ $dev_mod -ne 1 ]
+if [ $(ls -a $install_folder 2>> "$log_folder/$log_error_file" | sed -e "/\.$/d" | wc -l  ) -ne 0 ] && [ $dev_mod -ne 1 ]
 then
-    echo -e "la suite va supprimer le contenu du dossier $install_folder, voulez vous continuer [O/n] :"
-    read REP
+    read -p "la suite va supprimer le contenu du dossier $install_folder, voulez vous continuer [o/N] : " REP
 
     case $REP in
                  O|o)
-                    log "rm -Rf $install_folder/*"
-                    rm -Rf $install_folder
-                    echo "Contenu du dossier $install_folder éffacé" >> "$log_folder/$log_file"
+                    cmd "rm -Rf $install_folder/*"
+                    log "Contenu du dossier $install_folder éffacé"
                 ;;
                  N|n|*)
                        log "vous avez répondu "$REP" installation avortée"
@@ -363,34 +379,74 @@ then
     esac
 fi
 
-affich action "Clonage de Eva "
-affich point
-if [ $dev_mod -ne 1 ]
-then
-    log "git clone --verbose $url_git --branch $branche --single-branch $install_folder"
-    git clone --verbose $url_git --branch $branche --single-branch $install_folder >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
-else
-    log "Pas de clone en dev"
-    echo "Pas de clone en dev" >> "$log_folder/$log_file"
-fi
-chmod -R 775 $install_folder
-affich point
-affich point
-affich ok
-
 affich action "Création d'un utilisateur eva "
 affich point
-groupadd web
 affich point
-useradd --home /home/eva --groups web,eva,spi eva >> "$log_folder/$log_file" 2>> "$log_folder/$log_error_file"
+cmd "useradd --home /home/eva eva"
 affich point
-sudo -u eva cat /var/log/eva/install.log >> "$log_folder/$log_file" 2>>"$log_folder/$log_file"
+cmd "sudo -u eva cat /var/log/eva/install.log" 
 affich point
-
-
 if [ ! $? -eq 1 ]
 then
     affich ok
 else
     affich error
 fi
+
+ligne_sudoers="git ALL=(eva) ALL"
+if [ $(cat /etc/sudoers | grep -v "#" |  grep "^git.*\(eva\)" | wc -l) -gt 0 ]
+    then
+    echo -e "Eva doit modifier le fichier sudoers, cependant, il semble que votre fichier contient déjà une règle à propos de eva \n vous devez rajouter/modifier la ligne comme ceci : $ligne_sudoers"
+    log "Eva doit modifier le fichier sudoers, cependant, il semble que votre fichier contient déjà une règle à propos de eva \n vous devez rajouter/modifier la ligne comme ceci : $ligne_sudoers"
+    read -p "[appuyer sur entrée]"
+else
+    read -p "Eva doit modifier le fichier sudoers, voulez vous le faire automatiquement ( conseillé ) [o/N] : " REP
+
+    case $REP in
+                 O|o)
+                    affich action "Modification du fichier sudoers "
+                    log "cat /etc/sudoers >> sudoers.tmp" 
+                    cat /etc/sudoers > sudoers.tmp
+                            affich point
+                    cat sudoers.tmp > "$log_folder/sudoers.backup"
+                    echo $ligne_sudoers >> sudoers.tmp
+                    cat sudoers.tmp > "$log_folder/sudoers.modif.log"
+                            affich point
+                    cmd "visudo -c -f sudoers.tmp"
+                            affich point
+                    if [ $? -eq 1 ];
+                    then
+                        affich error
+                    else
+                        cat sudoers.tmp > /etc/sudoers
+                        affich ok
+                    fi
+                    ;;
+                 N|n|*)
+                       echo -e " vous devez rentrer la ligne suivante dans ton sudoers : \n $ligne_sudoers "
+                       log " vous devez rentrer la ligne suivante dans ton sudoers : \n $ligne_sudoers "
+                 ;;
+    esac
+    
+fi
+
+affich action "Clonage de Eva "
+affich point
+if [ $dev_mod -ne 1 ]
+then
+    cmd "sudo -u eva git clone --verbose $url_git --branch $branche --single-branch $install_folder"
+else
+    log "Pas de clone en mode developpeur"
+fi
+
+cmd "chmod -R 775 $install_folder"
+affich point
+affich point
+if [ $(ls -a $install_folder 2>> "$log_folder/$log_error_file" | sed -e "/\.$/d" | wc -l ) -ne 0 ]
+    then
+    affich ok
+else
+    log "dossier cloné vide !"
+    affich error
+fi
+

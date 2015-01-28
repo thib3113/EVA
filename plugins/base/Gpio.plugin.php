@@ -10,10 +10,12 @@ if($myUser->is_connect){
 }
 
 function affich_gpio(){
-    global $RaspberryPi, $smarty;
+    global $RaspberryPi, $smarty, $system;
 
     $state = $RaspberryPi->readAll();
     $smarty->assign('pins', $state);
+
+    var_dump($system->shell("cd /var/www/EVA/ && sudo -u eva git fetch"));
 
     // var_dump($RaspberryPi->getListWiringPin());
     //test des led 
