@@ -44,7 +44,9 @@ class System {
     }
 
     public function shell($str, $system_user = false){
-        exec(($system_user? "sudo -u ".SYSTEM_USER." " : "").$str, $return, $status);
+        $cmd = ($system_user? "sudo -u ".SYSTEM_USER." " : "").$str;
+        // var_dump($cmd);
+        exec($cmd, $return, $status);
         if(count($return) < 2 && $status == 0)
             $return = !empty($return[0])? $return[0] : "";
         else

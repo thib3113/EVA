@@ -7,13 +7,13 @@ Class Functions extends SgdbManager{
 
 
     public static function log($log, $label = "notice"){
-        if(!is_file(ROOT.'/'.LOG_FILE)){
+        if(!is_file(LOG_FILE)){
             self::createLogFile();
             self::log($log, $label);
         }
         else{
             $timestamp = date("r", time());
-            $fp = fopen(ROOT.'/'.LOG_FILE, 'a+');
+            $fp = fopen(LOG_FILE, 'a+');
             if(!fwrite($fp, "$label : $timestamp : $log\n"))
                 return false;
             else
@@ -23,12 +23,12 @@ Class Functions extends SgdbManager{
     }
 
     public static function createLogFile(){
-        if(!$fp = fopen(ROOT.'/'.LOG_FILE,"a+")) // ouverture du fichier en écriture
+        if(!$fp = fopen(LOG_FILE,"a+")) // ouverture du fichier en écriture
             return false;
         if(self::log("Création du fichier de log"))
             die('écriture du fichier de log impossible !');
         else
-            chmod(ROOT.'/'.LOG_FILE, 0777);
+            chmod(LOG_FILE, 0777);
     }
 
     public static function slugIt($name) {

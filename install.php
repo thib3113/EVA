@@ -58,9 +58,6 @@ $all_is_not_good_message = "";
 $distribution = $RaspberryPi->getInfos("distribution");
 $version = $RaspberryPi->getInfos("version");
 
-var_dump($distribution);
-var_dump($version);
-
 //on test les erreurs
 if(!is_writable(dirname(DB_NAME))){
     $erreurs[] = createError('le dossier '.basename(dirname(DB_NAME)).' n\'est pas disponible en écriture', array("Rendre le dossier inscriptible par tout le monde <kbd>sudo chmod -R 777 ".basename(dirname(DB_NAME))."/</kbd>") );

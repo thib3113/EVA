@@ -1,5 +1,5 @@
 <?php
-    require __DIR__."/static.php";
+    require __DIR__.'/static.php';
 
     define('DB_TYPE','SQLITE');
     define('DB_PREFIX','EVA_');

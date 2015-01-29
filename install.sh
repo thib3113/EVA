@@ -5,7 +5,7 @@
 ##############################
 
 # version de l'installateur, pour le debug
-ver_install=1.0.14
+ver_install=1.0.19
 # url du dépot à télécharger
 url_git="https://github.com/thib3113/EVA.git"
 
@@ -398,10 +398,10 @@ affich point
 if [ ! -d $install_folder ]
 then
         cmd "mkdir -p $install_folder"
-        cmd "chown -R eva $install_folder"
+        cmd "chown -R eva:pi $install_folder"
         affich ok
     else
-        cmd "chown -R eva $install_folder"
+        cmd "chown -R eva:pi $install_folder"
         affich already
 fi
 
@@ -409,7 +409,8 @@ fi
 affich action "Création d'un utilisateur eva "
 affich point
 affich point
-cmd "useradd --home /home/eva eva"
+# cmd "useradd --home /home/eva eva"
+cmd "adduser --system eva"
 affich point
 cmd "sudo -u eva cat /var/log/eva/install.log" 
 affich point
@@ -441,12 +442,13 @@ fi
 
 #on ajoute une ligne dans le fichier sudoers
 #vu que le fichier est sensible, on fait un tmp au passage, que l'on check avec visudo
-ligne_sudoers="git ALL=(eva) ALL"
+ligne_sudoers_git="git ALL=(eva) ALL"
+ligne_sudoers="${ligne_sudoers_git}\nwww-data ALL=(eva) NOPASSWD: ALL"
 if [ $(cat /etc/sudoers | grep -v "#" |  grep "^git.*\(eva\)" | wc -l) -gt 0 ]
     then
     #si on passe ici, le fichier sudoers contient déjà des information sur les droit d'eva sur git
-    echo -e "Eva doit modifier le fichier sudoers, cependant, il semble que votre fichier contient déjà une règle à propos de eva \n vous devez rajouter/modifier la ligne comme ceci : $ligne_sudoers"
-    log "Eva doit modifier le fichier sudoers, cependant, il semble que votre fichier contient déjà une règle à propos de eva \n vous devez rajouter/modifier la ligne comme ceci : $ligne_sudoers"
+    echo -ne "Eva doit modifier le fichier sudoers, cependant, il semble que votre fichier contient déjà une règle à propos de eva \n vous devez rajouter/modifier les ligne comme ceci : $ligne_sudoers\n"
+    log "Eva doit modifier le fichier sudoers, cependant, il semble que votre fichier contient déjà une règle à propos de eva \n vous devez rajouter/modifier les ligne comme ceci :\n$ligne_sudoers"
     read -p "[appuyer sur entrée]"
 else
     #on demande à l'utilisateur si il veux le faire
@@ -463,7 +465,7 @@ else
                     #on crée un backup dans les log du fichier sudoers
                     cat sudoers.tmp > "$log_folder/sudoers.backup"
                     #on ajoute notre ligne à la fin du fichier sudoers
-                    echo $ligne_sudoers >> sudoers.tmp
+                    echo -e $ligne_sudoers >> sudoers.tmp
                     #on log le nouveau fichier sudoers
                     cat sudoers.tmp > "$log_folder/sudoers.modif.log"
                             affich point
@@ -506,7 +508,12 @@ fi
 
 #on change les droits du dossier d'installation
 cmd "chmod -R 775 $install_folder"
-cmd "chmod -R 777 $install_folder/cache $install_folder/db $install_folder/plugins"
+cmd "chgrp -R pi $install_folder"
+#on met les droits en écriture sur le cache, la db, les plugins, et les logs
+cmd "chmod -R 777 $install_folder/cache $install_folder/db $install_folder/plugins $install_folder/log"
+#on met les droits à eva sur le dossier de log
+cmd "chown -R eva $log_folder"
+cmd "chmod -R 775 $log_folder"
 affich point
 affich point
 #on regarde si ça à marché en regardant si le dossier d'installation est vide
@@ -517,5 +524,21 @@ else
     log "dossier cloné vide !"
     affich error
 fi
+
+if [ $branche == "dev" ]
+    then
+    debug=1
+else
+    debug=0
+fi
+#si on arrive ici tout va bien, on génère le fichier de configuration :
+fichier_conf="<?php\n\trequire __DIR__.'/static.php';\n\n\tdefine('DB_TYPE','SQLITE');\n\tdefine('DB_PREFIX','EVA_');\n\tdefine('SYSTEM_USER', 'eva');\n\tdefine('DB_NAME', ROOT.'/db/.database.db');\n\tdefine('DB_HASH','sha512');\n\tdefine('LOG_FILE', '$log_folder/log.txt');\n\tdefine('DEBUG', $debug);"
+log "on crée un fichier de config : \n $fichier_conf"
+echo -e $fichier_conf > $install_folder/config.php
+
+#on log la fin dans le fichier
+log "########################"
+log "## fin d'installation ##"
+log "########################"
 
 #TODO : système de post automatique de demande d'aide, avec un zip des logs

@@ -44,9 +44,6 @@ if(!$myUser->is_connect){
 if(!empty($_GET['get'])){
 
     switch ($_GET['get']) {
-        case 'test':
-             var_dump($RaspberryPi->readAll());
-            break;
         case "GPIO_STATE":
             $return = array(
             "status" => true,
@@ -55,6 +52,15 @@ if(!empty($_GET['get'])){
             "GPIO" => $RaspberryPi->getAllState(),
             );
         break;
+        case "CHECK_UPDATE":
+            $RaspberryPi->checkUpdate();
+            $return = array(
+            "status" => true,
+            "message" => "success",
+            "error_code" => 200,
+            );
+        break;
+
         default:
             # code...
             break;

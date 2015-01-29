@@ -26,7 +26,7 @@
         {/foreach}
         </ul>
         <small>nb : toutes les commandes doivent être lancé dans le dossier <kbd>{$smarty.const.ROOT}</kbd>, pour y aller vous pouvez utilisé <kbd>cd {$smarty.const.ROOT}</kbd></small><br>
-        <small>vous pouvez trouver plus d'informations sur le forum : <a href="{$smarty.const.PROGRAMM_FORUM}/viewtopic.php?id=2">{$smarty.const.PROGRAMM_FORUM}/viewtopic.php?id=2</a></small>
+        <small>vous pouvez trouver plus d'informations sur le forum : <a href="{$smarty.const.PROGRAM_FORUM}/viewtopic.php?id=2">{$smarty.const.PROGRAM_FORUM}/viewtopic.php?id=2</a></small>
       </div>
     </div>
     {/if}

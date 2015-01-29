@@ -157,7 +157,7 @@ Class User extends SgdbManager{
             }
         }
         $this->current_ip = $_SERVER['REMOTE_ADDR'];
-        $this->current_ip_list = unserialize($result['ips']);
+        $this->current_ip_list = Functions::secureUnserialize($result['ips']);
         $this->current_user_agent = $_SERVER['HTTP_USER_AGENT'];
         $this->current_uid = $result['uid'];
         $this->current_token = $result['token'];

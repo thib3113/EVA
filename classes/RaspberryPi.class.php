@@ -378,6 +378,10 @@ class RaspberryPi extends System{
       }
     }
 
+    public function checkUpdate(){
+      var_dump($this->exec("git fetch"));
+    }
+
     public function setRevision($revision){
       $this->revision = $revision;
     }
