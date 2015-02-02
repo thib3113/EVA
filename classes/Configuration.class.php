@@ -1,13 +1,7 @@
 <?php
 
-Class Configuration extends SgdbManager{
+Class Configuration extends ConfigurationManager{
 	protected $id, $key, $value, $cacheConf;
-	protected $TABLE_NAME = "configuration";
-	protected $object_fields= array(
-									'id'=>'key',
-									'key'=>'string',
-									'value'=>'string'
-									);
 
     private static $templateInfos = array();
     private static $menu_items = array();

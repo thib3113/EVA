@@ -5,8 +5,8 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <p class="navbar-brand logo visible-*-*">
-                    <a href="index.php">
-                        {$smarty.const.PROGRAM_NAME} <i class="fa fa-github-alt fa-2x"></i> {$smarty.const.PROGRAM_VERSION}   
+                    <a href="index.php" class="navbar-brand" style="padding: 5px; font-size: 20pt; line-height: 1em;" id="header_title">
+                      {$smarty.const.PROGRAM_NAME} <span style="font-size: 40pt; position: relative; top: 10px;">∞</span> {$smarty.const.PROGRAM_VERSION}
                     </a>
                 </p>
             </div>

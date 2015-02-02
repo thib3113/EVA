@@ -27,8 +27,10 @@ Class Functions extends SgdbManager{
             return false;
         if(self::log("Création du fichier de log"))
             die('écriture du fichier de log impossible !');
-        else
+        else{
+            chown(LOG_FILE, "eva:eva");
             chmod(LOG_FILE, 0777);
+        }
     }
 
     public static function slugIt($name) {

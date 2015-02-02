@@ -295,7 +295,10 @@ Class SgdbManager{
 
     }
 
-    public  function existTable($table = false, $autocreate = false){
+    public  function existTable($table = false, $autocreate = false, $file = null, $line = null){
+        $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
+        $debug = $debug[0];
+        
         if(strtoupper(DB_TYPE) == "SQLITE")
             $query = 'SELECT COUNT(*) as count FROM sqlite_master WHERE type=\'table\' AND name=?';
         else

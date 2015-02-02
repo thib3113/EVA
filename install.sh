@@ -398,10 +398,10 @@ affich point
 if [ ! -d $install_folder ]
 then
         cmd "mkdir -p $install_folder"
-        cmd "chown -R eva:pi $install_folder"
+        cmd "chown -R eva:eva $install_folder"
         affich ok
     else
-        cmd "chown -R eva:pi $install_folder"
+        cmd "chown -R eva:eva $install_folder"
         affich already
 fi
 
@@ -439,6 +439,16 @@ then
                  ;;
     esac
 fi
+
+affich action "On crée des groupe pour eva "
+cmd "addgroup eva"
+    affich point
+cmd "addgroup eva eva"
+    affich point
+cmd "addgroup www-data eva"
+    affich point
+cmd "addgroup pi eva"
+    affich ok
 
 #on ajoute une ligne dans le fichier sudoers
 #vu que le fichier est sensible, on fait un tmp au passage, que l'on check avec visudo
@@ -508,7 +518,7 @@ fi
 
 #on change les droits du dossier d'installation
 cmd "chmod -R 775 $install_folder"
-cmd "chgrp -R pi $install_folder"
+cmd "chgrp -R eva $install_folder"
 #on met les droits en écriture sur le cache, la db, les plugins, et les logs
 cmd "chmod -R 777 $install_folder/cache $install_folder/db $install_folder/plugins $install_folder/log"
 #on met les droits à eva sur le dossier de log
@@ -532,9 +542,11 @@ else
     debug=0
 fi
 #si on arrive ici tout va bien, on génère le fichier de configuration :
-fichier_conf="<?php\n\trequire __DIR__.'/static.php';\n\n\tdefine('DB_TYPE','SQLITE');\n\tdefine('DB_PREFIX','EVA_');\n\tdefine('SYSTEM_USER', 'eva');\n\tdefine('DB_NAME', ROOT.'/db/.database.db');\n\tdefine('DB_HASH','sha512');\n\tdefine('LOG_FILE', '$log_folder/log.txt');\n\tdefine('DEBUG', $debug);"
+fichier_conf="<?php\n\trequire __DIR__.'/static.php';\n\n\tdefine('DB_TYPE','SQLITE');\n\tdefine('DB_PREFIX','EVA_');\n\tdefine('SYSTEM_USER', 'eva');\n\tdefine('DB_NAME', ROOT.'/db/.database.db');\n\tdefine('DB_HASH','sha512');\n\tdefine('LOG_FILE', '$install_folder/log/log.txt');\n\tdefine('DEBUG', $debug);"
 log "on crée un fichier de config : \n $fichier_conf"
 echo -e $fichier_conf > $install_folder/config.php
+cmd "chown eva:eva $install_folder/config.php"
+cmd "chmod 775 $install_folder/config.php"
 
 #on log la fin dans le fichier
 log "########################"
