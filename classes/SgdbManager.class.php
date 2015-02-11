@@ -251,7 +251,7 @@ Class SgdbManager{
             $i=0;
             foreach($this->object_fields as $field=>$type){
                 if($type!='key'){
-                    $query .= ($i>0?',' : '').'"'.eval('return htmlentities($this->'.$field.');').'"';
+                    $query .= ($i>0?',' : '').self::$db->quote($this->$field);
                     $i++;
                     // var_dump(eval('return htmlentities($this->'.$field.');'));
                     // var_dump(htmlentities($this->$field));

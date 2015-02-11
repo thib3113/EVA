@@ -12,8 +12,8 @@ function affich_sign($way = null){
         Functions::redirect("index.php",null, 0);
 
     if($myUser->is_connect){
-        Plugins::callHook("pre_signout");
-        Plugins::callHook("signout");
+        Plugin::callHook("pre_signout");
+        Plugin::callHook("signout");
     }
     else{
         if(!empty($way) && $way == "in")

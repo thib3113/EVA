@@ -239,6 +239,8 @@ Class Functions extends SgdbManager{
 
         Configuration::addJs("vues/js/redirect.js");
 
+        $config->setTemplateInfos(array("executionTime" => Functions::getExecutionTime()));
+
         $config->setTemplateInfos(array("debugList" => $debugObject->getDebugList()));
         $smarty->assign('template_infos', $config->getTemplateInfos());
         $smarty->assign("to", $to);

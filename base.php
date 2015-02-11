@@ -1,7 +1,6 @@
 <?php
 require_once ROOT.DIRECTORY_SEPARATOR."root.php";
 
-
 if(!is_file(DB_NAME) && basename($_SERVER['SCRIPT_FILENAME']) != "install.php"){
     header("location: install.php");
     die();
@@ -17,7 +16,7 @@ $debugObject = new Debug();
 $system = new System();
 $RaspberryPi = new RaspberryPi();
 $config = new Configuration();
-$myUser = new User;
+$myUser = new User();
 $ajaxResponse = new Ajax();
 $plugins = new Plugin();
 // $plugins = new Plugins();

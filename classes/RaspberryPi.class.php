@@ -28,6 +28,7 @@ class RaspberryPi extends System{
                           "000e" => "B2.0",
                           "000f" => "B2.0",
                           "0010" => "B+1.0",
+                          "01041" => "2B+1.0",
     );
 
     private $tablePins=array(
@@ -93,7 +94,8 @@ class RaspberryPi extends System{
                           "A2.0"  => array( 26  ,   0   ),
                           "B1.0"  => array( 26  ,   0   ),
                           "B2.0"  => array( 26  ,   8   ),
-                          "B+1.0" => array( 40  ,   0   )
+                          "B+1.0" => array( 40  ,   0   ),
+                          "2B+1.0" => array( 40  ,   0   ),
 
     );
 

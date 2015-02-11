@@ -2,7 +2,7 @@
 
     define('PROGRAM_NAME','EVA');
     define('PROGRAM_AUTHOR','Thibaut SEVERAC');
-    define('PROGRAM_VERSION','0.4.6');
+    define('PROGRAM_VERSION','0.4.7');
     define('PROGRAM_WEBSITE','http://www.evaproject.net'); //no end slash
     define('DISTANT_API','http://www.evaproject.net/api.php');
     define('PROGRAM_FORUM','http://www.evaproject.net/forum'); //no end slash

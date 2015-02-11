@@ -41,9 +41,9 @@
     <link rel="stylesheet" href="vues/css/jquery-ui.min.css">
 
     <link rel="stylesheet" href="vues/css/style.css">
-    {foreach from=$template_infos.externcss item=style}
+{foreach from=$template_infos.externcss item=style}
     <link rel="stylesheet" href="{$style}">
-    {/foreach}
+{/foreach}
     <script>
     base_url = "{$template_infos.configs.base_url}";
     program_version  = "{$smarty.const.PROGRAM_VERSION}";

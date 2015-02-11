@@ -39,7 +39,7 @@ if(Functions::isAjax()){
     die();
 }
 
-$debugObject->addCustomQuery("SELECT * FROM ".DB_PREFIX."users WHERE id=1");
+// $debugObject->addCustomQuery("SELECT * FROM ".DB_PREFIX."users WHERE id=1");
 $debugObject->addBasicDebug();
 
 

@@ -86,6 +86,9 @@ function marketSearch(search_query){
           list_plugins.push(current_plugin);
         };
         affich_plugins();
+      },
+      error: function(data){
+              $("#market_list_plugins").html('<div style="text-align:center;"><i style="color: rgb(183, 10, 10);" class="fa fa-exclamation-triangle fa-5x"></i><br>Le serveur de plugin ne répond pas, veuillez réessayer ultérieurement</div>');
       }
   });
     loader_timeout = setTimeout(function(){

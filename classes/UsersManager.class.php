@@ -44,7 +44,7 @@ class UsersManager extends SgdbManager{
         return $pass_hashed;
     }
 
-    public function createUser($username, $pass, $email, $g_id = null){
+    public function createUser($username, $pass, $email, $g_id = null, $Avatar = "" ,$PluginsList = array() ,$DashboardList = array()){
         if(empty($g_id) )
             $g_id = $this->default_g_id;
 
@@ -58,11 +58,11 @@ class UsersManager extends SgdbManager{
             return false;
         if(!$this->setCreateTime(time()))
             return false;
-        if(!$this->setAvatar(""))
+        if(!$this->setAvatar($Avatar))
             return false;
-        if(!$this->setToken())
+        if(!$this->setPluginsList($PluginsList))
             return false;
-        if(!$this->setUid())
+        if(!$this->setDashboardList($DashboardList))
             return false;
         if(!$this->sgbdSave())
             return false;
@@ -112,13 +112,10 @@ class UsersManager extends SgdbManager{
     }
 
     public function setDashboardList(array $dashboard_list){
+        var_dump($dashboard_list);
         $this->dashboard_list = serialize($dashboard_list);
-    }
-
-    public function setToken(){
-        $this->current_token = Functions::randomStr(rand(100, 127));
-        $this->_query("UPDATE ".DB_PREFIX.$this->uid_table_name." SET token=?, time=?  WHERE uid=?", array($this->current_token, time(), $this->current_uid), __FILE__, __LINE__);
-
         return true;
     }
+
+
 }

@@ -1,6 +1,5 @@
 <?php
 define('ROOT', __DIR__);
-
 require_once ROOT.DIRECTORY_SEPARATOR."root.php";
 
 
@@ -134,9 +133,18 @@ if(!empty($_['launch_install'])){
 
         $taskList[] = "Vérification de la création de la database ... ".check(filesize(DB_NAME) >1);
 
+        $connection = new Connection();
+        $taskList[] = "création de la table de connection ... ".check($connection->sgbdCreate());
+
         $user = new UsersManager();
         $taskList[] = "création de la table User ... ".check($user->sgbdCreate());
-        $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser($_['username'], $_['pass'], $_['email'], 0));
+        $dashboardList =  array(
+                        array("default", "position" => 0),
+                        array("actual_users", "position" => 1),
+                        array("lorem", "position" => 2),
+                        );
+        $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser(htmlspecialchars($_['username']), $_['pass'], htmlspecialchars($_['email']), 0, "", array(), $dashboardList));
+
         if($GLOBALS['error']){
             if(!$createBackup = Functions::backupDb())
                 $all_is_not_good_message = "Une erreur est intervenue, un backup de la base de donnée à était crée : ".basename($createBackup);
@@ -157,7 +165,8 @@ $template_infos = array(
                 "vues/js/libs.js",
                 "vues/js/debug.js",
              )),
-            "externcss"    => '',
+            "configs" => array("base_url" => "."),
+            "externcss"    => array(),
             "distribution" => $RaspberryPi->getInfos("distribution"),
             "version"      => $RaspberryPi->getInfos("version"),
             'debugList'    => $debugObject->getDebugList(),
