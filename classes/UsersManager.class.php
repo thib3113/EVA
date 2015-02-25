@@ -30,20 +30,6 @@ class UsersManager extends SgdbManager{
     private $current_uid = 0; //uid courant
     private $admin_g_id = 1;
 
-    /**
-     * Fonction de préparation du mot de passe
-     * @param  string $username username de la personne
-     * @param  string $pass     le motde pass en clair
-     * @return string           le mot de passe hashé
-     */
-    private function preparePasswd($username, $pass){
-        $hashKey = hash("adler32", $username);
-        $pass_temp = $username.$hashKey.$pass;
-        if(DB_HASH)
-            $pass_hashed = hash(DB_HASH, $pass_temp);
-        return $pass_hashed;
-    }
-
     public function createUser($username, $pass, $email, $g_id = null, $Avatar = "" ,$PluginsList = array() ,$DashboardList = array()){
         if(empty($g_id) )
             $g_id = $this->default_g_id;
@@ -64,7 +50,7 @@ class UsersManager extends SgdbManager{
             return false;
         if(!$this->setDashboardList($DashboardList))
             return false;
-        if(!$this->sgbdSave())
+        if(!$this->sgdbSave())
             return false;
 
         return true;
@@ -81,15 +67,21 @@ class UsersManager extends SgdbManager{
         $this->id = $id;
     }
     public function setusername($username){
+        if(empty($username))
+            return false;
         $this->username = $username;
         return true;
     }
     public function setPass($pass, $name = false, $need_encode = false){
+        if(empty($pass))
+            return false;
         if($need_encode && !$name)return false;
-        $this->pass = $need_encode? $this->preparePasswd($name, $pass) : $name;
+        $this->pass = $need_encode? Functions::preparePasswd($name, $pass) : $name;
         return true;
     }
     public function setEmail($email){
+        if(empty($email))
+            return false;
         $this->email = $email;
         return true;
     }
@@ -112,7 +104,6 @@ class UsersManager extends SgdbManager{
     }
 
     public function setDashboardList(array $dashboard_list){
-        var_dump($dashboard_list);
         $this->dashboard_list = serialize($dashboard_list);
         return true;
     }

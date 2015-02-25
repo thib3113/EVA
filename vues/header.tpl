@@ -46,6 +46,7 @@
 {/foreach}
     <script>
     base_url = "{$template_infos.configs.base_url}";
+    api_url = "{$template_infos.configs.base_url}/api/v1/";
     program_version  = "{$smarty.const.PROGRAM_VERSION}";
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->

@@ -7,31 +7,28 @@ Class Functions extends SgdbManager{
 
 
     public static function log($log, $label = "notice"){
-        if(!is_file(LOG_FILE)){
-            self::createLogFile();
-            self::log($log, $label);
-        }
-        else{
+        global $system;
+
             $timestamp = date("r", time());
-            $fp = fopen(LOG_FILE, 'a+');
-            if(!fwrite($fp, "$label : $timestamp : $log\n"))
-                return false;
-            else
-                return true;
-        }
+            if(filesize(LOG_FILE) > MAX_LOG_FILE_SIZE)
+                unlink(LOG_FILE);
+
+            $cmd = "sudo -u ".SYSTEM_USER." echo ".escapeshellarg(preg_replace("~\*~", "\*", "$label : $timestamp : $log") )." | sudo -u ".SYSTEM_USER." tee -a ".LOG_FILE;
+            exec($cmd, $return, $status);
+            return true;
             
     }
 
-    public static function createLogFile(){
-        if(!$fp = fopen(LOG_FILE,"a+")) // ouverture du fichier en écriture
-            return false;
-        if(self::log("Création du fichier de log"))
-            die('écriture du fichier de log impossible !');
-        else{
-            chown(LOG_FILE, "eva:eva");
-            chmod(LOG_FILE, 0777);
-        }
-    }
+    // public static function createLogFile(){
+    //     if(!$fp = fopen(LOG_FILE,"a+")) // ouverture du fichier en écriture
+    //         return false;
+    //     if(self::log("Création du fichier de log"))
+    //         die('écriture du fichier de log impossible !');
+    //     else{
+    //         chown(LOG_FILE, "eva:eva");
+    //         chmod(LOG_FILE, 0777);
+    //     }
+    // }
 
     public static function slugIt($name) {
         /*
@@ -61,13 +58,18 @@ Class Functions extends SgdbManager{
         return substr($path, strlen(ROOT)+1);
     }
 
-    public static function var_dump_advanced($text, $file, $line){
+    public static function var_dump_advanced($text){
+        global $debugObject;
+        $debug = $debugObject->whoCallMe(1);
+        $file = $debug["file"];
+        $line = $debug["line"];
         $text = (!is_array($text))? array($text) : $text;
         echo "<pre>";
         echo "$file : $line";
         $b = debug_backtrace();
+        var_dump($b);
         var_dump($b[1]['function']);
-        var_dump($b[1]['args'][0]);
+        var_dump($b[1]['args']);
         foreach ($text as $value) {
             var_dump($value);
         }
@@ -248,6 +250,16 @@ Class Functions extends SgdbManager{
         $smarty->assign("text", $text);
         $smarty->display(ROOT.'/vues/redirect.tpl');
         die();
+    }
+
+    public static function preparePasswd($username, $pass){ //on prépare le mot de passe à un stockage en bdd
+
+        $hashKey = hash("adler32", $username);
+        $pass_temp = $username.$hashKey.$pass;
+        if(DB_HASH)
+            $pass_temp = hash(DB_HASH, $pass_temp);
+        // var_dump($pass_temp);
+        return $pass_temp;
     }
 
     public static function fatal_error($text, $file = null, $line = null){

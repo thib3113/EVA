@@ -23,70 +23,55 @@ Class User extends SgdbManager{
                                     'dashboard_list' => 'TEXT',
                                     'avatar'         => 'longstring',
                                     );
-
+    private         $appInfo = "webphp";
+    
     //gravatar
-    private $gravatar_size = 80; // 1 - 2048 definie la taille de l'image
-    private $gravatar_default = 404; // image par défault de l'image [ 404 | mm | identicon | monsterid | wavatar ]
-    private $gravatar_max_rat = 'g'; // maximum rating ( aucune idée de à quoi ça sert )
+    private         $gravatar_size = 80; // 1 - 2048 definie la taille de l'image
+    private         $gravatar_default = "wavatar"; // image par défault de l'image [ 404 | mm | identicon | monsterid | wavatar ]
+    private         $gravatar_max_rat = 'g'; // maximum rating ( aucune idée de à quoi ça sert )
 
 
-    private $admin_g_id = 1;
-    private $enable_admin = true; // active les admins
-    public $is_admin = false; // l'utilisateur est il un administrateur
-    public $is_connect = false; // l'utilisateur est il connecté
+    private         $admin_g_id     = 1;
+    private         $enable_admin  = true; // active les admins
+    public          $is_admin      = false; // l'utilisateur est il un administrateur
+    public          $is_connect    = false; // l'utilisateur est il connecté
+    
+    private         $default_g_id  = 2;
+    private         $col_groups  = "group_id"; //nom de la colonne du groupe
+    private         $group_id_admin = 0; //valeur du groupe si l'utilisateur est admin
+    
+    private         $connectionOptions;
 
-    private $default_g_id = 2;
-    private $col_groups = "group_id"; //nom de la colonne du groupe
-    private $group_id_admin = 0; //valeur du groupe si l'utilisateur es admin
+    function __construct(){
 
-    function __construct($user = null, $password = null, $rememberMe = false, $needEncrypt = true){
-
-        if(empty($user) || empty($password) || empty($rememberMe) || empty($needEncrypt)){
-            $this->isConnect();
-        }
-        else{
-            $this->connect($user, $password, $rememberMe, $needEncrypt);
+        foreach (debug_backtrace()[0]["args"] as $arg) {
+            foreach ($arg as $key => $value) {
+                if(method_exists($this,"set".ucfirst($key)))
+                    $this->{"set".ucfirst($key)}($value);
+            }
         }
         parent::__construct();
     }
-
-    public function connect($user, $password, $rememberMe = false, $needEncrypt = true){
-        $this->connection = new Connection();
-        $id = $this->connection->open($user, $password, $rememberMe, $needEncrypt);
-        if($id !== false){
-            $this->fillObject($id);
-            // on génère les variables d'informations
-            $GLOBALS['is_connect'] = true;
-            $this->is_connect = true;
-            $this->is_admin();
-            return $this;
-        }
-        // $password = ($needEncrypt)? $this->preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant
-
-        // //on fait une requete du password avec le mot de passe
-        // $result = SgdbManager::sgbdSelect(array('*'), array("username" => $user,"pass" => $password), null,null,null, null,  __FILE__, __LINE__ );
-        // $result = $result->fetch();
-
-
-        // if(empty($result)){// si cela ne retourne rien, c'est que le mot de passe ne correspond pas à cet identifiant
-        //     return false;
-        // }
-        // else{
-        //     $this->id = $result['id'];
-        //     $this->set_uid_infos();
-
-        //     $this->fillObject($result['id']);
-        //     $this->createSession($rememberMe);
-        //     return $this;
-        // }
-    }
-
 
     public function is_admin(){
         if($this->group_id == $this->admin_g_id){
             $this->is_admin = true;
             $GLOBALS['is_admin'] = true;
             return true;
+        }
+    }
+
+    public function connect($user = null, $password = null, $rememberMe = false, $needEncrypt = true){
+        $this->connection = new Connection($this->connectionOptions);
+        $id = $this->connection->open($user, $password, $rememberMe, $needEncrypt);
+        
+        if($id !== false){
+            $this->fillObject();
+            // on génère les variables d'informations
+            $GLOBALS['is_connect'] = true;
+            $this->is_connect = true;
+            $this->is_admin();
+            return $this;
         }
     }
 
@@ -163,38 +148,23 @@ Class User extends SgdbManager{
     //     return true;
     // }
 
-    private function fillObject($id){
-        if(!is_numeric($id))
-            return false;
+    // private function fillObject($id){
+    //     if(!is_numeric($id))
+    //         return false;
 
-            $result = self::sgbdSelect( array_keys($this->object_fields) , array("id" => $id), null, null, null, null, __FILE__, __LINE__);
-            $result = $result->fetch();
-            $i = 0;
-            foreach($this->object_fields as $field=>$type){
-                    $this->$field = $result[$field];
-                    $i++;
-            }
-    }
+    //         $result = self::sgbdSelect( array_keys($this->object_fields) , array("id" => $id), null, null, null, null, __FILE__, __LINE__);
+    //         $result = $result->fetch();
+    //         $i = 0;
+    //         foreach($this->object_fields as $field=>$type){
+    //                 $this->$field = $result[$field];
+    //                 $i++;
+    //         }
+    // }
 
     public function disconnect(){
         $this->connection->close();
     }
 
-    public function isConnect(){
-        $this->connection = new Connection();
-        $id = $this->connection->open();
-        if($id !== false){
-            $this->fillObject($id);
-            // on génère les variables d'informations
-            $GLOBALS['is_connect'] = true;
-            $this->is_connect = true;
-            $this->is_admin();
-            return $this;
-        }
-        else{
-            return false;
-        }
-    }
 
     // public function isConnect(){
     //     if(!empty($_COOKIE[$this->cookie_name])){ //si le cookie existe
@@ -280,11 +250,7 @@ Class User extends SgdbManager{
             return false;
         if(!$this->setAvatar(""))
             return false;
-        if(!$this->setToken())
-            return false;
-        if(!$this->setUid())
-            return false;
-        if(!$this->sgbdSave())
+        if(!$this->sgdbSave())
             return false;
 
         return true;
@@ -310,15 +276,21 @@ Class User extends SgdbManager{
         $this->id = $id;
     }
     public function setusername($username){
+        if(empty($username))
+            return false;
         $this->username = $username;
         return true;
     }
     public function setPass($pass, $name = false, $need_encode = false){
+        if(empty($pass))
+            return false;
         if($need_encode && !$name)return false;
-        $this->pass = $need_encode? self::preparePasswd($name, $pass) : $name;
+        $this->pass = $need_encode? Functions::preparePasswd($name, $pass) : $name;
         return true;
     }
     public function setEmail($email){
+        if(empty($email))
+            return false;
         $this->email = $email;
         return true;
     }
@@ -354,6 +326,14 @@ Class User extends SgdbManager{
 
         $currentDashboardList[] = $dashboard;
         $this->setDashboardList($currentDashboardList);
+    }
+
+    public function getUsername(){
+        return $this->username;
+    }
+    
+    public function getPass(){
+        return $this->pass;
     }
 
     public function getPluginsList(){
@@ -417,6 +397,283 @@ Class User extends SgdbManager{
             else
                 return false;
         }
+    } 
+    
+
+    /**
+     * Gets the value of group_id.
+     *
+     * @return mixed
+     */
+    public function getGroupId()
+    {
+        return $this->group_id;
+    }
+
+    /**
+     * Gets the value of email.
+     *
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * Gets the value of create_time.
+     *
+     * @return mixed
+     */
+    public function getCreateTime()
+    {
+        return $this->create_time;
+    }
+
+    /**
+     * Gets the value of appInfo.
+     *
+     * @return mixed
+     */
+    public function getAppInfo()
+    {
+        return $this->appInfo;
+    }
+
+    /**
+     * Sets the value of appInfo.
+     *
+     * @param mixed $appInfo the app info
+     *
+     * @return self
+     */
+    private function setAppInfo($appInfo)
+    {
+        $this->appInfo = $appInfo;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of gravatar_size.
+     *
+     * @return mixed
+     */
+    public function getGravatarSize()
+    {
+        return $this->gravatar_size;
+    }
+
+    /**
+     * Gets the value of gravatar_default.
+     *
+     * @return mixed
+     */
+    public function getGravatarDefault()
+    {
+        return $this->gravatar_default;
+    }
+
+    /**
+     * Gets the value of gravatar_max_rat.
+     *
+     * @return mixed
+     */
+    public function getGravatarMaxRat()
+    {
+        return $this->gravatar_max_rat;
+    }
+
+    /**
+     * Gets the value of admin_g_id.
+     *
+     * @return mixed
+     */
+    public function getAdminGId()
+    {
+        return $this->admin_g_id;
+    }
+
+    /**
+     * Sets the value of admin_g_id.
+     *
+     * @param mixed $admin_g_id the admin g id
+     *
+     * @return self
+     */
+    private function setAdminGId($admin_g_id)
+    {
+        $this->admin_g_id = $admin_g_id;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of enable_admin.
+     *
+     * @return mixed
+     */
+    public function getEnableAdmin()
+    {
+        return $this->enable_admin;
+    }
+
+    /**
+     * Sets the value of enable_admin.
+     *
+     * @param mixed $enable_admin the enable admin
+     *
+     * @return self
+     */
+    private function setEnableAdmin($enable_admin)
+    {
+        $this->enable_admin = $enable_admin;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of is_admin.
+     *
+     * @return mixed
+     */
+    public function getIsAdmin()
+    {
+        return $this->is_admin;
+    }
+
+    /**
+     * Sets the value of is_admin.
+     *
+     * @param mixed $is_admin the is admin
+     *
+     * @return self
+     */
+    public function setIsAdmin($is_admin)
+    {
+        $this->is_admin = $is_admin;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of is_connect.
+     *
+     * @return mixed
+     */
+    public function getIsConnect()
+    {
+        return $this->is_connect;
+    }
+
+    /**
+     * Sets the value of is_connect.
+     *
+     * @param mixed $is_connect the is connect
+     *
+     * @return self
+     */
+    public function setIsConnect($is_connect)
+    {
+        $this->is_connect = $is_connect;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of default_g_id.
+     *
+     * @return mixed
+     */
+    public function getDefaultGId()
+    {
+        return $this->default_g_id;
+    }
+
+    /**
+     * Sets the value of default_g_id.
+     *
+     * @param mixed $default_g_id the default g id
+     *
+     * @return self
+     */
+    private function setDefaultGId($default_g_id)
+    {
+        $this->default_g_id = $default_g_id;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of col_groups.
+     *
+     * @return mixed
+     */
+    public function getColGroups()
+    {
+        return $this->col_groups;
+    }
+
+    /**
+     * Sets the value of col_groups.
+     *
+     * @param mixed $col_groups the col groups
+     *
+     * @return self
+     */
+    private function setColGroups($col_groups)
+    {
+        $this->col_groups = $col_groups;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of group_id_admin.
+     *
+     * @return mixed
+     */
+    public function getGroupIdAdmin()
+    {
+        return $this->group_id_admin;
+    }
+
+    /**
+     * Sets the value of group_id_admin.
+     *
+     * @param mixed $group_id_admin the group id admin
+     *
+     * @return self
+     */
+    private function setGroupIdAdmin($group_id_admin)
+    {
+        $this->group_id_admin = $group_id_admin;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of connectionOptions.
+     *
+     * @return mixed
+     */
+    public function getConnectionOptions()
+    {
+        return $this->connectionOptions;
+    }
+
+    /**
+     * Sets the value of connectionOptions.
+     *
+     * @param mixed $connectionOptions the connection options
+     *
+     * @return self
+     */
+    private function setConnectionOptions($connectionOptions)
+    {
+        $this->connectionOptions = $connectionOptions;
+
+        return $this;
     }
 }
 ?>

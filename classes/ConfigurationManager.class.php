@@ -12,7 +12,7 @@ Class ConfigurationManager extends SgdbManager{
     public function addConfig($key, $value){
         $this->key=$key;
         $this->value=$value;
-        $return = $this->sgbdSave();
+        $return = $this->sgdbSave();
         return $return;
     }
 }

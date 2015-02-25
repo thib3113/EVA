@@ -457,7 +457,7 @@ ligne_sudoers="${ligne_sudoers_git}\nwww-data ALL=(eva) NOPASSWD: ALL"
 if [ $(cat /etc/sudoers | grep -v "#" |  grep "^git.*\(eva\)" | wc -l) -gt 0 ]
     then
     #si on passe ici, le fichier sudoers contient déjà des information sur les droit d'eva sur git
-    echo -ne "Eva doit modifier le fichier sudoers, cependant, il semble que votre fichier contient déjà une règle à propos de eva \n vous devez rajouter/modifier les ligne comme ceci : $ligne_sudoers\n"
+    echo -ne "Eva doit modifier le fichier sudoers, cependant, il semble que votre fichier contient déjà une règle à propos de eva \n vous devez rajouter/modifier les ligne comme ceci :\n$ligne_sudoers\n"
     log "Eva doit modifier le fichier sudoers, cependant, il semble que votre fichier contient déjà une règle à propos de eva \n vous devez rajouter/modifier les ligne comme ceci :\n$ligne_sudoers"
     read -p "[appuyer sur entrée]"
 else

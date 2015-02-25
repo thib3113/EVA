@@ -183,3 +183,34 @@ $("body").on("click", ".plugin_install", function(){
   else
     alert("Une erreur c'est produite");
 });
+
+////////////////
+// Tab config //
+////////////////
+$("#profil_update").submit(function(){
+  username = $("#username").val();
+  email = $("#email").val();
+  pass = $("#pass").val();
+  pass_conf = $("#pass_conf").val();
+
+  if(pass != pass_conf){
+    if(pass != pass_conf)
+      alert("le mot de passe est différent du mot de passe de confirmation");
+    return false;
+  }
+  $.ajax({
+        type: "POST",
+        url: api_url+"?set=user_info",
+        data: {username : username, pass:pass, email:email},
+        success: function(json){
+          var data = JSON.parse(json);
+          if(data.status){
+            notify("success", "sauvegardé");
+          }
+        },
+        error: function(data){
+          notify("error", "une erreur c'est produite, reessayer ultérieurement");
+        }
+    });
+  return false;
+})

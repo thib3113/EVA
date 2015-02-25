@@ -29,13 +29,13 @@ function affich_json_index(){
         //     array("actual_users", "position" => 1),
         //     array("lorem", "position" => 2),
         // ));
-        // $myUser->sgbdSave();
+        // $myUser->sgdbSave();
         // /
         if (!empty($_['dashboard'])) {
 
             if(!empty($_['new_widget']) && $_['new_widget'] == 1){
                 $myUser->addDashboard(array($_['dashboard']));
-                $myUser->sgbdSave();
+                $myUser->sgdbSave();
             }
             // var_dump($myUser->dashboard_list);
             switch ($_['dashboard']) {
@@ -85,7 +85,7 @@ function affich_json_index(){
             }
 
             $myUser->setDashboardList($new_list);
-            $myUser->sgbdSave();
+            $myUser->sgdbSave();
 
             $return['status'] = true;
             $return['message'] = "modification réussie";

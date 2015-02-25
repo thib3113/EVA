@@ -28,7 +28,7 @@ $(function(){
     ajaxConnexion = "";
     function update_gpio(){
         ajaxConnexion = $.ajax({
-            url: 'api/v1/?get=GPIO_STATE',
+            url: api_url+'?type=get&API=GPIO_STATE',
             datatype: 'json',
             success: function(data){
                 // La fonction à éxécuter avec les données recu
@@ -64,7 +64,7 @@ $(function(){
         WPIN = $(this).data("wiringpin");
         state = Math.abs($(this).data("state")-1);
         $.ajax({
-            url: 'api/v1/?set=GPIO_STATE&GPIO_STATE='+state+'&GPIO='+WPIN,
+            url: api_url+'?type=set&API=GPIO_STATE&GPIO_STATE='+state+'&GPIO='+WPIN,
             datatype: 'json',
             success: function(data){
                 // La fonction à éxécuter avec les données recu

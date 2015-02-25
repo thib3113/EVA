@@ -35,26 +35,51 @@
         </table>
       </div>
       <div style="display:none;" id="tab_profil">
-          <form role="form" method="POST" action="?page=configs#profil">
+          <form id="profil_update" role="form" method="POST" action="?page=configs#profil">
               <table class="table table-striped">
                   <tr>
-                      <td>Pseudo</td>
-                      <td><input type="text" value="{$myUser.username}"></td>
+                    <td>
+                      <label for="username">Username</label>
+                    </td>
+                    <td>
+                      <div class="input-group">
+                        <input type="text" class="form-control" id="username" value="{$myUser.username}" placeholder="Username">
+                      </div>
+                    </td>
                   </tr>
                   <tr>
-                      <td>Email</td>
-                      <td><input type="email" value="{$myUser.email}"></td>
+                    <td>
+                      <label for="email">Email</label>
+                    </td>
+                    <td>
+                      <div class="input-group">
+                        <input type="text" class="form-control" id="email" value="{$myUser.email}" placeholder="Email">
+                      </div>
+                    </td>
                   </tr>
                   <tr>
-                    <td>Mot de passe</td>
-                    <td><input type="password"></td>
+                    <td>
+                      <label for="pass">Mot de passe</label>
+                    </td>
+                    <td>
+                      <div class="input-group">
+                        <input type="password" class="form-control" id="pass" placeholder="Mot de passe">
+                      </div>
+                      <span style="font-size:10pt;color:red;">laissez vide pour ne pas modifier</span>
+                    </td>
                   </tr>
                   <tr>
-                    <td>Confirmation du mot de passe</td>
-                    <td><input type="password"></td>
+                    <td>
+                      <label for="pass_conf">Confirmation</label>
+                    </td>
+                    <td>
+                      <div class="input-group">
+                        <input type="password" class="form-control" id="pass_conf" placeholder="Mot de passe">
+                      </div>
+                    </td>
                   </tr>
               </table>
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary">Sauvegarder</button>
           </form>
       </div>
       <div style="display:none;" id="tab_plugins">

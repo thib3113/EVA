@@ -60,7 +60,10 @@ Class SgdbManager{
         else
             $status = '<span class="label label-danger">'.$errorInfo[0].' ( '.$errorInfo[1].' ) : '.$errorInfo[2].'</span>';
 
-        $list = '<kbd>'.self::boundQuery(self::$db, $query, $params).'</kbd>&nbsp;'.$status.' ON '.((!empty($file) && !empty($line))? $file.' LINE '.$line : $infos['file'].' LINE '.$infos['line']);
+        $boundQuery = self::boundQuery(self::$db, $query, $params);
+        $list = '<kbd>'.$boundQuery.'</kbd>&nbsp;'.$status.' ON '.((!empty($file) && !empty($line))? $file.' LINE '.$line : $infos['file'].' LINE '.$infos['line']);
+        $error = array();
+        Functions::log("REQUETE : $boundQuery IN FILE $file LINE $line", "notice");
         $debugObject->addDebugList(array("SQL" => $list));
     }
 
@@ -221,7 +224,7 @@ Class SgdbManager{
 
     }
 
-    public function sgbdSave( $file = NULL, $line = NULL){
+    public function sgdbSave( $file = NULL, $line = NULL){
         $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
         $debug = $debug[0];
         $params = array();
@@ -231,7 +234,10 @@ Class SgdbManager{
             $i =0;
             foreach($this->object_fields as $field=>$value){
                 if($field != "id"){
-                    $params[] = $this->$field;
+                    $value = $this->$field;
+                    if(is_array($value))
+                        $value = serialize($value);
+                    $params[] = $value;
                     $query .= ($i>0?',' : '').'`'.$field.'`=?';
                     $i++;
                 }
@@ -251,7 +257,10 @@ Class SgdbManager{
             $i=0;
             foreach($this->object_fields as $field=>$type){
                 if($type!='key'){
-                    $query .= ($i>0?',' : '').self::$db->quote($this->$field);
+                    $value = $this->$field;
+                    if(is_array($value))
+                        $value = serialize($value);
+                    $query .= ($i>0?',' : '').self::$db->quote($value);
                     $i++;
                     // var_dump(eval('return htmlentities($this->'.$field.');'));
                     // var_dump(htmlentities($this->$field));
@@ -260,8 +269,10 @@ Class SgdbManager{
 
             $query .=');';
         }
-        return self::_query($query, $params, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
-
+        $return = self::_query($query, $params, (!empty($file)?$file:$debug['file']), (!empty($line)?$line:$debug['line']) );
+        if(empty($this->id))
+            $this->id = self::$db->lastInsertId();
+        return $return;
     }
 
     public function sgbdSelect(array $cols = null, array $where =null, $table = null, array $order =null, array $group_by =null, array $limit =null, $file=NULL, $line=NULL){
@@ -295,7 +306,16 @@ Class SgdbManager{
 
     }
 
-    public  function existTable($table = false, $autocreate = false, $file = null, $line = null){
+    public function fillObject($key_field = "id"){
+        $result = SgdbManager::sgbdSelect(array('*'), array($key_field => $this->$key_field), null, null, null, null,  __FILE__, __LINE__ );
+        $result = $result->fetch();
+
+        foreach($this->object_fields as $field=>$type){
+            $this->$field = Functions::isSerialized($result[$field])? Functions::secureUnserialize($result[$field]) : $result[$field];
+        }
+    }
+
+    public function existTable($table = false, $autocreate = false, $file = null, $line = null){
         $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 1);
         $debug = $debug[0];
         

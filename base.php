@@ -17,6 +17,7 @@ $system = new System();
 $RaspberryPi = new RaspberryPi();
 $config = new Configuration();
 $myUser = new User();
+$myUser->connect();
 $ajaxResponse = new Ajax();
 $plugins = new Plugin();
 // $plugins = new Plugins();
