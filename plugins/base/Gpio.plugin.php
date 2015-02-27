@@ -6,7 +6,7 @@
  */
 
 if($myUser->is_connect){
-    Plugin::addHook("header", "Configuration::addMenuItem", array("GPIO", "gpio","dot-circle-o", 1));
+    Plugin::addHook("header", "Configuration::addMenuItem", array("GPIO", "gpio","fa-dot-circle-o", 1));
 }
 
 function affich_gpio(){

@@ -64,8 +64,8 @@ Class User extends SgdbManager{
     public function connect($user = null, $password = null, $rememberMe = false, $needEncrypt = true){
         $this->connection = new Connection($this->connectionOptions);
         $id = $this->connection->open($user, $password, $rememberMe, $needEncrypt);
-        
         if($id !== false){
+            $this->id = $id;
             $this->fillObject();
             // on génère les variables d'informations
             $GLOBALS['is_connect'] = true;
@@ -308,15 +308,16 @@ Class User extends SgdbManager{
     }
 
     public function setPluginsList(array $plugins_list){
-        $this->plugins_list = serialize($plugins_list);
+        $this->plugins_list = $plugins_list;
     }
 
     public function setDashboardList(array $dashboard_list){
-        $this->dashboard_list = serialize($dashboard_list);
+        $this->dashboard_list = $dashboard_list;
     }
 
     public function addDashboard(array $dashboard){
-        $currentDashboardList = unserialize($this->dashboard_list);
+        $currentDashboardList = $this->dashboard_list;
+        // var_dump($currentDashboardList);
 
         if(!is_array($dashboard))
             return false;
@@ -342,18 +343,22 @@ Class User extends SgdbManager{
 
     public function getDashboardList(){
         $dashboard_list = array();
-        $dashboard_list_temp = unserialize($this->dashboard_list);
+        if(!is_array($this->dashboard_list) && Functions::isSerialize($this->dashboard_list))
+            $dashboard_list_temp = unserialize($this->dashboard_list);
+        else
+            $dashboard_list_temp = $this->dashboard_list;
         if($dashboard_list_temp){
-            uasort($dashboard_list_temp, function($a,$b){
-                                                if(!empty($a['position']) && !empty($b['position']) )
-                                                    return $a['position']>$b['position']?1:-1;
-                                                else
-                                                    return 0; 
-                                                });
+            // uasort($dashboard_list_temp, function($a,$b){
+                                                // if(!empty($a['position']) && !empty($b['position']) )
+                                                //     return $a['position']>$b['position']?1:-1;
+                                                // else
+                                                //     return 0; 
+                                                // });
             foreach ($dashboard_list_temp as $key => $value) {
-                $dashboard_list[$key] = $value[0];
+                $dashboard_list[$key] = $value;
             }
         }
+        // var_dump($dashboard_list);
         return $dashboard_list;
     }
 

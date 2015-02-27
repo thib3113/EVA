@@ -1,4 +1,4 @@
-function widget(name, id, special, new_widget){
+function widget(parent, name, id, special, new_widget){
     this.id = id;
     this.donneesRecu;
     this.title;
@@ -9,7 +9,8 @@ function widget(name, id, special, new_widget){
     this.ajaxConnexion;
     this.resizable;
     this.widgetType = (typeof(special) != "undefined")? special : false;
-    this.new_widget = (typeof(new_widget) != "undefined")? "&new_widget=1" : "";
+    this.new_widget = (typeof(new_widget) != "undefined")? new_widget : false;
+    this.parent = parent;
 
     this.getId = function(){
         return this.id;
@@ -96,10 +97,6 @@ function widget(name, id, special, new_widget){
                 case "error":
                     $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="selectable_text">Erreur lors du chargement du widget</span></div><div class="panel-body text-center"><i style="color: rgb(183, 10, 10);" class="fa fa-exclamation-triangle fa-5x"></i><br>'+this.message+'</div></div></div>');
                 break;
-
-                case "add_button":
-
-                break;
             }
         }
         else
@@ -111,37 +108,43 @@ function widget(name, id, special, new_widget){
     this.getWidget = function(){
         donneesRecu = "";
         parent = this;
+
         this.ajaxConnexion = $.ajax({
-            url: 'index.php?dashboard='+this.getName()+this.new_widget,
+            url: api_url+'?type=GET&API=WIDGET_'+this.getName().toUpperCase(),
             datatype: 'json',
+            type: "POST",
+            data: {expiration : new Date().getTime()+3000},
             success: function(data){
                 // La fonction à éxécuter avec les données recu
-                if(!$.parseJSON(data)){ //si le json reçu n'est pas réelement du json
-                    parent.message = "Une erreur s'est produite lors du chargement du widget";
-                    parent.createWidget("error");
-                }
-                donneesRecu = $.parseJSON(data);
-                if(donneesRecu.status){
-                    parent.setDonneesRecu(donneesRecu);
-                    parent.setTitle(donneesRecu.dash_title);
-                    parent.setContent(donneesRecu.dash_content);
-                    parent.setWidth(donneesRecu.dash_width);
-                    parent.setHTML(donneesRecu.HTML);
-                    // console.log()
-                    if(typeof(donneesRecu.executeFunction) == "undefined" || donneesRecu.executeFunction.length == 0){
-                        if(!parent.widgetType)
-                                parent.createWidget("widget");
+                try{
+                    donneesRecu = $.parseJSON(data);
+                    if(donneesRecu.status){
+                        parent.setDonneesRecu(donneesRecu);
+                        parent.setTitle(donneesRecu.dash_title);
+                        parent.setContent(donneesRecu.dash_content);
+                        parent.setWidth(donneesRecu.dash_width);
+                        parent.setHTML(donneesRecu.HTML);
+                        // console.log()
+                        if(typeof(donneesRecu.executeFunction) == "undefined" || donneesRecu.executeFunction.length == 0){
+                            if(!parent.widgetType)
+                                    parent.createWidget("widget");
+                            else{
+                                parent.createWidget(parent.widgetType);
+                            }
+                        }
                         else{
-                            parent.createWidget(parent.widgetType);
+                            window[donneesRecu.executeFunction](donneesRecu.arguments);
                         }
                     }
                     else{
-                        window[donneesRecu.executeFunction](donneesRecu.arguments);
+                        parent.message = "Une erreur s'est produite lors du chargement du widget";
+                        parent.createWidget("error");
                     }
                 }
-                else{
+                catch(e){
                     parent.message = "Une erreur s'est produite lors du chargement du widget";
                     parent.createWidget("error");
+                    console.log(e);
                 }
                 return false;
             },
@@ -154,31 +157,31 @@ function widget(name, id, special, new_widget){
         });
     }
 
-    this.newWidget = function(){
-        parent = this;
-        $.ajax({
-            url: 'index.php?dashboard=get_list',
-            datatype: 'json',
-            success: function(data){
-                if(!$.parseJSON(data)){
-                    message = 'erreur. Ressayer plus tard';
-                    notify(statut, message);
-                }
-                donneesRecu = $.parseJSON(data);
-                if(donneesRecu.status){
+    // this.newWidget = function(){
+    //     parent = this;
+    //     $.ajax({
+    //         url: 'index.php?dashboard=get_list',
+    //         datatype: 'json',
+    //         success: function(data){
+    //             if(!$.parseJSON(data)){
+    //                 message = 'erreur. Ressayer plus tard';
+    //                 notify(statut, message);
+    //             }
+    //             donneesRecu = $.parseJSON(data);
+    //             if(donneesRecu.status){
 
-                }
-                else{
-                    return false;
-                }
-            },
-            error: function(data){
-                message = 'erreur. Ressayer plus tard';
-                notify(statut, message);
-            }
+    //             }
+    //             else{
+    //                 return false;
+    //             }
+    //         },
+    //         error: function(data){
+    //             message = 'erreur. Ressayer plus tard';
+    //             notify(statut, message);
+    //         }
 
-        });
-    }
+    //     });
+    // }
 
 
 
@@ -191,5 +194,5 @@ function widget(name, id, special, new_widget){
     // console.log("On récupère le widget");
     // on récupère les informations du widget depuis le serveur
     this.getWidget();
-    return this.ajaxConnexion;
+    return this;
 }

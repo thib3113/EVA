@@ -101,8 +101,9 @@ class RaspberryPi extends System{
 
 
     function __construct(){
+      global $debugObject;
+
       $this->setVersion();
-      $this->checkPins();
       $this->nameTable();
     }
 

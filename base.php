@@ -12,24 +12,31 @@ $smarty->compile_dir = ROOT.'/cache/templates_c/';
 $smarty->config_dir = ROOT.'/cache/configs/';
 $smarty->cache_dir = ROOT.'/cache/cache/';
 
-$debugObject = new Debug();
 $system = new System();
 $RaspberryPi = new RaspberryPi();
 $config = new Configuration();
-$myUser = new User();
-$myUser->connect();
-$ajaxResponse = new Ajax();
+$myUser = new User(array(
+                "ConnectionOptions" => array(
+                    "expiration" => (!empty($_["expire"])? $_["expire"] : time() ),
+                    "appInfos"  => (!empty($_SERVER["HTTP_X_APPINFO"])? $_SERVER["HTTP_X_APPINFO"] : "web|".$_SERVER["HTTP_USER_AGENT"] )
+                )
+            ));
 $plugins = new Plugin();
 // $plugins = new Plugins();
+$debugObject->addDebugList(array("timer" => "initialize basic class"));
+
+$myUser->connect();
+$debugObject->addDebugList(array("timer" => "fin Tentative de connection d'un utilisateur"));
 
 //on liste les dossiers du dossier parent des plugins
 $pluginsFolder_link = ROOT.DIRECTORY_SEPARATOR.PLUGIN_DIR;
 $list_plugins = Functions::list_plugins_active($pluginsFolder_link);
+$debugObject->addDebugList(array("timer" => "search plugins"));
 
 foreach ($list_plugins as $key => $plugins) {
     include $plugins;
 }
-
+$debugObject->addDebugList(array("timer" => "plugins load"));
 
 $_ = array_merge($_GET, $_POST);
 

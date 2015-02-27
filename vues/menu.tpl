@@ -32,7 +32,7 @@
                 {if {$menu_item.custom_item} ne ""}
                 {$menu_item.custom_item}
                 {else}
-                <a href="{$menu_item.link}"><i class="fa fa-{$menu_item.icon}"></i> {$menu_item.name}</a>
+                <a href="{$menu_item.link}"><i class="fa {$menu_item.icon}"></i> {$menu_item.name}</a>
                 {/if}
             </li>
 {/if}

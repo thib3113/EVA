@@ -2,14 +2,17 @@
 
 Class Plugin extends SgdbManager{
     static private $hook_list = array();
+    static private $widget_list = array();
     static private $menuItems;
 
     function __construct(){
         parent::__construct();
     }
 
-    static public function addHook($hook, $function, $args = array()){
+    static public function addHook($hook, $function, $args = array(), $widget_options = array()){
         self::$hook_list[$hook][] = array($function => $args);
+        if(!empty($widget_options))
+            self::$widget_list[$function] = $widget_options;
     }
 
     static public function callHook($hook){
@@ -22,6 +25,23 @@ Class Plugin extends SgdbManager{
             return false;
     }
 
+    /**
+     * Gets the value of hook_list.
+     *
+     * @return mixed
+     */
+    static public function getHookList()
+    {
+        return self::$hook_list;
+    }
 
-
+    /**
+     * Gets the value of widget_list.
+     *
+     * @return mixed
+     */
+    static public function getWidgetList()
+    {
+        return self::$widget_list;
+    }
 }

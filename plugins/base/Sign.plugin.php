@@ -43,6 +43,6 @@ function disconnect(){
 }
 
 if($myUser->is_connect)
-    Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "sign","times", -1, array("sign" => "out")));
+    Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "sign","fa-times", -1, array("sign" => "out")));
 
 Plugin::addHook("signout", "disconnect");

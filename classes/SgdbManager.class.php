@@ -182,6 +182,10 @@ Class SgdbManager{
         die();
     }
 
+    public function sgdbLastInsertId(){
+        return self::$db->lastInsertId();
+    }
+
 	public function sgbdCreate(){
 		$query = 'CREATE TABLE IF NOT EXISTS `'.DB_PREFIX.$this->TABLE_NAME.'` (';
 
@@ -309,9 +313,8 @@ Class SgdbManager{
     public function fillObject($key_field = "id"){
         $result = SgdbManager::sgbdSelect(array('*'), array($key_field => $this->$key_field), null, null, null, null,  __FILE__, __LINE__ );
         $result = $result->fetch();
-
         foreach($this->object_fields as $field=>$type){
-            $this->$field = Functions::isSerialized($result[$field])? Functions::secureUnserialize($result[$field]) : $result[$field];
+            $this->$field = Functions::isSerialized($result[$field])? unserialize($result[$field]) : $result[$field];
         }
     }
 

@@ -28,7 +28,9 @@ Class Connection extends SgdbManager{
 
     private $username;
 
+    private $debug;
     public function __construct(){
+        
         $this->session_name = PROGRAM_NAME.'_auth';
         $this->cookie_name = PROGRAM_NAME.'_auth';
         $this->session_connect = PROGRAM_NAME.'_connect';
@@ -48,15 +50,19 @@ Class Connection extends SgdbManager{
     }
 
     public function open($user = null, $password = null, $rememberMe = false, $needEncrypt = true){
+
+        
         if(empty($user) || empty($password)){
             return $this->alreadyOpen();
         }
         else{
-            return $this->connect($user, $password, $rememberMe, $needEncrypt);
+            return $this->connect($user, $password, $rememberMe, $needEncrypt);        
         }
     }
 
     public function connect($user, $password, $rememberMe = false, $needEncrypt = true){
+
+        
         $password = ($needEncrypt)? Functions::preparePasswd($user, $password) : $password; //on prépare le mot de passe si celui ci n'as pas était hashé auparavant
 
         $result = SgdbManager::sgbdSelect(array('*'), array("username" => $user, "pass" => $password), "users", null, null, null,  __FILE__, __LINE__ );
@@ -86,11 +92,14 @@ Class Connection extends SgdbManager{
         }
 
         $this->createSession($rememberMe);
+        $this->sgdbSave();
 
         return $result["userId"];
     }
 
     public function close(){
+
+        
         //on supprime la session
         $_SESSION[$this->session_name] = NULL;
         $_SESSION[$this->session_connect] = NULL;
@@ -101,59 +110,85 @@ Class Connection extends SgdbManager{
     }
 
     public function alreadyOpen(){
-        if(!empty($_COOKIE[$this->cookie_name])){ //si le cookie existe
-            //on crée la session correspondante ( qui fonctionnera, ou pas )
-            $_SESSION[$this->session_name] = $_COOKIE[$this->cookie_name];
-        }
 
-        // Bien, mais en ajax, mais pose des probleme avec les requete ajax asynchrone
-        if(isset($_SESSION[$this->session_name])){ //on regarde si la session existe
+        do{
+            if(isset($_SESSION[$this->session_name])){ //on regarde si la session existe
 
-            $session_infos = $_SESSION[$this->session_name]; //on renomme la session
-            $session_infos = unserialize($session_infos);
+                $session_infos = $_SESSION[$this->session_name]; //on renomme la session
+                $session_infos = unserialize($session_infos);
 
-            //on met les bons résultats dans les bonnes variables
-            $username = $session_infos[0];
-            $uid = $session_infos[1];
-            $token = $session_infos[2];
+                //on met les bons résultats dans les bonnes variables
+                $username = $session_infos[0];
+                $uid = $session_infos[1];
+                $token = $session_infos[2];
 
-            $result = SgdbManager::sgbdSelect(array('*'), array("uid" => $uid), null, null, null, null,  __FILE__, __LINE__ );
-            $connection = $result->fetch();
+                $result = SgdbManager::sgbdSelect(array('*'), array("uid" => $uid), null, null, null, null,  __FILE__, __LINE__ );
+                $connection = $result->fetch();
 
-            if(empty($connection)){
-                $this->close();
-                return false;
-            }
 
-            $result = SgdbManager::sgbdSelect(array('*'), array("username" => $username, "id" => $connection["userId"]), "users", null, null, null,  __FILE__, __LINE__ );
-            $user = $result->fetch();
+                
 
-            //on vérifie que l'expiration ne soit pas dépassé
-            if($connection["expiration"] > time() ){ 
-                //on vérifie que le token soit le bon
-                if($token != $connection["token"]){
-                    //le token n'es pas bon, on le change donc pour éviter le bruteforce
-                    $this->setToken();
-                    $this->sgdbSave();
-                    //on efface le cookie et la session
+                if(empty($connection)){
                     $this->close();
-
                     return false;
                 }
+
+                $result = SgdbManager::sgbdSelect(array('*'), array("username" => $username, "id" => $connection["userId"]), "users", null, null, null,  __FILE__, __LINE__ );
+                $user = $result->fetch();
+                
+
+                if(empty($user)){
+                    $this->close();
+                    return false;
+                }
+
+                //on vérifie que l'expiration ne soit pas dépassé
+                if($connection["expiration"] > time() ){ 
+
+                    
+                    //on vérifie que le token soit le bon
+                    if($token != $connection["token"]){
+
+                        
+                        //le token n'es pas bon, on le change donc pour éviter le bruteforce
+                        $this->setToken();
+                        $this->sgdbSave();
+                        //on efface le cookie et la session
+                        $this->close();
+
+                        return false;
+                    }
+                    else{
+                        
+                        $this->setUsername($user["username"]);                     
+                        $this->set_infos($connection['uid']);
+                        //si le token est bon on connecte
+                        $this->createSession(empty($_COOKIE[$this->cookie_name]));
+
+                        $this->sgdbSave();
+                        return $user['id'];
+                    }
+                }
                 else{
+
+                    
+                    $this->setUsername($user["username"]); 
                     $this->set_infos($connection['uid']);
                     //si le token est bon on connecte
                     $this->createSession(empty($_COOKIE[$this->cookie_name]));
+
                     return $user['id'];
                 }
             }
-            else{
-                $this->set_infos($connection['uid']);
-                //si le token est bon on connecte
-                $this->createSession(empty($_COOKIE[$this->cookie_name]));
-                return $user['id'];
+
+            //si la connection n'as pas fonctionné avec la session, on teste avec le cookie
+            $connection_via_cookie = false;
+            if(!empty($_COOKIE[$this->cookie_name])){ //si le cookie existe
+                //on crée la session correspondante ( qui fonctionnera, ou pas )
+                $_SESSION[$this->session_name] = $_COOKIE[$this->cookie_name];
+                $connection_via_cookie = true;
             }
-        }
+        }while($connection_via_cookie);
         return false;
 
     }
@@ -161,7 +196,10 @@ Class Connection extends SgdbManager{
 
 
     public function setToken(){
+
+        
         $this->token = Functions::randomStr(rand(100, 127));
+        
         // $this->_query("UPDATE ".DB_PREFIX.$this->uid_table_name." SET token=?, time=?  WHERE uid=?", array($this->token, time(), $this->current_uid), __FILE__, __LINE__);
 
         return true;
@@ -174,13 +212,13 @@ Class Connection extends SgdbManager{
     public function saveIp(){
         if(!in_array($_SERVER['REMOTE_ADDR'], $this->ips)){
             $this->ips[] = $_SERVER['REMOTE_ADDR'];
-            $this->sgdbSave();
             // $this->_query("UPDATE ".DB_PREFIX.$this->uid_table_name." SET ips=? WHERE uid=?", array(serialize($this->current_ip_list), $this->current_uid), __FILE__, __LINE__);
         }
     }
 
     public function createSession($cookie = false){
 
+        
         //on crée la session
         $_SESSION[$this->session_name] = serialize(array($this->username, $this->uid, $this->token));
         // $_SESSION[$this->session_connect] = !empty($_COOKIE['PHPSESSID'])? $_COOKIE['PHPSESSID'] : SID;
@@ -205,24 +243,22 @@ Class Connection extends SgdbManager{
 
     public function set_infos($uid = null){
 
+        
         if(empty($uid)){
             //on enregistre le nouvel uid
             $this->generateUid();
-            $this->token = "";
             $this->current_ip = $_SERVER['REMOTE_ADDR'];
             $this->ips = array($_SERVER['REMOTE_ADDR']);
             $this->time = time();
-            $this->sgdbSave();
+            $this->id = $this->sgdbLastInsertId(); 
 
         }
         else{
             $this->uid = $uid;
+            $this->fillObject("uid");
         }
 
-        $this->fillObject("uid");
         $this->setToken();
-        $this->sgdbSave();
-        
 
         return true;
     }
@@ -234,7 +270,7 @@ Class Connection extends SgdbManager{
      *
      * @return self
      */
-    protected function setAppInfos($appInfos)
+    public function setAppInfos($appInfos)
     {
         $this->appInfos = $appInfos;
 
@@ -258,7 +294,7 @@ Class Connection extends SgdbManager{
      *
      * @return self
      */
-    protected function setExpiration($expiration)
+    public function setExpiration($expiration)
     {
         $this->expiration = $expiration;
 
@@ -272,7 +308,7 @@ Class Connection extends SgdbManager{
      *
      * @return self
      */
-    protected function setUsername($username)
+    public function setUsername($username)
     {
         $this->username = $username;
 
@@ -285,7 +321,7 @@ Class Connection extends SgdbManager{
      *
      * @return self
      */
-    protected function setUserId($userId)
+    public function setUserId($userId)
     {
         $this->userId = $userId;
 

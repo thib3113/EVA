@@ -115,7 +115,6 @@ class Debug extends SgdbManager{
     }
 
     public function getDebugList(){
-    global $smarty;
         if(DEBUG && !Functions::isAjax()){
             //on écris les debug
             $listDebug = array();

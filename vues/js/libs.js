@@ -19,7 +19,7 @@ function notify(statut, message){
     }
 $.ajaxSetup({
     headers:{
-        "X-AppInfo" : "ajax"
+        "X-AppInfo" : "web|"+navigator.userAgent
     }
 });
 

@@ -1,4 +1,5 @@
 <?php
+define('TIME_START',microtime(true));
 ini_set("log_errors", 1);
 error_reporting(E_ALL);
 set_error_handler("error_handler", E_ALL);
@@ -27,7 +28,6 @@ function error_handler( $errno , $errstr , $errfile , $errline, $errcontext){
 }
 @session_start();
 
-define('TIME_START',microtime(true));
 
 require ROOT.'/config.php';
 ini_set("error_log", LOG_FILE);
@@ -39,8 +39,11 @@ else{
 }
 
 function autoload($name) {
+	global $debugObject;
     if (file_exists(ROOT.'/classes/'.$name.".class.php")) {
         require_once(ROOT.'/classes/'.$name.".class.php");
+        if(is_a($debugObject, "Debug"))
+			$debugObject->addDebugList(array("timer" => "end load $name"));
     }
     else
         return false;
@@ -48,3 +51,5 @@ function autoload($name) {
 
 
 spl_autoload_register("autoload");
+$debugObject = new Debug();
+$debugObject->addDebugList(array("timer" => "autoload"));

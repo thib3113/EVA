@@ -38,6 +38,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 
     <link rel="stylesheet" href="vues/css/font-awesome.min.css">
+    <link rel="stylesheet" href="vues/css/material-design-iconic-font.min.css">
     <link rel="stylesheet" href="vues/css/jquery-ui.min.css">
 
     <link rel="stylesheet" href="vues/css/style.css">
