@@ -7,29 +7,28 @@ Class Functions extends SgdbManager{
 
 
     public static function log($log, $label = "notice"){
-        if(!is_file(ROOT.'/'.LOG_FILE)){
-            self::createLogFile();
-            self::log($log, $label);
-        }
-        else{
+        global $system;
+
             $timestamp = date("r", time());
-            $fp = fopen(ROOT.'/'.LOG_FILE, 'a+');
-            if(!fwrite($fp, "$label : $timestamp : $log\n"))
-                return false;
-            else
-                return true;
-        }
+            if(is_file(LOG_FILE) && filesize(LOG_FILE) > MAX_LOG_FILE_SIZE)
+                unlink(LOG_FILE);
+
+            $cmd = "sudo -u ".SYSTEM_USER." echo ".escapeshellarg(preg_replace("~\*~", "\*", "$label : $timestamp : $log") )." | sudo -u ".SYSTEM_USER." tee -a ".LOG_FILE;
+            exec($cmd, $return, $status);
+            return true;
             
     }
 
-    public static function createLogFile(){
-        if(!$fp = fopen(ROOT.'/'.LOG_FILE,"a+")) // ouverture du fichier en écriture
-            return false;
-        if(self::log("Création du fichier de log"))
-            die('écriture du fichier de log impossible !');
-        else
-            chmod(ROOT.'/'.LOG_FILE, 0777);
-    }
+    // public static function createLogFile(){
+    //     if(!$fp = fopen(LOG_FILE,"a+")) // ouverture du fichier en écriture
+    //         return false;
+    //     if(self::log("Création du fichier de log"))
+    //         die('écriture du fichier de log impossible !');
+    //     else{
+    //         chown(LOG_FILE, "eva:eva");
+    //         chmod(LOG_FILE, 0777);
+    //     }
+    // }
 
     public static function slugIt($name) {
         /*
@@ -59,13 +58,18 @@ Class Functions extends SgdbManager{
         return substr($path, strlen(ROOT)+1);
     }
 
-    public static function var_dump_advanced($text, $file, $line){
+    public static function var_dump_advanced($text){
+        global $debugObject;
+        $debug = $debugObject->whoCallMe(1);
+        $file = $debug["file"];
+        $line = $debug["line"];
         $text = (!is_array($text))? array($text) : $text;
         echo "<pre>";
         echo "$file : $line";
         $b = debug_backtrace();
+        var_dump($b);
         var_dump($b[1]['function']);
-        var_dump($b[1]['args'][0]);
+        var_dump($b[1]['args']);
         foreach ($text as $value) {
             var_dump($value);
         }
@@ -125,8 +129,8 @@ Class Functions extends SgdbManager{
     }
 
     public static function getSupportedVersion(){
-        $url = DISTANT_API."?get=supported_distribution"; //ne pas mettre http
-
+        $url = DISTANT_API."?get=supported_distribution";
+        
         //on vérifie la connexion avec le site
         if(!self::checkConnectivity($url))
             return false;
@@ -153,8 +157,8 @@ Class Functions extends SgdbManager{
         $version = $RaspberryPi->getInfos("version");
 
         foreach ($supported_versions as $version_support) {
-            if(strtolower($version_support[0]) == strtolower($distribution))
-                if(strtolower($version_support[1]) == strtolower($version))
+            if(strtolower($version_support["distribution"]) == strtolower($distribution))
+                if(strtolower($version_support["version"]) == strtolower($version))
                     return true;
         }
         return false;
@@ -195,11 +199,36 @@ Class Functions extends SgdbManager{
         }
     }
 
+    /**
+     * [is_serialized description]
+     * @author Wordpress
+     * @param  [type]  $data [description]
+     * @return boolean       [description]
+     */
     public static function isSerialized($data){
-        if(@unserialize($data))
-            return true;
-        else 
+        // if it isn't a string, it isn't serialized
+        if ( !is_string( $data ) )
             return false;
+        $data = trim( $data );
+        if ( 'N;' == $data )
+            return true;
+        if ( !preg_match( '/^([adObis]):/', $data, $badions ) )
+            return false;
+        switch ( $badions[1] ) {
+            case 'a' :
+            case 'O' :
+            case 's' :
+                if ( preg_match( "/^{$badions[1]}:[0-9]+:.*[;}]\$/s", $data ) )
+                    return true;
+                break;
+            case 'b' :
+            case 'i' :
+            case 'd' :
+                if ( preg_match( "/^{$badions[1]}:[0-9.E-]+;\$/", $data ) )
+                    return true;
+                break;
+        }
+        return false;
     }
 
     /**
@@ -237,6 +266,8 @@ Class Functions extends SgdbManager{
 
         Configuration::addJs("vues/js/redirect.js");
 
+        $config->setTemplateInfos(array("executionTime" => Functions::getExecutionTime()));
+
         $config->setTemplateInfos(array("debugList" => $debugObject->getDebugList()));
         $smarty->assign('template_infos', $config->getTemplateInfos());
         $smarty->assign("to", $to);
@@ -244,6 +275,16 @@ Class Functions extends SgdbManager{
         $smarty->assign("text", $text);
         $smarty->display(ROOT.'/vues/redirect.tpl');
         die();
+    }
+
+    public static function preparePasswd($username, $pass){ //on prépare le mot de passe à un stockage en bdd
+
+        $hashKey = hash("adler32", $username);
+        $pass_temp = $username.$hashKey.$pass;
+        if(DB_HASH)
+            $pass_temp = hash(DB_HASH, $pass_temp);
+        // var_dump($pass_temp);
+        return $pass_temp;
     }
 
     public static function fatal_error($text, $file = null, $line = null){
@@ -270,7 +311,7 @@ Class Functions extends SgdbManager{
         $liste_plugins =self::list_plugins($dir);
         $list_plugins_active = $myUser->getPluginsList();
         $return_list = array();
-
+        
         foreach ($liste_plugins as $key => $plugins) {
             if(in_array($key, $list_plugins_active) || preg_match("~".DIRECTORY_SEPARATOR."base".DIRECTORY_SEPARATOR."~", substr($plugins, strlen(__DIR__))))
                 $return_list[$key] = $plugins;

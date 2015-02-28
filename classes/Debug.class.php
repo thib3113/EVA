@@ -54,8 +54,11 @@ class Debug extends SgdbManager{
 
     private function echoArray($array, $depth = 0, $maxDepth = 3){
         $return ="";
-        if(!is_array($array))
+        if(!is_array($array) && !is_object($array))
             $return .= "$array";
+        elseif(is_object($array)){
+            $return .= "objet";
+        }
         else{
             foreach ($array as $key => $value) {
                 if(!is_array($value))
@@ -112,7 +115,6 @@ class Debug extends SgdbManager{
     }
 
     public function getDebugList(){
-    global $smarty;
         if(DEBUG && !Functions::isAjax()){
             //on écris les debug
             $listDebug = array();

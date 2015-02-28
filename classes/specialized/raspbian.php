@@ -4,7 +4,7 @@ $specialized_list = array(
     //connaitre la version de la distrib courrante
     "getCurrentDistribVersion" => "uname -r",
 
-    //permet de récupéré la liste des interfaces réseaux
+    //permet de récupérer la liste des interfaces réseaux
     "getListNetworkInterfaces" => "ifconfig -s | grep -v Iface | cut -d ' '  -f1",
 
     //////////////////

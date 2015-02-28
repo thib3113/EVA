@@ -1,6 +1,5 @@
 <?php
 define('ROOT', __DIR__);
-
 require_once ROOT.DIRECTORY_SEPARATOR."root.php";
 
 
@@ -9,7 +8,7 @@ $_ = array_merge($_GET, $_POST);
 
 //on regarde si la db existe déjà, pour empécher l'installaion dans ce cas
 if(is_file(DB_NAME)){
-    //pour le debug, on supprime le fichier de db à chaque
+    //pour le debug, on supprime le fichier de db à chaque fois
     // unlink(DB_NAME);
     die('<meta charset="utf-8">le fichier de base de donnée existe déjà <a href="index.php">Retour à l\'accueil</a>');
 }
@@ -30,10 +29,8 @@ $error_form = array(
         "pass_confirm" => 0,
         "email"        => 0
     );
+$debugObject = new Debug();
 
-////////////////////////////////////////
-//on vérifie les droits du dossier db //
-////////////////////////////////////////
 
 function createError($error, $resolve = array()){
     global $erreurs;
@@ -56,7 +53,6 @@ function check($value){
         $GLOBALS['error'] = 1;
     return '[ '.($value? '<span style="color:green">OK</span>' : '<span style="color:red">ERREUR</span>').' ]';
 }
-
 $GLOBALS['error'] = 0;
 $all_is_not_good_message = "";
 $distribution = $RaspberryPi->getInfos("distribution");
@@ -74,7 +70,7 @@ if(!$RaspberryPi->getInfos('wiringpi'))
     $erreurs[] = createError("WiringPi ne semble pas être installer sur votre RaspberryPi", 'Suivre les étapes d\'installation : <a href="http://wiringpi.com/download-and-install/">http://wiringpi.com/download-and-install/</a>');
 
 if(!$RaspberryPi->getInfos('git'))
-    $erreurs[] = createError("Git ne semble pas être installer sur votre RaspberryPi", 'Installer git <kdb>sudo apt-get install git</kdb>');
+    $erreurs[] = createError("Git ne semble pas être installer sur votre RaspberryPi", 'Installer git <kbd>sudo apt-get install git</kbd>');
 
 
 //on teste les erreurs non blocantes
@@ -90,7 +86,7 @@ else{
         $notices[] = createError("votre RaspberryPi n'arrive pas à communiquer avec notre site, nous ne pouvons pas voir si votre version est supportée");
     }
 }
-$html = @file_get_html('http://'.$_SERVER['SERVER_NAME'].dirname($_SERVER['REQUEST_URI']).'/db/index.html');
+$html = @file_get_contents('http://'.$_SERVER['SERVER_NAME'].dirname($_SERVER['REQUEST_URI']).'/db/index.html');
 if(!$html){
     $notices = createError("Il semble que la base de donnée soit accessible depuis internet !", array('Renseignez vous sur notre forum sur des solutions possibles ( <a href="'.PROGRAM_FORUM.'">'.PROGRAM_FORUM.'</a> )'));
 }
@@ -127,15 +123,24 @@ if(!empty($_['launch_install'])){
 
 
     if(empty($erreurs)){
-        $config = new Configuration();
+        $config = new ConfigurationManager();
         $taskList[] = "création de la base ... ".check($config->sgbdCreate());
-        $taskList[] = "Ajout des infos ... ".check( $config->addConfig("base_url", 'http://'.$_SERVER['SERVER_NAME']) );
+        $taskList[] = "Ajout des Première configurations ... ".check( 
+            $config->addConfig("base_url", "http".(!empty($_SERVER["HTTPS"])? "s" : "")."://".$_SERVER["HTTP_HOST"].dirname($_SERVER["PHP_SELF"]))
+        &&  $config->addConfig("base_version", PROGRAM_VERSION)
+        &&  $config->addConfig("channel", "stable")
+            );
 
         $taskList[] = "Vérification de la création de la database ... ".check(filesize(DB_NAME) >1);
 
-        $user = new User();
+        $connection = new Connection();
+        $taskList[] = "création de la table de connection ... ".check($connection->sgbdCreate());
+
+        $user = new UsersManager();
         $taskList[] = "création de la table User ... ".check($user->sgbdCreate());
-        $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser($_['username'], $_['pass'], $_['email'], 0));
+        $dashboardList =  array("default","actual_users","lorem");
+        $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser(htmlspecialchars($_['username']), $_['pass'], htmlspecialchars($_['email']), 0, "", array(), $dashboardList));
+
         if($GLOBALS['error']){
             if(!$createBackup = Functions::backupDb())
                 $all_is_not_good_message = "Une erreur est intervenue, un backup de la base de donnée à était crée : ".basename($createBackup);
@@ -156,7 +161,8 @@ $template_infos = array(
                 "vues/js/libs.js",
                 "vues/js/debug.js",
              )),
-            "externcss"    => '',
+            "configs" => array("base_url" => "."),
+            "externcss"    => array(),
             "distribution" => $RaspberryPi->getInfos("distribution"),
             "version"      => $RaspberryPi->getInfos("version"),
             'debugList'    => $debugObject->getDebugList(),

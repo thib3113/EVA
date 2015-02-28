@@ -6,9 +6,10 @@
  @description:  Classe de gestion du raspberry pi
  */
 
-class RaspberryPi extends SgdbManager{
+class RaspberryPi extends System{
 
-    public $version, $revision;
+    public $version, $revision, $pins;
+    private $active_optionnal = false;
     const GPIO_DEFAULT_PATH = '/usr/local/bin/gpio';
 
     // version du raspberry par revision
@@ -27,6 +28,7 @@ class RaspberryPi extends SgdbManager{
                           "000e" => "B2.0",
                           "000f" => "B2.0",
                           "0010" => "B+1.0",
+                          "01041" => "2B+1.0",
     );
 
     private $tablePins=array(
@@ -92,12 +94,15 @@ class RaspberryPi extends SgdbManager{
                           "A2.0"  => array( 26  ,   0   ),
                           "B1.0"  => array( 26  ,   0   ),
                           "B2.0"  => array( 26  ,   8   ),
-                          "B+1.0" => array( 40  ,   0   )
+                          "B+1.0" => array( 40  ,   0   ),
+                          "2B+1.0" => array( 40  ,   0   ),
 
     );
 
 
     function __construct(){
+      global $debugObject;
+
       $this->setVersion();
       $this->nameTable();
     }
@@ -121,9 +126,9 @@ class RaspberryPi extends SgdbManager{
         $this->version = $this->getRaspVersion();
     }
 
-    private function exec($cmd){
+    private function exec($cmd, $system_user = true){
         // echo $cmd;
-        return exec($cmd);
+        return $this->shell($cmd, $system_user); 
     }
 
     public function mode($pin,$mode = 'out'){
@@ -141,6 +146,37 @@ class RaspberryPi extends SgdbManager{
     public function toggle($pin,$automode = false){
         if($automode) $this->mode($pin,'out');
         return $this->exec(self::GPIO_DEFAULT_PATH.' toggle '.$pin);
+    }
+
+
+    public function checkPins(){
+      //on récupère les pins
+      $this->pins = $this->tablePins;
+      if($this->active_optionnal){
+        foreach ($this->optionalPins as $key => $value) {
+          $this->pins[] = $value;
+        }
+      }
+
+      //on récupère les informations du readall
+      $read_all = $this->exec("gpio readall", true);
+      foreach ($read_all as $key => $value) {
+        //on match les lignes dans les bonnes cases
+        preg_match("~\|(?:(?'LBCM'\s*[0-9]*\s*)\|(?'LwPi'\s*[0-9]*\s*)\|(?'LName'\s*[^\|]*\s*)\|(?'LMode'\s*[^\|]*\s*)\|(?'LValue'\s*[^\|]*\s*)\|(?'LPhysical'\s*[0-9]*\s*))\|\|(?:(?'Rphysical'\s*[0-9]*\s*)\|(?'RValue'\s*[0-9]*\s*)\|(?'RMode'\s*[^\|]*\s*)\|(?'RName'\s*[^\|]*\s*)\|(?'RwPi'\s*[^\|]*\s*)\|(?'RBCM'\s*[0-9]*\s*))\s*\|~i", $value, $matches);
+        
+        //on les met dans le tableau ( gauche du tableau, puis droite)
+        if(!empty($matches["LPhysical"]))
+          $this->pins[trim($matches["LPhysical"])]["value"] = trim($matches["LValue"]);
+
+        if(!empty($matches["Rphysical"]))
+          $this->pins[trim($matches["Rphysical"])]["value"] = trim($matches["RValue"]);
+        
+      }
+    }
+
+    public function readAll(){
+        $this->checkPins();
+        return $this->pins;
     }
 
 
@@ -243,6 +279,16 @@ class RaspberryPi extends SgdbManager{
         return $tempPinsTable;
     }
 
+    public function getAllState(){
+        $pins = $this->readAll();
+        $return = array();
+        foreach ($pins as $key => $value) {
+            if(isset($value['value']) && !is_null($value['value']))
+                $return[] = array("id" => $key, "state" => $value["value"]);
+        }
+        return $return;
+    }
+
   /**
    * Permet de récupéré la version du raspberry
    * @author Thibaut SEVERAC ( thibaut@thib3113.fr )
@@ -254,7 +300,7 @@ class RaspberryPi extends SgdbManager{
       $this->setRevision($revision);
       $version = !empty($this->versionByRev[$revision])? $this->versionByRev[$revision] : false;
       return $version;
-    }
+  }
 
 
     /**
@@ -333,6 +379,10 @@ class RaspberryPi extends SgdbManager{
             return false;
           break;
       }
+    }
+
+    public function checkUpdate(){
+      var_dump($this->exec("git fetch"));
     }
 
     public function setRevision($revision){

@@ -16,7 +16,7 @@ if($myUser->is_connect){
 
         $yourRaspberryPi = "Type : ".$RaspberryPi->getRaspVersion()." <br>
         Révision : ".$RaspberryPi->getInfos("revision").'<br>
-        Nombre de pins : '.$RaspberryPi->getNumberOfPins().' et '.$RaspberryPi->getNumberOfOptionalPins().' pins optionnels <br>
+        Nombre de pins : '.$RaspberryPi->getNumberOfPins().' et '.$RaspberryPi->getNumberOfOptionalPins().' pins optionnels <i title="non activable actuellement" class="fa fa-question-circle"></i> <br>
         dont '.$nb_wiring_pi.' pin'.($nb_wiring_pi>1? 's' : '').' controllable'.($nb_wiring_pi>1? 's' : '').' <br>
          <a href="http://fr.wikipedia.org/wiki/OS" title="Operating System">OS</a> : '.$RaspberryPi->getInfos('distribution', true).' '.$RaspberryPi->getInfos('version');
         $smarty->assign('yourRaspberryPi', $yourRaspberryPi);
@@ -32,22 +32,7 @@ if($myUser->is_connect){
 
         //mise à jour
         $erreur = array();
-        if(!is_dir($system->getUserSystemFolder()))
-            $erreur[] = "le dossier de l'utilisateur système n'existe pas.".$system->getUserSystemFolder();
-
-        if(!is_file($system->getUserSystemFolder().'/update_list.txt')){
-            $erreur[] = "le fichier des mises à jour du système n'existe pas.";
-        }
-        else{
-            if(filemtime($system->getUserSystemFolder().'/update_list.txt') < time()-5097600){//2 jours
-                $erreur[] = "le fichier de mise à jour, semble vieux de plus de 2 jours";
-            }
-            else{
-                
-            }
-
-        }
-        $smarty->assign("erreur_maj", $erreur);
+        // $smarty->assign("erreur_maj", $erreur);
 
 
 
@@ -57,7 +42,7 @@ if($myUser->is_connect){
 
     }
 
-    Plugin::addHook("header", "Configuration::addMenuItem", array("Configuration", "configs","cogs", -2));
+    Plugin::addHook("header", "Configuration::addMenuItem", array("Configuration", "configs","fa-cogs", -2));
 }
 
 function affich_json_configs(){

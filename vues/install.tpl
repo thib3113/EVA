@@ -1,17 +1,17 @@
 {* SMARTY TEMPLATE *}
 {include "{$smarty.const.ROOT}/vues/header.tpl"}
-<div class="container-fluid">
     <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
                 <p class="navbar-brand logo visible-*-*">
-                    <a href="index.php">
-                        {$smarty.const.PROGRAM_NAME} <i class="fa fa-github-alt fa-2x"></i> {$smarty.const.PROGRAM_VERSION}   
+                    <a href="index.php" class="navbar-brand" style="padding: 5px; font-size: 20pt; line-height: 1em;" id="header_title">
+                      {$smarty.const.PROGRAM_NAME} <span style="font-size: 40pt; position: relative; top: 10px;">∞</span> {$smarty.const.PROGRAM_VERSION}
                     </a>
                 </p>
             </div>
         </div><!-- /.container-fluid -->
     </nav>
+<div class="container-fluid">
 
     <div class="container">
     {if $erreurs}  
@@ -26,7 +26,7 @@
         {/foreach}
         </ul>
         <small>nb : toutes les commandes doivent être lancé dans le dossier <kbd>{$smarty.const.ROOT}</kbd>, pour y aller vous pouvez utilisé <kbd>cd {$smarty.const.ROOT}</kbd></small><br>
-        <small>vous pouvez trouver plus d'informations sur le forum : <a href="{$smarty.const.PROGRAMM_FORUM}/viewtopic.php?id=2">{$smarty.const.PROGRAMM_FORUM}/viewtopic.php?id=2</a></small>
+        <small>vous pouvez trouver plus d'informations sur le forum : <a href="{$smarty.const.PROGRAM_FORUM}/viewtopic.php?id=2">{$smarty.const.PROGRAM_FORUM}/viewtopic.php?id=2</a></small>
       </div>
     </div>
     {/if}
@@ -49,27 +49,27 @@
         <form class="form-horizontal" method="post" role="form">
         <h3 class="col-md-offset-1">Création d'un compte administrateur</h3>
             <div class="form-group {if $error_form.username == 1}has-error{/if}">
-                <label for="inputEmail3" class="col-sm-2 control-label">Username</label>
+                <label for="username" class="col-sm-2 control-label">Username</label>
                 <div class="col-sm-10">
-                    <input type="text" name="username" class="form-control" id="inputEmail3" placeholder="Username">
+                    <input type="text" name="username" class="form-control" id="username" placeholder="Username">
                 </div>
             </div>
             <div class="form-group {if $error_form.pass == 1}has-error{/if}">
-                <label for="inputPassword3" class="col-sm-2 control-label">Mot de passe</label>
+                <label for="passwd" class="col-sm-2 control-label">Mot de passe</label>
                 <div class="col-sm-10">
-                    <input type="password" name="pass" class="form-control" id="inputPassword3" placeholder="Password">
+                    <input type="password" name="pass" class="form-control" id="passwd" placeholder="Password">
                 </div>
             </div>
             <div class="form-group {if $error_form.pass_confirm == 1}has-error{/if}">
-                <label for="inputPassword3" class="col-sm-2 control-label">Confirmation</label>
+                <label for="passwdconf" class="col-sm-2 control-label">Confirmation</label>
                 <div class="col-sm-10">
-                    <input type="password" name="pass_confirm" class="form-control" id="inputPassword3" placeholder="Password">
+                    <input type="password" name="pass_confirm" class="form-control" id="passwdconf" placeholder="Password">
                 </div>
             </div>
             <div class="form-group {if $error_form.email == 1}has-error{/if}">
-                <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+                <label for="email" class="col-sm-2 control-label">Email</label>
                 <div class="col-sm-10">
-                    <input type="email" name="email" class="form-control" id="inputEmail3" placeholder="Email">
+                    <input type="email" name="email" class="form-control" id="email" placeholder="Email">
                 </div>
             </div>
             <input type="hidden" name="launch_install" value="1">
@@ -86,7 +86,7 @@
         <li>{$task}</li>
     {/foreach}
     {if $all_is_good}
-        <li>Tout c'est passé sans problème, <a href="index.php">cliquez ici pour commencer à utiliser EVA</a></li>
+        <li>Tout c'est passé sans problèmes, <a href="index.php">cliquez ici pour commencer à utiliser EVA</a></li>
     {else}
         <li>{$all_is_not_good_message}</li>
         <li>Une erreur s'est produite, merci de la reporter sur le <a href="{$smarty.const.PROGRAM_FORUM}">forum</a>, et de <a href="install.php?token=aaaaaa">recommencer</a></li>

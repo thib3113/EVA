@@ -17,6 +17,11 @@ function notify(statut, message){
 
         });
     }
+$.ajaxSetup({
+    headers:{
+        "X-AppInfo" : "web|"+navigator.userAgent
+    }
+});
 
     var last_notif = 0;
     $("form#form_sign_in").submit(function(e) {
@@ -31,7 +36,7 @@ function notify(statut, message){
                 last_notif.close();
 
             $.ajax({
-            url: 'index.php?page=sign',        /* Il s'agit de l'url ou seront traitÃ¯Â¿Â½s les donnÃ¯Â¿Â½es */
+            url: api_url+'?type=SET&API=AUTH',        /* Il s'agit de l'url ou seront traitÃ¯Â¿Â½s les donnÃ¯Â¿Â½es */
             type: 'POST',            /* Il s'agit de la mÃ¯Â¿Â½thode employÃ¯Â¿Â½e */
             data : {user : user, pass : pass, remember_me : remember_me},
             datatype: 'json',

@@ -6,23 +6,18 @@
  */
 
 if($myUser->is_connect){
-    Plugin::addHook("header", "Configuration::addMenuItem", array("GPIO", "gpio","dot-circle-o", 1));
+    Plugin::addHook("header", "Configuration::addMenuItem", array("GPIO", "gpio","fa-dot-circle-o", 1));
 }
 
 function affich_gpio(){
-    global $RaspberryPi, $smarty;
+    global $RaspberryPi, $smarty, $system;
 
-    $pins = array();
+    $state = $RaspberryPi->readAll();
+    $smarty->assign('pins', $state);
 
-    //on ajoute les etats
-    foreach ($RaspberryPi->getTablePins() as $key => $value) {
-        $pins[$key] = $value;
-        if($value['type'] == 'GPIO')
-            $pins[$key]["state"] = $RaspberryPi->read($value['wiringPin']);
-    }
-    // var_dump($pins);
-    $smarty->assign('pins', $pins);
+    // var_dump($system->shell("cd /var/www/EVA/ && sudo -u eva git fetch"));
 
+    // var_dump($RaspberryPi->getListWiringPin());
     //test des led 
     // $led = new LED(array(array(0 , true), array(1 , false)));
     // $led1 = new LED(array(array(0 , false), array(1 , true)));
@@ -43,6 +38,7 @@ function affich_gpio(){
     // $sevenseg->affich("hello");
 
     Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/gpio/gpio.tpl'));
+    Configuration::addJs('plugins/base/vues/gpio/js/gpio.js');
     Plugin::callHook("pre_header");
     Plugin::callHook("header");
     Plugin::callHook("pre_gpio");

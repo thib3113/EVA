@@ -9,23 +9,24 @@ class System {
     private $specialized_file;
 
     public function __construct(){
+        global $debugObject;
         //charge les spécialité de l'os en cours
-        $this->specialized_file = ROOT.DIRECTORY_SEPARATOR."classes".DIRECTORY_SEPARATOR."specialized".DIRECTORY_SEPARATOR.strtolower($this->getCurrentDistrib()).".php";
-        if(is_file($this->specialized_file)){
-            require $this->specialized_file;
+        // $this->specialized_file = ROOT.DIRECTORY_SEPARATOR."classes".DIRECTORY_SEPARATOR."specialized".DIRECTORY_SEPARATOR.strtolower($this->getCurrentDistrib()).".php";
+        // if(is_file($this->specialized_file)){
+            require ROOT.DIRECTORY_SEPARATOR."classes".DIRECTORY_SEPARATOR."specialized".DIRECTORY_SEPARATOR."raspbian.php";
             $this->specialized_list = $specialized_list;
-        }
-        else{
-            Functions::fatal_error("Le fichier des spécialités de votre OS est manquant !<br> Il devrais se trouver à cet endroit <kbd>$specialized_file</kbd>");
-        }
+        // }
+        // else{
+        //     Functions::fatal_error("Le fichier des spécialités de votre OS est manquant !<br> Il devrais se trouver à cet endroit <kbd>$specialized_file</kbd>");
+        // }
 
         //on cherche l'utilisateur courant
         $this->setUser($this->getProcessUser());
 
-        //on cherche la distrib courante
-        $this->setDistrib($this->getCurrentDistrib());
+        //on cherche la distrib courante ( long )
+        // $this->setDistrib($this->getCurrentDistrib());
 
-        $this->setUserSystemFolder($this->getUserSystemFolder());
+        // $this->setUserSystemFolder($this->getUserSystemFolder());
         //on regarde si l'utilisateur systeme est installé
     }
 
@@ -36,7 +37,9 @@ class System {
     }
 
     public function getUserSystemFolder(){
-        return $this->shell(' cat /etc/passwd | grep '.SYSTEM_USER.' | cut -d : -f6', true);
+        global $debugObject;
+        $return = $this->shell(' cat /etc/passwd | grep '.SYSTEM_USER.' | cut -d : -f6', true);
+        return $return;
     }
 
     public function setUserSystemFolder($userSystemFolder){
@@ -44,7 +47,13 @@ class System {
     }
 
     public function shell($str, $system_user = false){
-        exec(($system_user? "sudo -u ".SYSTEM_USER." " : "").$str, $return, $status);
+        global $debugObject;
+
+        $cmd = ($system_user? "sudo -u ".SYSTEM_USER." " : "").$str;
+        Functions::log($cmd);
+        $time = microtime();
+        exec($cmd, $return, $status);
+        $debugObject->addDebugList(array("shell" => "commande (".(microtime()-$time)." ms): $cmd"));
         if(count($return) < 2 && $status == 0)
             $return = !empty($return[0])? $return[0] : "";
         else

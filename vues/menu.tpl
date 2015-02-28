@@ -7,8 +7,8 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-        <a href="index.php" class="navbar-brand" style="padding: 5px;" id="header_title">
-          {$smarty.const.PROGRAM_NAME} <i class="fa fa-github-alt fa-2x"></i> {$smarty.const.PROGRAM_VERSION}
+        <a href="index.php" class="navbar-brand" style="padding: 5px; font-size: 20pt; line-height: 1em;" id="header_title">
+          {$smarty.const.PROGRAM_NAME} <span style="font-size: 40pt; position: relative; top: 10px;">∞</span> {$smarty.const.PROGRAM_VERSION}
         </a>
     </div>
     <div class="collapse navbar-collapse navbar-inner" id="bs-example-navbar-collapse-1">
@@ -32,7 +32,7 @@
                 {if {$menu_item.custom_item} ne ""}
                 {$menu_item.custom_item}
                 {else}
-                <a href="{$menu_item.link}"><i class="fa fa-{$menu_item.icon}"></i> {$menu_item.name}</a>
+                <a href="{$menu_item.link}"><i class="fa {$menu_item.icon}"></i> {$menu_item.name}</a>
                 {/if}
             </li>
 {/if}

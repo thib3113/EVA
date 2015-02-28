@@ -5,25 +5,21 @@ ob_start();
 //on inclus les fichiers de base
 require ROOT.'/base.php';
 
-$custom_function = "";
-if(Functions::isAjax())
-    $custom_function = "json_";
-
 if($myUser->is_connect){
     //on inclus le modèle ou l'index
     if(empty($_['page'])){
-        $func_name = 'affich_'.$custom_function.'index';
+        $func_name = 'affich_index';
         if(function_exists($func_name)){
             $func_name();
         }
         else
             Functions::fatal_error("impossible d'appeler la fonction $func_name");
     }
-    elseif (!function_exists("affich_$custom_function".$_['page'])) {
+    elseif (!function_exists("affich_".$_['page'])) {
         Functions::fatal_error("aucun template n'as était donné pour l'affichage");
     }
     else{
-        $func_name = "affich_$custom_function".$_['page'];
+        $func_name = "affich_".$_['page'];
         if(function_exists($func_name)){
             $func_name();
         }
@@ -34,12 +30,7 @@ if($myUser->is_connect){
 else
     affich_sign("in");
 
-if(Functions::isAjax()){
-    echo json_encode($ajaxResponse->get_response());
-    die();
-}
-
-$debugObject->addCustomQuery("SELECT * FROM ".DB_PREFIX."users WHERE id=1");
+// $debugObject->addCustomQuery("SELECT * FROM ".DB_PREFIX."users WHERE id=1");
 $debugObject->addBasicDebug();
 
 

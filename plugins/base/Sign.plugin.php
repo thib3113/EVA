@@ -12,8 +12,8 @@ function affich_sign($way = null){
         Functions::redirect("index.php",null, 0);
 
     if($myUser->is_connect){
-        Plugins::callHook("pre_signout");
-        Plugins::callHook("signout");
+        Plugin::callHook("pre_signout");
+        Plugin::callHook("signout");
     }
     else{
         if(!empty($way) && $way == "in")
@@ -43,6 +43,6 @@ function disconnect(){
 }
 
 if($myUser->is_connect)
-    Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "sign","times", -1, array("sign" => "out")));
+    Plugin::addHook("header", "Configuration::addMenuItem", array("Deconnexion", "sign","fa-times", -1, array("sign" => "out")));
 
 Plugin::addHook("signout", "disconnect");
