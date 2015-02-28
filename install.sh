@@ -553,4 +553,18 @@ log "########################"
 log "## fin d'installation ##"
 log "########################"
 
+
+url=`/sbin/ifconfig eth0 | grep 'inet adr:' | cut -d: -f2 | awk '{ print $1}'`
+# get lighttpd port
+port=`cat /etc/lighttpd/lighttpd.conf | grep "server.port\s*=" | cut -d = -f2 | sed 's/\s*//' `
+document_root=`cat /etc/lighttpd/lighttpd.conf | grep server.document-root | awk -F "\"" '{print $2}'`
+
+if [ $port = 80 ]
+then
+    port=""
+else
+    port=":$port"
+fi
+
+echo "rendez vous à l'url http://${url}${port}${install_folder#$document_root} ( dans votre navigateur ) pour finaliser l'intallation"
 #TODO : système de post automatique de demande d'aide, avec un zip des logs
