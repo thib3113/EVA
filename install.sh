@@ -5,7 +5,7 @@
 ##############################
 
 # version de l'installateur, pour le debug
-ver_install=1.0.19
+ver_install=1.0.20
 # url du dépot à télécharger
 url_git="https://github.com/thib3113/EVA.git"
 
