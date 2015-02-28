@@ -542,7 +542,7 @@ else
     debug=0
 fi
 #si on arrive ici tout va bien, on génère le fichier de configuration :
-fichier_conf="<?php\n\trequire __DIR__.'/static.php';\n\n\tdefine('DB_TYPE','SQLITE');\n\tdefine('DB_PREFIX','EVA_');\n\tdefine('SYSTEM_USER', 'eva');\n\tdefine('DB_NAME', ROOT.'/db/.database.db');\n\tdefine('DB_HASH','sha512');\n\tdefine('LOG_FILE', '$install_folder/log/log.txt');\n\tdefine('DEBUG', $debug);"
+fichier_conf="<?php\n\trequire __DIR__.'/static.php';\n\n\tdefine('DB_TYPE','SQLITE');\n\tdefine('DB_PREFIX','EVA_');\n\tdefine('SYSTEM_USER', 'eva');\n\tdefine('DB_NAME', ROOT.'/db/.database.db');\n\tdefine('DB_HASH','sha512');\n\tdefine('LOG_FILE', '$log_folder/log.txt');\n\tdefine('MAX_LOG_FILE_SIZE', 20971520);//20 Mo\n\tdefine('DEBUG', $debug);"
 log "on crée un fichier de config : \n $fichier_conf"
 echo -e $fichier_conf > $install_folder/config.php
 cmd "chown eva:eva $install_folder/config.php"

@@ -74,7 +74,7 @@ function marketSearch(search_query){
   // window.location.pathname = "search-"+query;
   xhr = $.ajax({
       type: "GET",
-      url: "http://www.evaproject.net/api.php",
+      url: "http://www.evaproject.net/api/v1/",
       crossDomain: false,
       data: "get=market_search&query="+query+"&version="+program_version,
       success: function(json){

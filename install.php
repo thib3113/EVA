@@ -125,8 +125,8 @@ if(!empty($_['launch_install'])){
     if(empty($erreurs)){
         $config = new ConfigurationManager();
         $taskList[] = "création de la base ... ".check($config->sgbdCreate());
-        $taskList[] = "Ajout des infos ... ".check( 
-            $config->addConfig("base_url", "http".(!empty($_SERVER["HTTPS"])? "s" : "")."://".$_SERVER["SERVER_NAME"].dirname($_SERVER["PHP_SELF"]))
+        $taskList[] = "Ajout des Première configurations ... ".check( 
+            $config->addConfig("base_url", "http".(!empty($_SERVER["HTTPS"])? "s" : "")."://".$_SERVER["HTTP_HOST"].dirname($_SERVER["PHP_SELF"]))
         &&  $config->addConfig("base_version", PROGRAM_VERSION)
         &&  $config->addConfig("channel", "stable")
             );
@@ -138,11 +138,7 @@ if(!empty($_['launch_install'])){
 
         $user = new UsersManager();
         $taskList[] = "création de la table User ... ".check($user->sgbdCreate());
-        $dashboardList =  array(
-                        array("default", "position" => 0),
-                        array("actual_users", "position" => 1),
-                        array("lorem", "position" => 2),
-                        );
+        $dashboardList =  array("default","actual_users","lorem");
         $taskList[] = "Création de l'utilisateur ".$_['username'].' ... '.check($user->createUser(htmlspecialchars($_['username']), $_['pass'], htmlspecialchars($_['email']), 0, "", array(), $dashboardList));
 
         if($GLOBALS['error']){

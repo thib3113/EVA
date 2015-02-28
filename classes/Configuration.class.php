@@ -36,6 +36,7 @@ Class Configuration extends ConfigurationManager{
     public function addConfig($key, $value){
         $this->key=$key;
         $this->value=$value;
+        $this->id = null;
         $return = $this->sgdbSave();
         self::fetch_config();
         return $return;

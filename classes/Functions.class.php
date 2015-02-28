@@ -10,7 +10,7 @@ Class Functions extends SgdbManager{
         global $system;
 
             $timestamp = date("r", time());
-            if(filesize(LOG_FILE) > MAX_LOG_FILE_SIZE)
+            if(is_file(LOG_FILE) && filesize(LOG_FILE) > MAX_LOG_FILE_SIZE)
                 unlink(LOG_FILE);
 
             $cmd = "sudo -u ".SYSTEM_USER." echo ".escapeshellarg(preg_replace("~\*~", "\*", "$label : $timestamp : $log") )." | sudo -u ".SYSTEM_USER." tee -a ".LOG_FILE;
