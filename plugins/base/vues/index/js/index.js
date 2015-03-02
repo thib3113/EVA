@@ -7,7 +7,7 @@ $(function () {
 
     $( "#dashboard" ).sortable({ 
         items: "> .sortable ",
-        cancel: "a,button,.panel-body,.selectable_text",
+        cancel: "a,button,.no-drag",
         stop: function( event, ui ) {
             new_order = [];
             $("#dashboard > .sortable").each(function( i ){
@@ -20,6 +20,31 @@ $(function () {
             // console.log(ui);
         },
     });
+
+    $("body").on("click", ".toggle_widget", function(){
+        $(this.parentNode.parentNode).children(".panel-body").slideToggle(500);
+        this.style.transform=(this.style.transform=='rotate(180deg)')?'rotate(0deg)':'rotate(180deg)';
+    });
+
+    $("body").on("click", ".widget_menu_icon", function(event){
+        widget_id = $(this).parents(".dashboard_element").data("id");
+        // $(this).parents(".panel-heading").children(".widget_menu").children(".widget_config").show('slide', {direction: 'right'}, 500);
+        $(".widget_menu").removeClass("active");
+        $("[data-id="+widget_id+"] .widget_menu").addClass("active");
+        event.stopPropagation();
+    })
+
+    $("body").on("click", '.widget_menu', function(event){
+        event.stopPropagation();
+    });
+
+    $("html").click(function(){
+        $(".widget_menu").each(function(index, element){
+            // $(element).parents(".panel-heading").children(".widget_menu").children(".widget_config").hide('slide', {direction: 'right'}, 500);
+            // $(element).children(".widget_config").hide();
+            $(element).removeClass("active");
+        })
+    })
 
     $("#add_dashboard").click(function(){
         dashboard.askNewWidget();

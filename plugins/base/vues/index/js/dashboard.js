@@ -72,7 +72,6 @@ function dashboard(){
     }
 
     this.newOrder = function(newOrder){
-        console.log(newOrder);
         //on évite la requete si l'ordre n'as pas changé
         if(JSON.stringify(newOrder) == JSON.stringify(this.order))
             return false;
@@ -182,7 +181,7 @@ function dashboard(){
     this.createWaitingWidget = function(id){
         loader_text = '<svg class="loader" width="20px" height="20px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle></svg>';
         // loader_text = '<div class="outline"><div class="circle"></div></div>';
-        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center">'+loader_text+'</div></div></div>');
+        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="no-drag">Chargement du widget</span></div><div class="panel-body text-center">'+loader_text+'</div></div></div>');
     }
 
     //execution
@@ -190,3 +189,4 @@ function dashboard(){
     this.getCurrentWidget();
 
 }
+

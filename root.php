@@ -23,7 +23,7 @@ function error_handler( $errno , $errstr , $errfile , $errline, $errcontext){
 		case 'E_ALL':$erreur="E_ALL";break;
 		default: $erreur='E_UNKNOW';break;
 	}
-	Functions::log("$erreur : $errstr FILE $errfile LINE $errline");
+	// Functions::log("$erreur : $errstr FILE $errfile LINE $errline");
 	return false;
 }
 @session_start();

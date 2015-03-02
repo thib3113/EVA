@@ -71,7 +71,26 @@ function widget(parent, name, id, special, new_widget){
         if(!this.HTML){
             switch(type){
                 case "widget":
-                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n<div class="panel full_height panel-default">\n<div class="panel-heading"><span class="selectable_text">'+this.title+'</span><span class="float_right selectable_text toggle_widget" style="cursor:pointer" onclick="$(this.parentNode.parentNode.getElementsByTagName(\'div\')[1]).slideToggle(500);this.style.transform=(this.style.transform==\'rotate(180deg)\')?\'rotate(0deg)\':\'rotate(180deg)\';"><i class="fa fa-angle-double-down"></i></span></div>\n<div class="panel-body">'+this.content+'\n</div>\n</div>\n</div>');
+                    $('#dashboard_id_'+this.id).replaceWith('\t\t\t<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n\
+\t\t\t\t<div class="panel full_height panel-default">\n\
+\t\t\t\t\t<div class="panel-heading">\n\
+\t\t\t\t\t\t<span class="no-drag">'+this.title+'</span>\
+\t\t\t\t\t\t<span class="widget_menu_icon float_right no-drag" style="cursor: pointer;">\
+\t\t\t\t\t\t\t<i class="md-apps"></i>\
+\t\t\t\t\t\t</span>\
+\t\t\t\t\t\t<span class="float_right no-drag toggle_widget" style="cursor:pointer">\
+\t\t\t\t\t\t\t<i class="md-expand-more"></i>\
+\t\t\t\t\t\t</span>\
+\t\t\t\t\t\t<div class="widget_menu no-drag">\n\
+\t\t\t\t\t\t\t<span class="widget_config">MENU\n\
+\t\t\t\t\t\t\t</span>\
+\t\t\t\t\t\t</div>\
+\t\t\t\t\t</div>\n\
+\t\t\t\t\t<div class="panel-body no-drag">\n\
+\t\t\t\t\t\t'+this.content+'\n\
+\t\t\t\t\t</div>\n\
+\t\t\t\t</div>\n\
+\t\t\t</div>');
                 break;
 
                 case "waiting":
@@ -80,9 +99,9 @@ function widget(parent, name, id, special, new_widget){
                     code_loader = '<div class="loader"><svg class="circular"><circle class="path" cx="30" cy="30" r="20" fill="none" stroke-width="5" stroke-miterlimit="10"/></svg></div>';
 
                     if(!$('#dashboard_id_'+this.id).length)
-                        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
+                        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="no-drag">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
                     else
-                        $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="selectable_text">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
+                        $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="no-drag">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
                 break;
 
                 case "addNewWidget":
@@ -91,11 +110,11 @@ function widget(parent, name, id, special, new_widget){
                         list += '\t\t<option value="'+this.donneesRecu.widget_list[i][0]+'">'+this.donneesRecu.widget_list[i][1]+'</option>\n';
                     };
                     list += '\t\t</select>';
-                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+(this.id)+'" data-id="'+(this.id)+'"><div class="panel full_height panel-default"><div class="panel-heading">Ajouter un nouveau widget<span class="float_right selectable_text"  style="cursor:pointer" onclick="$(this.parentNode.parentNode.parentNode).remove();">X</span></div><div class="panel-body">\n'+list+'\n</div></div></div>');
+                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+(this.id)+'" data-id="'+(this.id)+'"><div class="panel full_height panel-default"><div class="panel-heading">Ajouter un nouveau widget<span class="float_right no-drag"  style="cursor:pointer" onclick="$(this.parentNode.parentNode.parentNode).remove();">X</span></div><div class="panel-body">\n'+list+'\n</div></div></div>');
                 break;
 
                 case "error":
-                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="selectable_text">Erreur lors du chargement du widget</span></div><div class="panel-body text-center"><i style="color: rgb(183, 10, 10);" class="fa fa-exclamation-triangle fa-5x"></i><br>'+this.message+'</div></div></div>');
+                    $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="no-drag">Erreur lors du chargement du widget</span></div><div class="panel-body text-center"><i style="color: rgb(183, 10, 10);" class="fa fa-exclamation-triangle fa-5x"></i><br>'+this.message+'</div></div></div>');
                 break;
             }
         }

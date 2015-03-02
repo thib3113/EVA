@@ -49,6 +49,7 @@
     base_url = "{$template_infos.configs.base_url}";
     api_url = "{$template_infos.configs.base_url}/api/v1/";
     program_version  = "{$smarty.const.PROGRAM_VERSION}";
+    distant_api  = "{$smarty.const.DISTANT_API};";
     </script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
