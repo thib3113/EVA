@@ -1,3 +1,4 @@
+
 .float_right{
     float:right;
 }
@@ -60,6 +61,7 @@
 
 html,
 body {
+    min-width: 323px;
     height: 100%;
 }
 body { padding-bottom: 70px; }
@@ -104,6 +106,7 @@ body { padding-bottom: 70px; }
 
 .dashboard_element{
     margin-bottom: 20px;
+    min-width: 115px;
 }
 
 .dashboard_element .panel{
@@ -163,11 +166,11 @@ body { padding-bottom: 70px; }
     animation-timing-function: cubic-bezier(0.79,0,0.54,0.99);
 }
 
-.sortable .panel-heading{
+.sortable{
     cursor:move;
 }
 
-.sortable .panel-heading .no-drag{
+.no-drag{
     cursor:auto;
 }
 
@@ -187,25 +190,58 @@ body { padding-bottom: 70px; }
     margin-bottom: 0;
 }
 
-.widget_menu.active {
-  width: 120px;
-  height: 120px;
-}
 .widget_menu {
   float: right;
   border: 1px solid whitesmoke;
-  height: 0;
-  width: 0;
   position: absolute;
   background: white;
   overflow: hidden;
   top: 10px;
-  -webkit-transition: width 0.5s ease-in-out ,height 0.5s ease-in-out;
-  -moz-transition: width 0.5s ease-in-out ,height 0.5s ease-in-out;
-  -o-transition: width 0.5s ease-in-out ,height 0.5s ease-in-out;
-  transition: width 0.5s ease-in-out ,height 0.5s ease-in-out;
+  -webkit-transition: max-width 0.5s ease-in-out ,max-height 0.5s ease-in-out;
+  -moz-transition: max-width 0.5s ease-in-out ,max-height 0.5s ease-in-out;
+  -o-transition: max-width 0.5s ease-in-out ,max-height 0.5s ease-in-out;
+  transition: max-width 0.5s ease-in-out ,max-height 0.5s ease-in-out;
   right: 35px;
   opacity: 1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.widget_config{
+  white-space: nowrap;
+  height: 60px;
+  font-size: 0;
+}
+
+
+.widget_config .config {
+  display: inline-block;
+  vertical-align: top;
+  white-space: normal;
+  line-height: 3;
+  text-align: center;
+  font-size: initial;
+}
+
+.config-icon{
+  font-size: 17pt;
+  cursor: pointer;
+  -webkit-transition:-webkit-transform 0.5s ;
+  -moz-transition:-moz-transform 0.5s ;
+  -o-transition:-o-transform 0.5s ;
+  transition:transform 0.5s ;
+  position: relative;
+  top: -4px;
+}
+
+.widget_config .config .config-icon{
+  height: 60px;
+  width: 60px;
+  position: initial;
+  top:initial;
+}
+
+.widget_config .config .config-icon:hover{
+  background: whitesmoke;
 }
 
 .btn-connexion{
@@ -213,12 +249,6 @@ body { padding-bottom: 70px; }
     border-top-right-radius: 0;
 }
 
-.toggle_widget{
-    -webkit-transition:-webkit-transform 0.5s ;
-    -moz-transition:-moz-transform 0.5s ;
-    -o-transition:-o-transform 0.5s ;
-    transition:transform 0.5s ;
-}
 
 /* loading by http://codepen.io/jovanChe/pen/IzHuo */
 .loader_content .panel-body{

@@ -140,7 +140,7 @@ Class Configuration extends ConfigurationManager{
         self::$css_list[] = $url;
     }
 
-    public static function addDashboardWidget($title, $function, $position, $width = 4){
+    public static function addWidgetWidget($title, $function, $position, $width = 4){
         if(!empty(self::$DashboardWidgetList[$title]))
             return false;
         

@@ -1,11 +1,11 @@
-function widget(parent, name, id, special, new_widget){
+function widget(parent, widget_info, id, special, new_widget){
     this.id = id;
     this.donneesRecu;
     this.title;
     this.content;
-    this.width;
     this.HTML;
-    this.name = name;
+    this.name = widget_info.name;
+    this.width = widget_info.width;
     this.ajaxConnexion;
     this.resizable;
     this.widgetType = (typeof(special) != "undefined")? special : false;
@@ -36,6 +36,12 @@ function widget(parent, name, id, special, new_widget){
         return ($.isNumeric(this.width)? this.width : 4);
     }
 
+    this.changeWidth = function(width){
+        $('#dashboard_id_'+this.id).removeClass("col-sm-"+this.width).removeClass("col-md-"+this.width).removeClass("col-lg-"+this.width);
+        this.setWidth(width);
+        $('#dashboard_id_'+this.id).addClass("col-sm-"+this.getWidth()).addClass("col-md-"+this.getWidth()).addClass("col-lg-"+this.getWidth());
+    }   
+
     this.setId = function(id){
         this.id = id;
     }
@@ -57,7 +63,7 @@ function widget(parent, name, id, special, new_widget){
     }
 
     this.setWidth = function(width){
-        this.width = width;
+        this.width = parseInt(width);
     }
 
     this.setHTML = function(HTML){
@@ -71,20 +77,40 @@ function widget(parent, name, id, special, new_widget){
         if(!this.HTML){
             switch(type){
                 case "widget":
-                    $('#dashboard_id_'+this.id).replaceWith('\t\t\t<div class="col-sm-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-id="'+this.id+'">\n\
+                    $('#dashboard_id_'+this.id).replaceWith('\t\t\t<div class="col-sm-'+this.getWidth()+' col-md-'+this.getWidth()+' col-lg-'+this.getWidth()+' tiers_height dashboard_element sortable" id="dashboard_id_'+this.id+'" data-widget-id="'+this.id+'">\n\
 \t\t\t\t<div class="panel full_height panel-default">\n\
 \t\t\t\t\t<div class="panel-heading">\n\
-\t\t\t\t\t\t<span class="no-drag">'+this.title+'</span>\
-\t\t\t\t\t\t<span class="widget_menu_icon float_right no-drag" style="cursor: pointer;">\
-\t\t\t\t\t\t\t<i class="md-apps"></i>\
-\t\t\t\t\t\t</span>\
-\t\t\t\t\t\t<span class="float_right no-drag toggle_widget" style="cursor:pointer">\
-\t\t\t\t\t\t\t<i class="md-expand-more"></i>\
-\t\t\t\t\t\t</span>\
-\t\t\t\t\t\t<div class="widget_menu no-drag">\n\
-\t\t\t\t\t\t\t<span class="widget_config">MENU\n\
-\t\t\t\t\t\t\t</span>\
-\t\t\t\t\t\t</div>\
+\t\t\t\t\t\t<span class="widget_menu_icon float_right no-drag config-icon">\n\
+\t\t\t\t\t\t\t<i class="md-apps"></i>\n\
+\t\t\t\t\t\t</span>\n\
+\t\t\t\t\t\t<span data-role="toggle_widget" class="float_right hidden-xs no-drag config-icon">\n\
+\t\t\t\t\t\t\t<i class="md-expand-more"></i>\n\
+\t\t\t\t\t\t</span>\n\
+\t\t\t\t\t\t<span class="no-drag">'+this.title+'</span>\n\
+\t\t\t\t\t\t<div style="display:none;" class="widget_menu no-drag">\n\
+\t\t\t\t\t\t\t<div class="widget_config">\n\
+\t\t\t\t\t\t\t\t<div class="config">\n\
+\t\t\t\t\t\t\t\t\t<div data-role="toggle_widget" class="config-icon hidden-md hidden-sm hidden-lg">\n\
+\t\t\t\t\t\t\t\t\t\t<i class="md-expand-more"></i>\n\
+\t\t\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t\t\t<div class="config">\n\
+\t\t\t\t\t\t\t\t\t<div class="config-icon" data-role="change_width" style="position: relative;top: -4px;height: 64px;">\n\
+\t\t\t\t\t\t\t\t\t\t↔\n\
+\t\t\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t\t\t<div class="config">\n\
+\t\t\t\t\t\t\t\t\t<div data-role="refresh_widget" class="config-icon">\n\
+\t\t\t\t\t\t\t\t\t\t<i class="md-refresh"></i>\n\
+\t\t\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t\t\t<div class="config">\n\
+\t\t\t\t\t\t\t\t\t<div class="config-icon">\n\
+\t\t\t\t\t\t\t\t\t\t<i class="md-close"></i>\n\
+\t\t\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t</div>\n\
 \t\t\t\t\t</div>\n\
 \t\t\t\t\t<div class="panel-body no-drag">\n\
 \t\t\t\t\t\t'+this.content+'\n\
@@ -99,9 +125,9 @@ function widget(parent, name, id, special, new_widget){
                     code_loader = '<div class="loader"><svg class="circular"><circle class="path" cx="30" cy="30" r="20" fill="none" stroke-width="5" stroke-miterlimit="10"/></svg></div>';
 
                     if(!$('#dashboard_id_'+this.id).length)
-                        $("#add_dashboard").before('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="no-drag">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
+                        $("#add_dashboard").before('<div class="col-sm-'+(!isNaN(this.width)? this.width : 4)+' tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="no-drag">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
                     else
-                        $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-4 tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="no-drag">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
+                        $('#dashboard_id_'+this.id).replaceWith('<div class="col-sm-'+(!isNaN(this.width)? this.width : 4)+' tiers_height dashboard_element" id="dashboard_id_'+this.id+'" data-id="'+this.id+'"><div class="panel full_height panel-default loader_content"><div class="panel-heading"><span class="no-drag">Chargement du widget</span></div><div class="panel-body text-center">'+code_loader+'</div></div></div>');
                 break;
 
                 case "addNewWidget":

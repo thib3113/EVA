@@ -51,6 +51,7 @@ Class User extends SgdbManager{
             }
         }
         parent::__construct();
+
     }
 
     public function is_admin(){
@@ -75,153 +76,9 @@ Class User extends SgdbManager{
         }
     }
 
-    // public function createSession($cookie = false){
-
-    //     //on génère un nouveau token
-    //     $this->setToken();
-    //     $this->_query("UPDATE ".DB_PREFIX.$this->uid_table_name." SET token=? WHERE uid=?", array($this->current_token, $this->current_uid), __FILE__, __LINE__);
-
-    //     //on génère les variables d'informations
-    //     $GLOBALS['is_connect'] = true;
-    //     $this->is_connect = true;
-    //     $this->is_admin();
-
-
-    //     //on crée la session
-    //     $_SESSION[$this->session_name] = serialize(array($this->username, $this->current_uid, $this->current_token));
-    //     $_SESSION[$this->session_connect] = !empty($_COOKIE['PHPSESSID'])? $_COOKIE['PHPSESSID'] : SID;
-
-    //     //et un cookie au besoin
-    //     if($cookie || !empty($_COOKIE[$this->cookie_name])){
-    //         setcookie($this->cookie_name, $_SESSION[$this->session_name], time()+$this->cookie_time, '/' );
-    //     }
-
-    //     $this->saveIp();
-
-    // }
-
-    // public function setToken(){
-    //     $this->current_token = Functions::randomStr(rand(100, 127));
-    //     $this->_query("UPDATE ".DB_PREFIX.$this->uid_table_name." SET token=?, time=?  WHERE uid=?", array($this->current_token, time(), $this->current_uid), __FILE__, __LINE__);
-
-    //     return true;
-    // }
-    // public function generateUid(){
-    //     $uid = rand(0,9);
-
-    //     for ($i=0; $i <= 20 ; $i++) {
-    //         $uid .= rand(0,9);
-    //     }
-
-    //     $this->current_uid = $uid;
-    // }
-
-    // public function saveIp(){
-    //     if(!in_array($_SERVER['REMOTE_ADDR'], $this->current_ip_list)){
-    //         $this->current_ip_list[] = $_SERVER['REMOTE_ADDR'];
-    //         $this->_query("UPDATE ".DB_PREFIX.$this->uid_table_name." SET ips=? WHERE uid=?", array(serialize($this->current_ip_list), $this->current_uid), __FILE__, __LINE__);
-    //     }
-
-    // }
-
-    // public function set_uid_infos(){
-    //     if(!empty($this->current_uid)){
-    //         $result = SgdbManager::sgbdSelect(array('*'), array("uid" => $this->current_uid), "uid", null, null, null,  __FILE__, __LINE__ );
-    //         $result = $result->fetch();
-    //     }
-    //     else{
-    //         $result = SgdbManager::sgbdSelect(array('*'), array("browser_infos" => $_SERVER['HTTP_USER_AGENT']), "uid", null, null, null,  __FILE__, __LINE__ );
-    //         $result = $result->fetch();
-    //         if(!$result){
-    //             $this->generateUid();
-    //             $result['uid'] = $this->current_uid;
-    //             $result['token'] = "";
-    //             $result['ips'] = serialize(array($_SERVER['REMOTE_ADDR']));
-    //             $this->_query("INSERT INTO ".DB_PREFIX.$this->uid_table_name." (uid, browser_infos, ips, id, time) VALUES (?, ?, ?, ?, ?)", array($this->current_uid, $_SERVER['HTTP_USER_AGENT'], $result['ips'], $this->id, time() ), __FILE__, __LINE__);
-    //         }
-    //     }
-    //     $this->current_ip = $_SERVER['REMOTE_ADDR'];
-    //     $this->current_ip_list = Functions::secureUnserialize($result['ips']);
-    //     $this->current_user_agent = $_SERVER['HTTP_USER_AGENT'];
-    //     $this->current_uid = $result['uid'];
-    //     $this->current_token = $result['token'];
-    //     return true;
-    // }
-
-    // private function fillObject($id){
-    //     if(!is_numeric($id))
-    //         return false;
-
-    //         $result = self::sgbdSelect( array_keys($this->object_fields) , array("id" => $id), null, null, null, null, __FILE__, __LINE__);
-    //         $result = $result->fetch();
-    //         $i = 0;
-    //         foreach($this->object_fields as $field=>$type){
-    //                 $this->$field = $result[$field];
-    //                 $i++;
-    //         }
-    // }
-
     public function disconnect(){
         $this->connection->close();
     }
-
-
-    // public function isConnect(){
-    //     if(!empty($_COOKIE[$this->cookie_name])){ //si le cookie existe
-    //         //on crée la session correspondante ( qui fonctionnera, ou pas )
-    //         $_SESSION[$this->session_name] = $_COOKIE[$this->cookie_name];
-    //     }
-
-    //     // Bien, mais en ajax, mais pose des probleme avec les requete ajax asynchrone
-    //     if(isset($_SESSION[$this->session_name])){ //on regarde si la session existe
-    //         $session_infos = $_SESSION[$this->session_name]; //on renomme la session
-    //         $session_infos = unserialize($session_infos);
-
-    //         //on met les bons résultats dans les bonnes variables
-    //         $this->username = $session_infos[0];
-    //         $this->current_uid = $session_infos[1];
-    //         $this->current_token = $session_infos[2];
-
-    //         $result = SgdbManager::sgbdSelect(array('*'), array("username" => $this->username), null, null, null, null,  __FILE__, __LINE__ );
-    //         $result = $result->fetch();
-
-
-
-    //         if(empty($result))
-    //             return false;
-
-
-    //         $this->id = $result['id'];
-    //         $this->set_uid_infos();
-
-    //         //permet de sauter la vérification du token . Cela permet d'avoir 2 requètes ajax asynchrone
-    //         if(isset($_SESSION[$this->session_connect]) && $_SESSION[$this->session_connect] == empty($_COOKIE['PHPSESSID'])? $_COOKIE['PHPSESSID'] : SID){
-
-    //             $this->fillObject($result['id']);
-    //             //si le token est bon on connecte
-    //             $this->createSession();
-    //             return $this;
-    //         }
-
-    //         //on vérifie que le token soit le bon
-    //         if($this->current_token != $this->current_token){
-    //             //le token n'es pas bon, on le change donc pour éviter le bruteforce
-    //             $this->setToken();
-
-    //             //on efface le cookie et la session
-    //             $this->disconnect();
-
-    //             return false;
-    //         }
-    //         else{
-    //             $this->fillObject($result['id']);
-    //             //si le token est bon on connecte
-    //             $this->createSession();
-    //             return $this;
-    //         }
-    //     }
-
-    // }
 
     public function getUserInfos(){
         $id = $this->id;
@@ -234,27 +91,27 @@ Class User extends SgdbManager{
 
     }
 
-    public function createUser($username, $pass, $email, $g_id = null){
-        if(empty($g_id) )
-            $g_id = $this->default_g_id;
+    // public function createUser($username, $pass, $email, $g_id = null){
+    //     if(empty($g_id) )
+    //         $g_id = $this->default_g_id;
 
-        if(!$this->setUsername($username))
-            return false;
-        if(!$this->setPass($pass, $username, true))
-            return false;
-        if(!$this->setEmail($email))
-            return false;
-        if(!$this->setGroupId($g_id))
-            return false;
-        if(!$this->setCreateTime(time()))
-            return false;
-        if(!$this->setAvatar(""))
-            return false;
-        if(!$this->sgdbSave())
-            return false;
+    //     if(!$this->setUsername($username))
+    //         return false;
+    //     if(!$this->setPass($pass, $username, true))
+    //         return false;
+    //     if(!$this->setEmail($email))
+    //         return false;
+    //     if(!$this->setGroupId($g_id))
+    //         return false;
+    //     if(!$this->setCreateTime(time()))
+    //         return false;
+    //     if(!$this->setAvatar(""))
+    //         return false;
+    //     if(!$this->sgdbSave())
+    //         return false;
 
-        return true;
-    }
+    //     return true;
+    // }
 
     /**
      * Gets the value of id,.
@@ -311,22 +168,29 @@ Class User extends SgdbManager{
         $this->plugins_list = $plugins_list;
     }
 
-    public function setDashboardList(array $dashboard_list){
+    public function setWidgetList(array $dashboard_list){
         $this->dashboard_list = $dashboard_list;
     }
 
-    public function addDashboard(array $dashboard){
+    public function setWidgetSize($name, $new_size){
+        $widget_list = $this->getWidgetList();
+        foreach ($widget_list as $key => $value) {
+            if($value["name"] == $name)
+                $widget_list[$key]["width"] = $new_size;
+        }
+        $this->setWidgetList($widget_list);
+    }
+
+    public function addWidget($dashboard, $width){
+        if($width>1)
+            $width = $width*12;
+
+        $widget = array("name" => $dashboard, "width" => $width);
+
         $currentDashboardList = $this->dashboard_list;
-        // var_dump($currentDashboardList);
-
-        if(!is_array($dashboard))
-            return false;
-
-        if(empty($dashboard["position"]))
-            $dashboard["position"] = count($this->dashboard_list);
-
-        $currentDashboardList[] = $dashboard;
-        $this->setDashboardList($currentDashboardList);
+        
+        $currentDashboardList[] = $widget;
+        $this->setWidgetList($currentDashboardList);
     }
 
     public function getUsername(){
@@ -341,7 +205,16 @@ Class User extends SgdbManager{
         return Functions::secureUnserialize($this->plugins_list);
     }
 
-    public function getDashboardList(){
+    public function getWidget($widget_name){
+        $widget_list = $this->getWidgetList();
+        foreach ($widget_list as $widget) {
+            if($widget["name"] == $widget_name)
+                return $widget;
+        }
+        return false;
+    }
+
+    public function getWidgetList(){
         $dashboard_list = array();
         if(!is_array($this->dashboard_list) && Functions::isSerialize($this->dashboard_list))
             $dashboard_list_temp = unserialize($this->dashboard_list);

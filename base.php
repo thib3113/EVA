@@ -55,4 +55,3 @@ Configuration::addJs("vues/js/idle.min.js");
 Configuration::addJs("vues/js/libs.js");
 //debuguer perso
 Configuration::addJs("vues/js/debug.js");
-

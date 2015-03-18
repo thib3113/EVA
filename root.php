@@ -1,4 +1,5 @@
 <?php
+ob_start();
 define('TIME_START',microtime(true));
 ini_set("log_errors", 1);
 error_reporting(E_ALL);

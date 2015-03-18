@@ -1,7 +1,6 @@
 <?php
 //on définis le root
 define('ROOT', dirname(dirname(__DIR__)));
-ob_start();
 //on inclus les fichiers de base
 require ROOT.'/base.php';
 

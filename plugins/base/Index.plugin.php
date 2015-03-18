@@ -24,7 +24,7 @@ function affich_index(){
 //     global $myUser, $ajaxResponse, $_, $system;
 //     if($myUser->is_connect){
 //         //debuguage uniquement
-//         // $myUser->setDashboardList(array(
+//         // $myUser->setWidgetList(array(
 //         //     array("default", "position" => 0),
 //         //     array("actual_users", "position" => 1),
 //         //     array("lorem", "position" => 2),
@@ -34,14 +34,14 @@ function affich_index(){
 //         if (!empty($_['dashboard'])) {
 
 //             if(!empty($_['new_widget']) && $_['new_widget'] == 1){
-//                 $myUser->addDashboard(array($_['dashboard']));
+//                 $myUser->addWidget(array($_['dashboard']));
 //                 $myUser->sgdbSave();
 //             }
 //             // var_dump($myUser->dashboard_list);
 //             switch ($_['dashboard']) {
 //                 //getters
 //                 case 'get_all':
-//                     $ajaxResponse->set_response(array("status" => true, "dashboard_list" => $myUser->getDashboardList(), "message" => "ok"));
+//                     $ajaxResponse->set_response(array("status" => true, "dashboard_list" => $myUser->getWidgetList(), "message" => "ok"));
 //                 break;
 //                 case 'get_list':
 //                     $list_widget = Plugin::getHookList();
@@ -78,7 +78,7 @@ function affich_index(){
 //         }
 
 //         if(!empty($_['change_order'])){
-//             $old_list = $myUser->getDashboardList();
+//             $old_list = $myUser->getWidgetList();
 //             $i=0;
 //             foreach ($_['change_order'] as $key => $value) {
 //                 $new_list[] = array($old_list[$value], "position" => $key);
@@ -86,7 +86,7 @@ function affich_index(){
 //                 $i++;
 //             }
 
-//             $myUser->setDashboardList($new_list);
+//             $myUser->setWidgetList($new_list);
 //             $myUser->sgdbSave();
 
 //             $return['status'] = true;

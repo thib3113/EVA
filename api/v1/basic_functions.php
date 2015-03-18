@@ -67,7 +67,7 @@ function API_GET_WIDGET_ALL(&$return){
     if($myUser->is_connect){
         $return = array(
                         "status" => true, 
-                        "dashboard_list" => $myUser->getDashboardList(),
+                        "dashboard_list" => $myUser->getWidgetList(),
                         "message" => "ok",
                         "error_code" => 200,
                         );
@@ -104,7 +104,7 @@ function API_GET_WIDGET_DEFAULT(&$return){
         $return = array(
                         'status' => true,
                         "dash_content" => "Bienvenue sur E.V.A, enjoy !",
-                        "dash_width" => 12,
+                        "dash_width" => $myUser->getWidget("DEFAULT")["width"],
                         "dash_title" => "Widget par défaut",
                         "error_code" => 200,
                         );
@@ -120,6 +120,7 @@ function API_GET_WIDGET_NETWORK(&$return){
                         'status' => true, 
                         "dash_title" => "Réseau",
                         "dash_content" => $system->getNetworkInfos() ,
+                        "dash_width" => $myUser->getWidget("NETWORK")["width"],
                         "error_code" => 200,
                         );
     }
@@ -137,7 +138,7 @@ function API_GET_WIDGET_ACTUAL_USERS(&$return){
                         "message" => "ok", 
                         "dash_title" => "User actif", 
                         "dash_content" => $content, 
-                        "dash_width" => 4,
+                        "dash_width" => $myUser->getWidget("ACTUAL_USERS")["width"],
                         "error_code" => 200,
                         );
     }
@@ -150,8 +151,10 @@ function API_GET_WIDGET_LOREM(&$return){
     if($myUser->is_connect){
         $return = array(
                         "status" => true,
-                        "message" => "ok", "dash_title" => "lorem",
+                        "message" => "ok",
+                        "dash_title" => "lorem",
                         "dash_content" => "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam aut sequi nobis corporis veniam voluptatem reiciendis animi necessitatibus fugit! At quos dolor iusto libero. Ullam reiciendis, soluta ea dolore distinctio. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet eaque neque quaerat voluptates obcaecati aspernatur, minima iure quas. Natus ea eius voluptates. Sed iure, iste omnis natus similique quidem fugit",
+                        "dash_width" => $myUser->getWidget("LOREM")["width"],
                         "error_code" => 200,
                         );
     }
@@ -275,12 +278,12 @@ function API_SET_WIDGET_LIST(&$return){
     global $API, $myUser, $_;
     if($myUser->is_connect){
         if(!empty($_["widget_list"])){
-            $myUser->setDashboardList($_["widget_list"]);
+            $myUser->setWidgetList($_["widget_list"]);
             $myUser->sgdbSave();
             $return["status"] = true;
             $return["message"] = "widget add";
             $return["message"] = $_["widget_list"];
-            $return["dash"] = $myUser->getDashboardList();
+            $return["dash"] = $myUser->getWidgetList();
             $return["error_code"] = 200;
         }
         else{
@@ -296,7 +299,7 @@ function API_SET_WIDGET_ORDER(&$return){
     global $API, $myUser, $_;
     if($myUser->is_connect){
         if(!empty($_["change_order"])){
-            $old_list = $myUser->getDashboardList();
+            $old_list = $myUser->getWidgetList();
             $i=0;
             foreach ($_['change_order'] as $key => $value) {
                 $new_list[$key] = $old_list[$value];
@@ -305,7 +308,7 @@ function API_SET_WIDGET_ORDER(&$return){
             }
             ksort($new_list);
 
-            $myUser->setDashboardList($new_list);
+            $myUser->setWidgetList($new_list);
             $myUser->sgdbSave();
 
             $return['status'] = true;
@@ -316,6 +319,27 @@ function API_SET_WIDGET_ORDER(&$return){
             $return["message"] = "parametre incorrects";
             $return["error_code"] = 400;
         }        
+    }
+    else
+        $return = $API["NEED_AUTH"];
+
+}
+
+function API_SET_WIDGET_WIDTH(&$return){
+    global $API, $myUser, $_;
+    if($myUser->is_connect){
+        if(!empty($_["new_width"]) && !empty($_["widget_name"])){
+            $myUser->setWidgetSize($_["widget_name"], $_["new_width"]);
+            $myUser->sgdbSave();
+
+            $return['status'] = true;
+            $return['message'] = "mise à jour de la taille réussie";
+            $return["error_code"] = 200;
+        }
+        else{
+            $return["message"] = "parametre incorrects";
+            $return["error_code"] = 400;
+        }
     }
     else
         $return = $API["NEED_AUTH"];
@@ -336,6 +360,7 @@ Plugin::addHook("API_GET_WIDGET_ALL", "API_GET_WIDGET_ALL", array(&$return));
 Plugin::addHook("API_GET_WIDGET_LIST", "API_GET_WIDGET_LIST", array(&$return));
 Plugin::addHook("API_SET_WIDGET_LIST", "API_SET_WIDGET_LIST", array(&$return));
 Plugin::addHook("API_SET_WIDGET_ORDER", "API_SET_WIDGET_ORDER", array(&$return));
+Plugin::addHook("API_SET_WIDGET_WIDTH", "API_SET_WIDGET_WIDTH", array(&$return));
 
 //liste de widget initiaux
 Plugin::addHook("API_GET_WIDGET_DEFAULT", "API_GET_WIDGET_DEFAULT", array(&$return), array("title" => "DEFAULT"));

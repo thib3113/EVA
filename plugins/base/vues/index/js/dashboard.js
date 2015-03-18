@@ -5,6 +5,7 @@ function dashboard(){
     this.widgets = [];
     this.nextWidgetId = 0;
     this.newOrderRequest;
+    this.newWidthRequest = null;
     this.order = [];
 
     this.setDonneesRecu = function(DonneesRecu){
@@ -31,6 +32,10 @@ function dashboard(){
 
     this.getCurrentWidgetList = function(currentWidgetList){
         return this.currentWidgetList;
+    }
+
+    this.getWidgetById = function(id){
+        return this.widgets[id];
     }
 
     this.getNextWidgetId = function(nextWidgetId){
@@ -71,7 +76,54 @@ function dashboard(){
         });
     }
 
+    this.setWidgetWidth = function(widget_id, width){
+        w = this.getWidgetById(widget_id);
+        w.changeWidth(width);
+        if(this.newWidthRequest != null )
+            this.newWidthRequest.abort();
+
+        this.newWidthRequest = $.ajax({
+            url: api_url+'?type=SET&API=WIDGET_WIDTH',
+            datatype: 'JSON',
+            type: "POST",
+            data: {widget_name: w.name, new_width: width, expiration : new Date().getTime()+3000},
+            success: function(data){
+                try{
+                    donneesRecu = $.parseJSON(data);
+                    if(donneesRecu.status){
+                        parent.setDonneesRecu(donneesRecu);
+                    }
+                    else{
+                        return false;
+                    }
+                }
+                catch(e){
+                    notify("error", "une erreur s'est produite lors de la mise à jour de l'ordre des widgets");
+                    console.log(e);
+                }
+            },
+            error: function(data){
+                notify("error", "une erreur s'est produite lors de la mise à jour de l'ordre des widgets");
+            }
+        });
+    }
+
+    this.removeWidget = function(id){
+        
+    }
+
+    this.refreshWidget = function(id){
+        this.widgets[id] = new widget(this, this.widgets[id], id);
+    }
+
     this.newOrder = function(newOrder){
+
+        //si le tableau n'as qu'une valeur, il n'y à pas d'ordre
+        if(newOrder.length < 2)
+            return false;
+
+        console.log(JSON.stringify(newOrder));
+        console.log(JSON.stringify(this.order));
         //on évite la requete si l'ordre n'as pas changé
         if(JSON.stringify(newOrder) == JSON.stringify(this.order))
             return false;
@@ -115,16 +167,9 @@ function dashboard(){
         this.order[i] = i;
         parent_dashboard = this;
         //sert à attendre le retour de la requete
-        this.widgets[i] = new widget(parent_dashboard, this.currentWidgetList[i], i, false, false)
-        $.when(this.widgets[i].ajaxConnexion)
-        .done(function(){
-            length = (typeof(parent_dashboard.currentWidgetList) != "array")? objectSize(parent_dashboard.currentWidgetList) : parent_dashboard.currentWidgetList.length;
-            if(i<length)
-                parent_dashboard.callWidgets();
-            else
-                return true;
-        });
-        i++;
+        for (var i = 0; i < this.currentWidgetList.length; i++) {
+            this.widgets[i] = new widget(parent_dashboard, this.currentWidgetList[i], i, false, false);
+        };
         this.setNextWidgetId(i);
     }
 
@@ -161,7 +206,7 @@ function dashboard(){
     }
 
     this.askNewWidget = function(){
-        new widget(this, "list", i, "addNewWidget", false);
+        new widget(this, {"name":"list", "width":"4"}, this.getNextWidgetId(), "addNewWidget", false);
     }
 
     this.addWidget = function(current){
@@ -171,7 +216,7 @@ function dashboard(){
 
         i = this.getNextWidgetId();
         this.order[i] = i;
-        this.widgets[i] = new widget(this, $(current).val(), i, false, true);
+        this.widgets[i] = new widget(this, {"name":$(current).val(), "width":4}, i, false, true);
         this.currentWidgetList[i] = this.widgets[i].name;
         this.updateWidgetList();
         i++;

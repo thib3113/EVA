@@ -48,7 +48,7 @@ class UsersManager extends SgdbManager{
             return false;
         if(!$this->setPluginsList($PluginsList))
             return false;
-        if(!$this->setDashboardList($DashboardList))
+        if(!$this->setWidgetList($DashboardList))
             return false;
         if(!$this->sgdbSave())
             return false;
@@ -103,7 +103,7 @@ class UsersManager extends SgdbManager{
         return true;
     }
 
-    public function setDashboardList(array $dashboard_list){
+    public function setWidgetList(array $dashboard_list){
         $this->dashboard_list = serialize($dashboard_list);
         return true;
     }
