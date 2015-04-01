@@ -17,11 +17,6 @@ function notify(statut, message){
 
         });
     }
-$.ajaxSetup({
-    headers:{
-        "X-AppInfo" : "web|"+navigator.userAgent
-    }
-});
 
     var last_notif = 0;
     $("form#form_sign_in").submit(function(e) {

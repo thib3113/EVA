@@ -15,8 +15,10 @@
 function API_GET_PING(&$return){
     $return = array(
         "status" => true,
+        "message" => "success",
         "ping" => "pong",
         "version" => PROGRAM_VERSION,
+        "error_code" => 200,
     );
     return $return;
 }
@@ -48,18 +50,30 @@ function API_GET_GPIO_STATE(&$return){
  * @return ???
  */
 function API_GET_CHECK_UPDATE(&$return){
-    global $RaspberryPi, $myUser, $API;
-        if($myUser->is_connect){
-            $RaspberryPi->checkUpdate();
-            $return = array(
-                "status" => true,
-                "message" => "success",
-                "error_code" => 200,
-                );
-        }
-        else{
+    global $API, $myUser, $_;
+        if(!$myUser->is_connect){
             $return = $API["NEED_AUTH"];
+            return $return;
         }
+
+    $curl_handle=curl_init();
+    curl_setopt($curl_handle, CURLOPT_URL,'https://raw.githubusercontent.com/thib3113/EVA/dev/static.php');
+    curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 2);
+    curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl_handle, CURLOPT_USERAGENT, 'Evaproject.net get version');
+    $dev_file = curl_exec($curl_handle);
+    curl_close($curl_handle);
+    preg_match("~define\('PROGRAM_VERSION','([0-9.]+)'\);~", $dev_file, $matches);
+    if(!empty($matches[1]))
+      $developpeur_version = $matches[1];
+
+        $return = array(
+        "status" => true,
+        "message" => "success",
+        "error_code" => 200,
+        "dev_version" => $developpeur_version,
+        );
+        return $return;
 }
 
 function API_GET_WIDGET_ALL(&$return){
@@ -98,13 +112,13 @@ function API_GET_WIDGET_LIST(&$return){
         $return = $API["NEED_AUTH"];
 }
 
-function API_GET_WIDGET_DEFAULT(&$return){
+function API_GET_WIDGET_DEFAULT(&$return, $default_width){
     global $API, $myUser, $_;
     if($myUser->is_connect){
         $return = array(
                         'status' => true,
                         "dash_content" => "Bienvenue sur E.V.A, enjoy !",
-                        "dash_width" => $myUser->getWidget("DEFAULT")["width"],
+                        "dash_width" => (!empty($myUser->getWidget("DEFAULT")["width"])?$myUser->getWidget("DEFAULT")["width"] : $default_width),
                         "dash_title" => "Widget par défaut",
                         "error_code" => 200,
                         );
@@ -113,14 +127,14 @@ function API_GET_WIDGET_DEFAULT(&$return){
         $return = $API["NEED_AUTH"];
 }
 
-function API_GET_WIDGET_NETWORK(&$return){
+function API_GET_WIDGET_NETWORK(&$return, $default_width){
     global $API, $myUser, $_, $system;
     if($myUser->is_connect){
         $return = array(
                         'status' => true, 
                         "dash_title" => "Réseau",
                         "dash_content" => $system->getNetworkInfos() ,
-                        "dash_width" => $myUser->getWidget("NETWORK")["width"],
+                        "dash_width" => (!empty($myUser->getWidget("NETWORK")["width"])?$myUser->getWidget("NETWORK")["width"] : $default_width),
                         "error_code" => 200,
                         );
     }
@@ -128,7 +142,7 @@ function API_GET_WIDGET_NETWORK(&$return){
         $return = $API["NEED_AUTH"];
 }
 
-function API_GET_WIDGET_ACTUAL_USERS(&$return){
+function API_GET_WIDGET_ACTUAL_USERS(&$return, $default_width){
     global $API, $myUser, $_;
     if($myUser->is_connect){
         $avatar = '<img src="'.$myUser->getAvatar().'" alt="avatar de '.$myUser->getName().'" class="img-thumbnail">';
@@ -138,7 +152,7 @@ function API_GET_WIDGET_ACTUAL_USERS(&$return){
                         "message" => "ok", 
                         "dash_title" => "User actif", 
                         "dash_content" => $content, 
-                        "dash_width" => $myUser->getWidget("ACTUAL_USERS")["width"],
+                        "dash_width" => (!empty($myUser->getWidget("ACTUAL_USERS")["width"])?$myUser->getWidget("ACTUAL_USERS")["width"] : $default_width),
                         "error_code" => 200,
                         );
     }
@@ -146,7 +160,7 @@ function API_GET_WIDGET_ACTUAL_USERS(&$return){
         $return = $API["NEED_AUTH"];
 }
 
-function API_GET_WIDGET_LOREM(&$return){
+function API_GET_WIDGET_LOREM(&$return, $default_width){
     global $API, $myUser, $_;
     if($myUser->is_connect){
         $return = array(
@@ -154,7 +168,7 @@ function API_GET_WIDGET_LOREM(&$return){
                         "message" => "ok",
                         "dash_title" => "lorem",
                         "dash_content" => "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam aut sequi nobis corporis veniam voluptatem reiciendis animi necessitatibus fugit! At quos dolor iusto libero. Ullam reiciendis, soluta ea dolore distinctio. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet eaque neque quaerat voluptates obcaecati aspernatur, minima iure quas. Natus ea eius voluptates. Sed iure, iste omnis natus similique quidem fugit",
-                        "dash_width" => $myUser->getWidget("LOREM")["width"],
+                        "dash_width" => (!empty($myUser->getWidget("LOREM")["width"])?$myUser->getWidget("LOREM")["width"] : $default_width),
                         "error_code" => 200,
                         );
     }
@@ -220,10 +234,12 @@ function API_SET_USER_INFO(&$return){
             break;
         }
         $myUser->setUsername($_["username"]);
+        // var_dump($myUser->getPass());
         $myUser->setPass($_["pass"], $myUser->getUsername(), true);
+        // var_dump($myUser->getPass());
         $myUser->setEmail($_["email"]);
-        var_dump($myUser);
-        // $myUser->sgdbSave();
+        // var_dump($myUser);
+        $myUser->sgdbSave();
         $return = array(
             "status" => true,
             "message" => "success",
@@ -242,6 +258,7 @@ function API_SET_USER_INFO(&$return){
  */
 function API_SET_AUTH(&$return){
     global $API, $myUser, $_;
+    // var_dump($_);
     if($myUser->is_connect){
         $return["status"] = false;
         $return["message"] = "deja connecte";
@@ -254,7 +271,7 @@ function API_SET_AUTH(&$return){
             array(
                 "ConnectionOptions" => array(
                     "expiration" => (!empty($_["expire"])? $_["expire"] : time() ),
-                    "appInfos"  => (!empty($_SERVER["HTTP_X_APPINFO"])? $_SERVER["HTTP_X_APPINFO"] : "web|".$_SERVER["HTTP_USER_AGENT"] )
+                    "userAgent"  => $_SERVER["HTTP_USER_AGENT"]
                 )
             ) 
         );
@@ -263,8 +280,31 @@ function API_SET_AUTH(&$return){
             $_['pass'],
             $_['remember_me']
         );
-        if($myUser->is_connect)
-            $return = array("status" => true,  "error_code" => 200, "message" => "Vous êtes connectés");
+        if($myUser->is_connect){
+            $texte = "Vous êtes connectés";
+            if(!empty($_["can_speak"])){
+                $texte = (date("H")>7 && date("H")< 18? "Bonjour" : "Bonsoir").", ".$myUser->getShortName()." . ";
+                $curl_handle=curl_init();
+                curl_setopt($curl_handle, CURLOPT_URL,'http://rss.accuweather.com/rss/liveweather_rss.asp?metric=1&locCode=EUR|FR|FR016|TOULOUSE');
+                curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 2);
+                curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($curl_handle, CURLOPT_USERAGENT, 'EVA get weather http://evaproject.net');
+                $weather_file = curl_exec($curl_handle);
+                preg_match("~currently in ([a-z]*),\s*[^0-9]*([0-9]++)(?:&#176;|\s)*C\s*and\s*([a-z]++)~Uis", $weather_file, $matches);
+                $town = $matches[1];
+                $temp = $matches[2];
+                $weather = $matches[3];
+
+                if($temp < 10)
+                    $texte .= "Il semblerais qu'il fasse froid, $temp °C à $town pour le moment.";
+                elseif($temp > 30)
+                    $texte .= "Il semblerais qu'il fasse chaud, restez au frais . ";
+
+                if(preg_match("~rain|shower~uis", $weather))
+                    $texte .= "Je pense qu'il va pleuvoir à $town, pensez à vous couvrir .";
+            }
+            $return = array("status" => true,  "error_code" => 200, "message" => $texte, "cookies" => json_encode($_COOKIE));
+        }
         else
             $return = array("status" => false, "error_code" => 401, "message" => "Le nom d'utilisateur et/ou le mot de passe est incorrect");
     }
@@ -363,10 +403,10 @@ Plugin::addHook("API_SET_WIDGET_ORDER", "API_SET_WIDGET_ORDER", array(&$return))
 Plugin::addHook("API_SET_WIDGET_WIDTH", "API_SET_WIDGET_WIDTH", array(&$return));
 
 //liste de widget initiaux
-Plugin::addHook("API_GET_WIDGET_DEFAULT", "API_GET_WIDGET_DEFAULT", array(&$return), array("title" => "DEFAULT"));
-// Plugin::addHook("API_GET_WIDGET_NETWORK", "API_GET_WIDGET_NETWORK", array(&$return), array("title" => "Réseau"));
-Plugin::addHook("API_GET_WIDGET_ACTUAL_USERS", "API_GET_WIDGET_ACTUAL_USERS", array(&$return), array("title" => "Users actif"));
-Plugin::addHook("API_GET_WIDGET_LOREM", "API_GET_WIDGET_LOREM", array(&$return), array("title" => "Lorem Ipsum"));
+Plugin::addHook("API_GET_WIDGET_DEFAULT", "API_GET_WIDGET_DEFAULT", array(&$return, "width" => 8), array("title" => "DEFAULT"));
+// Plugin::addHook("API_GET_WIDGET_NETWORK", "API_GET_WIDGET_NETWORK", array(&$return, "width" => 4), array("title" => "Réseau"));
+Plugin::addHook("API_GET_WIDGET_ACTUAL_USERS", "API_GET_WIDGET_ACTUAL_USERS", array(&$return, "width" => 4), array("title" => "Users actif"));
+Plugin::addHook("API_GET_WIDGET_LOREM", "API_GET_WIDGET_LOREM", array(&$return, "width" => 8), array("title" => "Lorem Ipsum"));
 
 Plugin::addHook("API_SET_USER_INFO", "API_SET_USER_INFO", array(&$return));
 Plugin::addHook("API_SET_GPIO_STATE", "API_SET_GPIO_STATE", array(&$return));

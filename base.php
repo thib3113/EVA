@@ -18,7 +18,7 @@ $config = new Configuration();
 $myUser = new User(array(
                 "ConnectionOptions" => array(
                     "expiration" => (!empty($_["expire"])? $_["expire"] : time() ),
-                    "appInfos"  => (!empty($_SERVER["HTTP_X_APPINFO"])? $_SERVER["HTTP_X_APPINFO"] : "web|".$_SERVER["HTTP_USER_AGENT"] )
+                    "userAgent"  => $_SERVER["HTTP_USER_AGENT"]
                 )
             ));
 $plugins = new Plugin();
@@ -45,6 +45,8 @@ $GLOBALS = array();
 //on charge les plugins jquery de base
 //Jquery
 Configuration::addJs("//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js");
+//jquery-ui
+Configuration::addJs('vues/js/jquery-ui.min.js');
 //bootstrap
 Configuration::addJs("https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js");
 //noty

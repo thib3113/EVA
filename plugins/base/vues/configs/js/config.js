@@ -200,7 +200,7 @@ $("#profil_update").submit(function(){
   }
   $.ajax({
         type: "POST",
-        url: api_url+"?set=user_info",
+        url: api_url+"?type=SET&API=USER_INFO",
         data: {username : username, pass:pass, email:email},
         success: function(json){
           var data = JSON.parse(json);
@@ -214,3 +214,35 @@ $("#profil_update").submit(function(){
     });
   return false;
 })
+
+
+//////////////////
+// CHECK UPDATE //
+//////////////////
+
+$("#check_update").click(function(){
+
+  $.ajax({
+        type: "GET",
+        url: api_url+"?type=GET&API=CHECK_UPDATE",
+        success: function(json){
+          var data = JSON.parse(json);
+          if(data.status){             
+            var result = data.dev_version.replace(/\./mg, "");
+            var res = program_version.replace(/\./mg, "");
+            if(res < result){
+              //pas à jour
+              $("#check_update_result").html("Une mise à jour est disponible, rendez vous dans le dossier d'installation de EVA, et faite la commande suivante : <br> <kdb>sudo git pull</kdb>")
+              notify("success", "Une mise à jour est diponible");  
+            }
+            else{
+              notify("success", "Votre version est à jour");
+            }
+          }
+        },
+        error: function(data){
+          notify("error", "une erreur c'est produite, reessayer ultérieurement");
+        }
+    });
+  // program_version
+});

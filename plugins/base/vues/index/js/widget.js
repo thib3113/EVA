@@ -63,7 +63,7 @@ function widget(parent, widget_info, id, special, new_widget){
     }
 
     this.setWidth = function(width){
-        this.width = parseInt(width);
+        this.width = parseInt(width) || 4;
     }
 
     this.setHTML = function(HTML){
@@ -71,6 +71,10 @@ function widget(parent, widget_info, id, special, new_widget){
             this.HTML = HTML;
         else
             this.HTML = false;
+    }
+
+    this.export = function(){
+        return {name:this.getName(), width:this.getWidth(), id:this.getId()}
     }
 
     this.createWidget = function(type){
@@ -103,12 +107,12 @@ function widget(parent, widget_info, id, special, new_widget){
 \t\t\t\t\t\t\t\t\t<div data-role="refresh_widget" class="config-icon">\n\
 \t\t\t\t\t\t\t\t\t\t<i class="md-refresh"></i>\n\
 \t\t\t\t\t\t\t\t\t</div>\n\
-\t\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t\t\t</div>\n<!--\
 \t\t\t\t\t\t\t\t<div class="config">\n\
-\t\t\t\t\t\t\t\t\t<div class="config-icon">\n\
+\t\t\t\t\t\t\t\t\t<div data-role="remove" class="config-icon">\n\
 \t\t\t\t\t\t\t\t\t\t<i class="md-close"></i>\n\
 \t\t\t\t\t\t\t\t\t</div>\n\
-\t\t\t\t\t\t\t\t</div>\n\
+\t\t\t\t\t\t\t\t</div>-->\n\
 \t\t\t\t\t\t\t</div>\n\
 \t\t\t\t\t\t</div>\n\
 \t\t\t\t\t</div>\n\

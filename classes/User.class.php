@@ -4,6 +4,8 @@
 Class User extends SgdbManager{
     protected $id;
     protected $username;
+    protected $forname;
+    protected $lastname;
     protected $pass;
     protected $group_id;
     protected $email;
@@ -15,6 +17,8 @@ Class User extends SgdbManager{
     protected $object_fields= array(
                                     'id'             => 'key',
                                     'username'       => 'string',
+                                    'forname'       => 'string',
+                                    'lastname'       => 'string',
                                     'pass'           => 'string',
                                     'group_id'       => 'int',
                                     'email'          => 'longstring',
@@ -240,7 +244,11 @@ Class User extends SgdbManager{
     }
 
     public function getName(){
-        return !empty($this->name) && !empty($this->forname)? $this->username." ".$this->forname : $this->username;
+        return !empty($this->lastname) && !empty($this->forname)? $this->forname." ".$this->lastname : $this->username;
+    }
+
+    public function getShortName(){
+        return !empty($this->forname) ? $this->forname : $this->username;
     }
 
     /*******************

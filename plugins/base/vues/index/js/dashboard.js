@@ -1,7 +1,6 @@
 function dashboard(){
     this.lastWidgetId = 0;
     this.DonneesRecu;
-    this.currentWidgetList = [];
     this.widgets = [];
     this.nextWidgetId = 0;
     this.newOrderRequest;
@@ -13,11 +12,11 @@ function dashboard(){
     }
 
     this.setCurrentWidgetList = function(currentWidgetList){
-        this.currentWidgetList = currentWidgetList;
+        this.widgets = currentWidgetList;
     }
 
     this.addToWidgetList = function(new_widget){
-        this.currentWidgetList.push(new_widget);
+        this.widgets.push(new_widget);
     }
 
     this.setNextWidgetId = function(nextWidgetId){
@@ -31,7 +30,7 @@ function dashboard(){
     }
 
     this.getCurrentWidgetList = function(currentWidgetList){
-        return this.currentWidgetList;
+        return this.widgets;
     }
 
     this.getWidgetById = function(id){
@@ -76,7 +75,7 @@ function dashboard(){
         });
     }
 
-    this.setWidgetWidth = function(widget_id, width){
+    this.setWidgetWidth = function(widget_id, width, callback){
         w = this.getWidgetById(widget_id);
         w.changeWidth(width);
         if(this.newWidthRequest != null )
@@ -92,6 +91,7 @@ function dashboard(){
                     donneesRecu = $.parseJSON(data);
                     if(donneesRecu.status){
                         parent.setDonneesRecu(donneesRecu);
+                        callback();
                     }
                     else{
                         return false;
@@ -108,15 +108,13 @@ function dashboard(){
         });
     }
 
-    this.removeWidget = function(id){
-        
-    }
-
     this.refreshWidget = function(id){
         this.widgets[id] = new widget(this, this.widgets[id], id);
     }
 
     this.newOrder = function(newOrder){
+
+        console.log(newOrder);
 
         //si le tableau n'as qu'une valeur, il n'y à pas d'ordre
         if(newOrder.length < 2)
@@ -167,10 +165,21 @@ function dashboard(){
         this.order[i] = i;
         parent_dashboard = this;
         //sert à attendre le retour de la requete
-        for (var i = 0; i < this.currentWidgetList.length; i++) {
-            this.widgets[i] = new widget(parent_dashboard, this.currentWidgetList[i], i, false, false);
+        for (var i = 0; i < this.widgets.length; i++) {
+            this.widgets[i] = new widget(parent_dashboard, this.widgets[i], i, false, false);
         };
         this.setNextWidgetId(i);
+    }
+
+    this.exportAllWidgets = function(){
+        temp = [];
+        for (var i = this.widgets.length - 1; i >= 0; i--) {
+            temp [i] = this.widgets[i].export();
+
+        console.log(this.widgets[i]);
+        };
+        console.log(temp);
+        return temp;
     }
 
     this.updateWidgetList = function(){
@@ -180,7 +189,7 @@ function dashboard(){
             url: api_url+'?type=SET&API=WIDGET_LIST',
             datatype: 'json',
             type: "POST",
-            data: {widget_list : this.currentWidgetList, expiration : new Date().getTime()+3000},
+            data: {widget_list : this.exportAllWidgets(), expiration : new Date().getTime()+3000},
             success: function(data){
                 // La fonction à éxécuter avec les données recu
                 try{
@@ -188,17 +197,17 @@ function dashboard(){
                     if(donneesRecu.status){
                     }
                     else{
-                        notify("error", "erreur lors de la sauvegarde de l'ajout du widget");
+                        notify("error", "erreur lors de la mise à jour des widgets");
                     }
                 }
                 catch(e){
-                    notify("error", "erreur lors de la sauvegarde de l'ajout du widget");
+                    notify("error", "erreur lors de la mise à jour des widgets");
                     console.log(e);
                 }
                 return false;
             },
             error: function(data){
-                    notify("error", "erreur lors de la sauvegarde de l'ajout du widget");
+                    notify("error", "erreur lors de la mise à jour des widgets");
                 return false;
             }
 
@@ -217,7 +226,7 @@ function dashboard(){
         i = this.getNextWidgetId();
         this.order[i] = i;
         this.widgets[i] = new widget(this, {"name":$(current).val(), "width":4}, i, false, true);
-        this.currentWidgetList[i] = this.widgets[i].name;
+         console.log(this.widgets[i]);
         this.updateWidgetList();
         i++;
         this.setNextWidgetId(i);

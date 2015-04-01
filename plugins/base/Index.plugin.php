@@ -5,7 +5,6 @@ function affich_index(){
 
     if($myUser->is_connect){
         Configuration::setTemplateInfos(array("tpl" => __DIR__.'/vues/index/index.tpl'));
-        Configuration::addJs('vues/js/jquery-ui.min.js');
         Configuration::addJs('plugins/base/vues/index/js/widget.js');
         Configuration::addJs('plugins/base/vues/index/js/dashboard.js');
         Configuration::addJs('plugins/base/vues/index/js/index.js');

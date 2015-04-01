@@ -8,7 +8,6 @@ if($myUser->is_connect){
         Plugin::callHook("header");
         Plugin::callHook("pre_content");
 
-        Configuration::addJs('vues/js/jquery-ui.min.js');
         Configuration::addJs("plugins/base/vues/configs/js/config.js");
 
         //accueil
@@ -16,7 +15,7 @@ if($myUser->is_connect){
 
         $yourRaspberryPi = "Type : ".$RaspberryPi->getRaspVersion()." <br>
         Révision : ".$RaspberryPi->getInfos("revision").'<br>
-        Nombre de pins : '.$RaspberryPi->getNumberOfPins().' et '.$RaspberryPi->getNumberOfOptionalPins().' pins optionnels <i title="non activable actuellement" class="fa fa-question-circle"></i> <br>
+        Nombre de pins : '.$RaspberryPi->getNumberOfPins().' et '.$RaspberryPi->getNumberOfOptionalPins().' pins optionnels <i title="necessite une intervention physique" class="fa fa-question-circle"></i> <br>
         dont '.$nb_wiring_pi.' pin'.($nb_wiring_pi>1? 's' : '').' controllable'.($nb_wiring_pi>1? 's' : '').' <br>
          <a href="http://fr.wikipedia.org/wiki/OS" title="Operating System">OS</a> : '.$RaspberryPi->getInfos('distribution', true).' '.$RaspberryPi->getInfos('version');
         $smarty->assign('yourRaspberryPi', $yourRaspberryPi);
@@ -32,6 +31,7 @@ if($myUser->is_connect){
 
         //mise à jour
         $erreur = array();
+        $smarty->assign("miseajourdispo", true);
         // $smarty->assign("erreur_maj", $erreur);
 
 

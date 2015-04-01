@@ -4,3 +4,4 @@ cache/templates_c/*
 config\.php
 plugins/*
 !plugins/base
+test.php

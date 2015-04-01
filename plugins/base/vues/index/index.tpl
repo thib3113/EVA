@@ -52,7 +52,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                <button type="button" data-role="valid_width" class="btn btn-primary">Sauvegarder</button>
+                <button type="button" data-loading-text="Loading..." data-role="valid_width" class="btn btn-primary">Sauvegarder</button>
               </div>
             </div><!-- /.modal-content -->
           </div><!-- /.modal-dialog -->

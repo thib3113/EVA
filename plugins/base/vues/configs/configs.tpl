@@ -115,22 +115,8 @@
         </div>
       </div>
       <div style="display:none;" id="tab_mise_a_jour">
-          {if !$erreur_maj}
-          
-          {else}
-        <div class="panel panel-danger">
-          <div class="panel-heading">
-              <h3 class="panel-title">Les erreurs suivantes sont apparus</h3>
-          </div>
-          <div class="panel-body">
-            <ul>
-            {foreach from=$erreur_maj item=erreur}
-              <li>{$erreur}</li>
-            {/foreach}
-            </ul>
-          </div>
-        </div>
-          {/if}
+              <div id="check_update_result"></div>
+              <button id="check_update" class="btn btn-primary">Rechercher une mise à jour</button>
       </div>
   </div>
 </div>

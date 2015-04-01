@@ -3,7 +3,9 @@ Class Connection extends SgdbManager{
     protected $id;
     protected $uid;
     protected $token;
-    protected $appInfos;
+    protected $userAgent;
+    protected $application = 'web';
+    protected $app_can_speak;
     protected $current_ip;
     protected $ips;
     protected $time;
@@ -14,7 +16,9 @@ Class Connection extends SgdbManager{
                                'id'            => 'key',
                                'uid'           => 'TEXT',
                                'token'         => 'TEXT',
-                               'appInfos'      => 'TEXT',
+                               'userAgent'     => 'TEXT',
+                               'application'   => 'TEXT',
+                               'app_can_speak' => 'boolean',
                                'ips'           => 'TEXT',
                                'time'          => 'int',
                                'userId'        => 'int',
@@ -81,7 +85,7 @@ Class Connection extends SgdbManager{
         $this->setUserId($result["id"]);
 
         //on cherche une uid déjà existante pour cet utilisateur
-        $result = SgdbManager::sgbdSelect(array('*'), array("userId" => $result['id'], "appInfos" => $this->appInfos ), null, null, null, null,  __FILE__, __LINE__ );
+        $result = SgdbManager::sgbdSelect(array('*'), array("userId" => $result['id'], "userAgent" => $this->userAgent ), null, null, null, null,  __FILE__, __LINE__ );
         $result = $result->fetch();
 
         if($result){
@@ -107,6 +111,10 @@ Class Connection extends SgdbManager{
         //on vide le cookie en le faisant expirer il y à une heure
         setcookie($this->cookie_name, "", time()-3600, '/' );
         $_COOKIE[$this->cookie_name] = NULL;
+    }
+
+    public function can_speak(){
+        return $this->app_can_speak;
     }
 
     public function alreadyOpen(){
@@ -206,7 +214,7 @@ Class Connection extends SgdbManager{
     }
 
     public function setApp($app){
-        $this->appInfos = $app;
+        $this->userAgent = $app;
     }
 
     public function saveIp(){
@@ -264,15 +272,15 @@ Class Connection extends SgdbManager{
     }
 
     /**
-     * Sets the value of appInfos.
+     * Sets the value of userAgent.
      *
-     * @param mixed $appInfos the app infos
+     * @param mixed $userAgent the app infos
      *
      * @return self
      */
-    public function setAppInfos($appInfos)
+    public function setuserAgent($userAgent)
     {
-        $this->appInfos = $appInfos;
+        $this->userAgent = $userAgent;
 
         return $this;
     }
@@ -336,5 +344,53 @@ Class Connection extends SgdbManager{
     public function getUsername()
     {
         return $this->username;
+    }
+
+    /**
+     * Gets the value of application.
+     *
+     * @return mixed
+     */
+    public function getApplication()
+    {
+        return $this->application;
+    }
+
+    /**
+     * Sets the value of application.
+     *
+     * @param mixed $application the application
+     *
+     * @return self
+     */
+    protected function setApplication($application)
+    {
+        $this->application = $application;
+
+        return $this;
+    }
+
+    /**
+     * Gets the value of app_can_speak.
+     *
+     * @return mixed
+     */
+    public function getAppCanSpeak()
+    {
+        return $this->app_can_speak;
+    }
+
+    /**
+     * Sets the value of app_can_speak.
+     *
+     * @param mixed $app_can_speak the app can speak
+     *
+     * @return self
+     */
+    protected function setAppCanSpeak($app_can_speak)
+    {
+        $this->app_can_speak = $app_can_speak;
+
+        return $this;
     }
 }

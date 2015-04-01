@@ -37,12 +37,23 @@ $(function () {
         $('#width_modal').modal('show');
     });
 
+    $("body").on("click", "[data-role='remove']", function(){
+        widget_id = $(this).parents(".dashboard_element").data("widget-id");
+        $("[data-widget-id='"+widget_id+"']").remove();
+        dashboard.widgets = dashboard.widgets.slice(widget_id, 1);
+        dashboard.updateWidgetList();
+        console.log(dashboard.currentWidgetList);
+    });
+
     $("body").on("click", "[data-role='valid_width']", function(){
         if(isNaN(widget_id))
             return false;
 
-        dashboard.setWidgetWidth(widget_id,$("#change_width").val());
-        $('#width_modal').modal('hide');
+        $btn = $("[data-role='valid_width']").button('loading');
+        dashboard.setWidgetWidth(widget_id,$("#change_width").val(), function(){
+            $('#width_modal').modal('hide');
+            $btn.button('reset')            
+        });
     });
 
     var select = $( "#change_width" );
@@ -70,9 +81,9 @@ $(function () {
         dashboard.refreshWidget(widget_id);
     });
 
-    $("body").on("click", "[data-role='delete_widget']", function(){
+    // $("body").on("click", "[data-role='delete_widget']", function(){
         
-    });
+    // });
 
     $("body").on("click", ".widget_menu_icon", function(event){
         widget_id = $(this).parents(".dashboard_element").data("widget-id");
